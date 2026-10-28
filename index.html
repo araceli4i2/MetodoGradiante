@@ -1273,14 +1273,103 @@
     </section>
 
     <!-- SECCIÓN 9: MÓDULO QA -->
-    <section id="sec-modulo-qa" class="content-section hidden space-y-4">
+    <section id="sec-modulo-qa" class="content-section hidden space-y-6">
       <div class="retro-panel rounded-lg p-6 border-cyan-500/50">
-        <h2 class="text-2xl md:text-3xl font-bold text-white neon-glow mb-4">
-          9. Módulo QA
-        </h2>
-        <div class="border border-dashed border-cyan-700/60 bg-black/40 p-8 rounded text-center">
-          <p class="text-cyan-400 tracking-wider uppercase text-lg">[ En construcción ]</p>
+        <div class="flex items-center space-x-2 text-cyan-400 text-sm mb-3">
+          <span class="cursor-blink">></span>
+          <span>SISTEMA DE AUDITORÍA Y ASEGURAMIENTO DE CALIDAD // VERIFICACIÓN EN VIVO</span>
         </div>
+
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-5">
+          <div>
+            <h2 class="text-2xl md:text-3xl font-bold text-white neon-glow">
+              9. Módulo QA
+            </h2>
+            <p class="text-xs text-cyan-300 mt-1">
+              Batería de pruebas automatizadas en tiempo real: validación de escenarios, captura preventiva de errores, reactividad y verificación de convergencia precondicionada.
+            </p>
+          </div>
+
+          <!-- Botón de ejecución y resumen -->
+          <div class="flex flex-wrap items-center gap-3">
+            <div id="badge-qa-resumen" class="px-3 py-1.5 rounded text-xs font-mono font-bold bg-cyan-950 border border-cyan-500 text-cyan-300 shadow-[0_0_10px_rgba(0,240,255,0.2)]">
+              ESTADO: PENDIENTE DE EJECUCIÓN
+            </div>
+            <button id="btn-ejecutar-qa" type="button" class="py-2 px-4 bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-xs uppercase tracking-wider rounded font-mono transition-all flex items-center gap-2 cursor-pointer shadow-[0_0_15px_rgba(0,240,255,0.4)]">
+              <span>⚡</span> EJECUTAR PRUEBAS
+            </button>
+          </div>
+        </div>
+
+        <!-- Tarjetas de Resumen de Diagnóstico QA -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div class="border border-cyan-900 bg-black/60 p-3.5 rounded flex flex-col justify-between">
+            <span class="text-[11px] text-gray-400 uppercase font-mono">1. Carga de Escenarios</span>
+            <div id="qa-stat-escenarios" class="text-sm font-bold text-gray-400 font-mono mt-1">--</div>
+            <span class="text-[10px] text-gray-500 font-mono mt-1">Ideal, Estrés, Mal cond.</span>
+          </div>
+
+          <div class="border border-cyan-900 bg-black/60 p-3.5 rounded flex flex-col justify-between">
+            <span class="text-[11px] text-gray-400 uppercase font-mono">2. Manejo de Excepciones</span>
+            <div id="qa-stat-excepciones" class="text-sm font-bold text-gray-400 font-mono mt-1">--</div>
+            <span class="text-[10px] text-gray-500 font-mono mt-1">Asimetría &amp; No-SPD</span>
+          </div>
+
+          <div class="border border-cyan-900 bg-black/60 p-3.5 rounded flex flex-col justify-between">
+            <span class="text-[11px] text-gray-400 uppercase font-mono">3. Reactividad &amp; Recálculo</span>
+            <div id="qa-stat-reactividad" class="text-sm font-bold text-gray-400 font-mono mt-1">--</div>
+            <span class="text-[10px] text-gray-500 font-mono mt-1">Cholesky, GCP &amp; Errores</span>
+          </div>
+
+          <div class="border border-cyan-900 bg-black/60 p-3.5 rounded flex flex-col justify-between">
+            <span class="text-[11px] text-gray-400 uppercase font-mono">4. Aceleración GCP</span>
+            <div id="qa-stat-convergencia" class="text-sm font-bold text-gray-400 font-mono mt-1">--</div>
+            <span class="text-[10px] text-gray-500 font-mono mt-1">it_GCP ≤ it_GC en κ > 2000</span>
+          </div>
+        </div>
+
+        <!-- Tabla QA: Entrada, Resultado Esperado, Resultado Obtenido, Conclusión -->
+        <div class="border border-cyan-800 bg-black/60 rounded-lg p-4 overflow-x-auto">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-cyan-900 pb-3 mb-3">
+            <h3 class="text-sm font-bold text-cyan-300 uppercase tracking-wider flex items-center gap-2 font-mono">
+              <span>BATERÍA DE PRUEBAS UNITARIAS Y DE INTEGRACIÓN (DAT-242)</span>
+            </h3>
+            <span class="text-[11px] text-gray-400 font-mono">
+              Evaluación en tiempo real en el navegador
+            </span>
+          </div>
+
+          <table class="w-full text-xs text-left border-collapse font-mono">
+            <thead>
+              <tr class="text-cyan-400 border-b border-cyan-800 bg-cyan-950/40">
+                <th class="p-3 w-1/5">Entrada</th>
+                <th class="p-3 w-1/4">Resultado Esperado</th>
+                <th class="p-3 w-2/5">Resultado Obtenido</th>
+                <th class="p-3 w-1/6 text-center">Conclusión</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-qa" class="divide-y divide-cyan-950 text-gray-200">
+              <!-- Se llena dinámicamente mediante js/qa.js con resultados en vivo -->
+              <tr>
+                <td class="p-4 text-center text-gray-400 italic" colspan="4">
+                  Haga clic en "EJECUTAR PRUEBAS" para iniciar la auditoría numérica en tiempo real...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Consola de Auditoría QA -->
+        <div class="border border-cyan-900 bg-black/80 rounded-lg p-3 font-mono text-xs">
+          <div class="flex justify-between items-center text-[11px] text-gray-400 border-b border-cyan-950 pb-1 mb-2">
+            <span class="text-cyan-400 font-bold">> TERMINAL DE LOGS QA</span>
+            <span id="qa-tiempo-total">Tiempo de ejecución: 0 ms</span>
+          </div>
+          <div id="qa-log-consola" class="space-y-1 text-[11px] text-gray-300 max-h-36 overflow-y-auto">
+            <div class="text-gray-500">// Módulo QA listo para iniciar batería de pruebas.</div>
+          </div>
+        </div>
+
       </div>
     </section>
 
@@ -1317,6 +1406,7 @@
   <script src="js/linalg.js"></script>
   <script src="js/solvers.js"></script>
   <script src="js/ui.js"></script>
+  <script src="js/qa.js"></script>
 </body>
 </html>
 
