@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DAT-242 // Optimización de Cartera Markowitz</title>
+  
+  <!-- Tailwind CSS por CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Estilos personalizados retro/arcade -->
+  <link rel="stylesheet" href="css/retro.css">
+</head>
+<body class="scanlines text-cyan-100 flex flex-col min-h-screen">
+
+  <!-- Encabezado Arcade / Terminal Superior -->
+  <header class="border-b border-cyan-500/40 bg-black/60 backdrop-blur sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-4">
+      <div>
+        <div class="flex items-center space-x-2">
+          <span class="inline-block w-3 h-3 bg-cyan-400 rounded-full animate-ping"></span>
+          <span class="text-xs uppercase tracking-widest text-cyan-400 font-bold">UMSA · DAT-242 · MÉTODOS NUMÉRICOS</span>
+        </div>
+        <h1 class="text-xl md:text-2xl font-bold tracking-tight text-white neon-glow">
+          OPTIMIZACIÓN DE CARTERA MARKOWITZ
+        </h1>
+        <p class="text-xs text-cyan-300">
+          Estudiante: <span class="text-white">Raquel Serrano</span> | Mención: <span class="text-cyan-400">IA y Ciencia de Datos</span>
+        </p>
+      </div>
+
+      <div class="flex items-center space-x-3">
+        <span class="hidden md:inline-flex items-center px-2.5 py-1 text-xs border border-cyan-500/50 bg-cyan-950/40 text-cyan-300 rounded">
+          <span class="w-2 h-2 bg-emerald-400 rounded-full mr-2"></span> TERMINAL LISTA
+        </span>
+        
+        <!-- Botón menú móvil -->
+        <button id="mobile-menu-btn" class="md:hidden border border-cyan-500 px-3 py-1 text-cyan-300 hover:bg-cyan-900/40 rounded text-sm flex items-center gap-1" aria-label="Abrir menú">
+          <span>☰</span> MENÚ
+        </button>
+      </div>
+    </div>
+
+    <!-- Menú Móvil Desplegable -->
+    <nav id="mobile-nav" class="hidden md:hidden border-t border-cyan-800 bg-black/95 px-4 py-3">
+      <div class="grid grid-cols-2 gap-2 text-xs">
+        <button class="nav-btn p-2 border border-cyan-700/60 text-left rounded" data-target="sec-inicio">1. Inicio</button>
+        <button class="nav-btn p-2 border border-cyan-700/60 text-left rounded" data-target="sec-caso-estudio">2. Caso de estudio</button>
+        <button class="nav-btn p-2 border border-cyan-700/60 text-left rounded" data-target="sec-formulacion">3. Formulación</button>
+        <button class="nav-btn p-2 border border-cyan-700/60 text-left rounded" data-target="sec-entrada-datos">4. Entrada de datos</button>
+        <button class="nav-btn p-2 border border-cyan-700/60 text-left rounded" data-target="sec-tres-escenarios">5. Tres escenarios</button>
+        <button class="nav-btn p-2 border border-cyan-700/60 text-left rounded" data-target="sec-solucion-referencia">6. Solución referencia</button>
+        <button class="nav-btn p-2 border border-cyan-700/60 text-left rounded" data-target="sec-gcp-vs-gc">7. GCP vs GC</button>
+        <button class="nav-btn p-2 border border-cyan-700/60 text-left rounded" data-target="sec-analisis-errores">8. Análisis errores</button>
+        <button class="nav-btn p-2 border border-cyan-700/60 text-left rounded" data-target="sec-modulo-qa">9. Módulo QA</button>
+        <button class="nav-btn p-2 border border-cyan-700/60 text-left rounded" data-target="sec-conclusiones-referencias">10. Conclusiones y Ref.</button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Barra de navegación Desktop (10 secciones) -->
+  <nav class="hidden md:block bg-black/50 border-b border-cyan-900/80 sticky top-[73px] z-30 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 py-2">
+      <div class="flex flex-wrap gap-1.5 justify-start text-xs">
+        <button class="nav-btn px-3 py-1.5 border border-cyan-800 rounded bg-cyan-950/20 hover:bg-cyan-900/40 text-cyan-200" data-target="sec-inicio">
+          1. Inicio
+        </button>
+        <button class="nav-btn px-3 py-1.5 border border-cyan-800 rounded bg-cyan-950/20 hover:bg-cyan-900/40 text-cyan-200" data-target="sec-caso-estudio">
+          2. Caso de estudio
+        </button>
+        <button class="nav-btn px-3 py-1.5 border border-cyan-800 rounded bg-cyan-950/20 hover:bg-cyan-900/40 text-cyan-200" data-target="sec-formulacion">
+          3. Formulación
+        </button>
+        <button class="nav-btn px-3 py-1.5 border border-cyan-800 rounded bg-cyan-950/20 hover:bg-cyan-900/40 text-cyan-200" data-target="sec-entrada-datos">
+          4. Entrada de datos
+        </button>
+        <button class="nav-btn px-3 py-1.5 border border-cyan-800 rounded bg-cyan-950/20 hover:bg-cyan-900/40 text-cyan-200" data-target="sec-tres-escenarios">
+          5. Tres escenarios
+        </button>
+        <button class="nav-btn px-3 py-1.5 border border-cyan-800 rounded bg-cyan-950/20 hover:bg-cyan-900/40 text-cyan-200" data-target="sec-solucion-referencia">
+          6. Solución de referencia
+        </button>
+        <button class="nav-btn px-3 py-1.5 border border-cyan-800 rounded bg-cyan-950/20 hover:bg-cyan-900/40 text-cyan-200" data-target="sec-gcp-vs-gc">
+          7. GCP vs GC
+        </button>
+        <button class="nav-btn px-3 py-1.5 border border-cyan-800 rounded bg-cyan-950/20 hover:bg-cyan-900/40 text-cyan-200" data-target="sec-analisis-errores">
+          8. Análisis de errores
+        </button>
+        <button class="nav-btn px-3 py-1.5 border border-cyan-800 rounded bg-cyan-950/20 hover:bg-cyan-900/40 text-cyan-200" data-target="sec-modulo-qa">
+          9. Módulo QA
+        </button>
+        <button class="nav-btn px-3 py-1.5 border border-cyan-800 rounded bg-cyan-950/20 hover:bg-cyan-900/40 text-cyan-200" data-target="sec-conclusiones-referencias">
+          10. Conclusiones y Referencias
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Contenedor Principal de Secciones -->
+  <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-8">
+
+    <!-- SECCIÓN 1: INICIO -->
+    <section id="sec-inicio" class="content-section space-y-6">
+      <div class="retro-panel rounded-lg p-6 border-cyan-500/50">
+        <div class="flex items-center space-x-2 text-cyan-400 text-sm mb-3">
+          <span class="cursor-blink">></span>
+          <span>TERMINAL DE CONTROL // DAT-242 MÉTODOS NUMÉRICOS</span>
+        </div>
+        
+        <h2 class="text-2xl md:text-3xl font-bold text-white neon-glow mb-2">
+          1. Inicio
+        </h2>
+        
+        <div class="border-b border-cyan-800/80 pb-4 mb-4">
+          <h3 class="text-lg md:text-xl text-cyan-300 font-semibold">
+            Optimización de Cartera Markowitz mediante Gradientes Conjugados y Precondicionado
+          </h3>
+          <div class="mt-2 flex flex-wrap gap-x-6 gap-y-1 text-xs text-gray-300">
+            <div><span class="text-cyan-400">Estudiante:</span> Raquel Serrano</div>
+            <div><span class="text-cyan-400">Materia:</span> DAT-242 Métodos Numéricos</div>
+            <div><span class="text-cyan-400">Institución:</span> UMSA</div>
+            <div><span class="text-cyan-400">Mención:</span> Inteligencia Artificial y Ciencia de Datos</div>
+          </div>
+        </div>
+
+        <div class="border-l-2 border-cyan-400 pl-4 py-1 text-sm md:text-base text-gray-200 leading-relaxed space-y-1">
+          <p>Aplicación interactiva para resolver el problema de optimización de carteras de Markowitz mediante el sistema lineal Σx = μ.</p>
+          <p>Contrasta la solución exacta por Cholesky frente a los métodos iterativos de Gradientes Conjugados (GC) y GC Precondicionado (GCP Jacobi).</p>
+          <p>Evalúa convergencia, estabilidad y precisión numérica bajo la tolerancia estricta ‖r‖/‖b‖ &lt; 10⁻⁶ en tres escenarios financieros.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+          <div class="border border-cyan-700/60 bg-black/40 p-4 rounded">
+            <h4 class="text-cyan-300 font-bold mb-1 flex items-center gap-2 text-sm">
+              <span class="text-xs bg-cyan-900/60 px-1.5 py-0.5 rounded border border-cyan-500/40">ACTIVOS</span>
+              Portafolio Cuádruple
+            </h4>
+            <p class="text-xs text-gray-400">
+              Evaluación sobre 4 activos tecnológicos: AAPL, MSFT, GOOGL y AMZN.
+            </p>
+          </div>
+          <div class="border border-cyan-700/60 bg-black/40 p-4 rounded">
+            <h4 class="text-cyan-300 font-bold mb-1 flex items-center gap-2 text-sm">
+              <span class="text-xs bg-cyan-900/60 px-1.5 py-0.5 rounded border border-cyan-500/40">ALGORITMOS</span>
+              Cholesky, GC y GCP
+            </h4>
+            <p class="text-xs text-gray-400">
+              Cholesky como referencia exacta y solvers iterativos basados en Suñagua (2020).
+            </p>
+          </div>
+          <div class="border border-cyan-700/60 bg-black/40 p-4 rounded">
+            <h4 class="text-cyan-300 font-bold mb-1 flex items-center gap-2 text-sm">
+              <span class="text-xs bg-cyan-900/60 px-1.5 py-0.5 rounded border border-cyan-500/40">CONDICIÓN</span>
+              3 Escenarios de Prueba
+            </h4>
+            <p class="text-xs text-gray-400">
+              Contraste de estabilidad en escenarios Ideal, Bajo estrés y Mal condicionado.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 2: CASO DE ESTUDIO -->
+    <section id="sec-caso-estudio" class="content-section hidden space-y-6">
+      <div class="retro-panel rounded-lg p-6 border-cyan-500/50">
+        <div class="flex items-center space-x-2 text-cyan-400 text-sm mb-3">
+          <span class="cursor-blink">></span>
+          <span>ANÁLISIS FINANCIERO Y MODELO MATRICIAL</span>
+        </div>
+
+        <h2 class="text-2xl md:text-3xl font-bold text-white neon-glow mb-4">
+          2. Caso de estudio
+        </h2>
+
+        <!-- Contexto de Markowitz -->
+        <div class="space-y-3 text-sm md:text-base text-gray-300 leading-relaxed">
+          <h3 class="text-lg text-cyan-300 font-bold">Contexto del Modelo de Markowitz</h3>
+          <p>
+            La Teoría Moderna de Portafolios (Markowitz, 1952) establece que los inversores racionales buscan maximizar 
+            el retorno esperado de su cartera para un nivel de riesgo dado, o minimizar el riesgo (varianza) para un nivel 
+            de retorno objetivo. La interacción y correlación entre los activos permite diversificar el riesgo no sistemático 
+            del mercado.
+          </p>
+          <p>
+            En este proyecto se analiza una cartera conformada por cuatro activos tecnológicos clave del índice S&amp;P 500: 
+            <strong class="text-cyan-200">Apple Inc. (AAPL)</strong>, 
+            <strong class="text-cyan-200">Microsoft Corp. (MSFT)</strong>, 
+            <strong class="text-cyan-200">Alphabet Inc. (GOOGL)</strong> y 
+            <strong class="text-cyan-200">Amazon.com Inc. (AMZN)</strong>.
+          </p>
+        </div>
+
+        <!-- Por qué se resuelve Sigma x = mu -->
+        <div class="border border-cyan-800 bg-cyan-950/20 p-5 rounded-lg space-y-3 mt-4">
+          <h3 class="text-lg text-cyan-300 font-bold flex items-center gap-2">
+            <span>Resolución del Sistema Lineal:</span>
+            <span class="px-2 py-0.5 bg-black/60 border border-cyan-500 rounded text-cyan-400 font-mono">Σx = μ</span>
+          </h3>
+          <p class="text-sm text-gray-300 leading-relaxed">
+            Al maximizar el índice de Sharpe de la cartera tangente (o en la formulación cuadrática media-varianza no restringida), 
+            las condiciones de primer orden conducen directamente al sistema lineal de ecuaciones <strong class="text-cyan-200">Σx = μ</strong> 
+            (equivalente a <strong class="text-cyan-200">Ax = b</strong>), donde:
+          </p>
+          <ul class="list-disc list-inside space-y-1.5 text-xs md:text-sm text-gray-300 pl-2">
+            <li>
+              <strong class="text-cyan-200 font-mono">Σ (A):</strong> Matriz simétrica y definida positiva ($4 \times 4$) de covarianzas anualizadas de los retornos de los activos.
+            </li>
+            <li>
+              <strong class="text-cyan-200 font-mono">μ (b):</strong> Vector ($4 \times 1$) de retornos esperados anualizados de cada activo.
+            </li>
+            <li>
+              <strong class="text-cyan-200 font-mono">x:</strong> Vector de ponderaciones o pesos no normalizados de la cartera óptima.
+            </li>
+          </ul>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+            <div class="bg-black/50 p-3 rounded border border-cyan-900/80">
+              <span class="text-cyan-400 font-semibold text-xs block mb-1">PESOS PROPORCIONALES Y NORMALIZACIÓN:</span>
+              <p class="text-xs text-gray-300">
+                Los componentes de <span class="text-cyan-200 font-mono">x</span> son proporcionales a las asignaciones óptimas. 
+                Posteriormente se normalizan dividiendo cada elemento por la suma total (<span class="text-cyan-200 font-mono">wᵢ = xᵢ / Σ xⱼ</span>), asegurando que la inversión sume el 100% de la cartera.
+              </p>
+            </div>
+            <div class="bg-black/50 p-3 rounded border border-cyan-900/80">
+              <span class="text-cyan-400 font-semibold text-xs block mb-1">INTERPRETACIÓN DE PESOS NEGATIVOS:</span>
+              <p class="text-xs text-gray-300">
+                La presencia de pesos negativos (<span class="text-cyan-200 font-mono">xᵢ &lt; 0</span>) modela legal y financieramente <strong class="text-cyan-200">posiciones cortas (short selling)</strong>, permitiendo vender activos prestados para financiar compras en posiciones largas.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Procedencia de los datos y Campo Editable -->
+        <div class="border border-cyan-700/60 bg-black/40 p-5 rounded-lg space-y-4 mt-4">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-cyan-900/70 pb-4">
+            <div>
+              <h3 class="text-base md:text-lg text-cyan-300 font-bold">Procedencia y Extracción de Datos</h3>
+              <p class="text-xs text-gray-300 mt-1">
+                Datos históricos de precios de cierre ajustados recopilados desde <strong class="text-cyan-200">Yahoo Finance</strong> 
+                mediante el paquete de Python <code class="text-cyan-300 bg-cyan-950 px-1 py-0.5 rounded border border-cyan-800">yfinance</code>, 
+                cubriendo un horizonte muestral de <strong class="text-cyan-200">2 años</strong>.
+              </p>
+            </div>
+            
+            <!-- Campo Editable: Fecha de extracción -->
+            <div class="flex-shrink-0 bg-cyan-950/40 p-3 rounded border border-cyan-500/50">
+              <label for="fecha-extraccion" class="block text-xs uppercase text-cyan-300 font-bold mb-1">
+                📅 Fecha de extracción:
+              </label>
+              <input 
+                type="date" 
+                id="fecha-extraccion" 
+                name="fecha-extraccion" 
+                value="2026-10-28" 
+                class="bg-black text-cyan-200 border border-cyan-400 rounded px-3 py-1.5 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-cyan-300 cursor-pointer shadow-inner"
+              >
+              <span class="block text-[10px] text-gray-400 mt-1">* Campo editable de control temporal</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center text-xs">
+            <div class="p-2 border border-cyan-900/70 rounded bg-cyan-950/20">
+              <span class="text-gray-400 block">Activo 1</span>
+              <span class="text-cyan-300 font-bold text-sm">AAPL</span>
+              <span class="text-[10px] text-gray-400 block">Apple Inc.</span>
+            </div>
+            <div class="p-2 border border-cyan-900/70 rounded bg-cyan-950/20">
+              <span class="text-gray-400 block">Activo 2</span>
+              <span class="text-cyan-300 font-bold text-sm">MSFT</span>
+              <span class="text-[10px] text-gray-400 block">Microsoft Corp.</span>
+            </div>
+            <div class="p-2 border border-cyan-900/70 rounded bg-cyan-950/20">
+              <span class="text-gray-400 block">Activo 3</span>
+              <span class="text-cyan-300 font-bold text-sm">GOOGL</span>
+              <span class="text-[10px] text-gray-400 block">Alphabet Inc.</span>
+            </div>
+            <div class="p-2 border border-cyan-900/70 rounded bg-cyan-950/20">
+              <span class="text-gray-400 block">Activo 4</span>
+              <span class="text-cyan-300 font-bold text-sm">AMZN</span>
+              <span class="text-[10px] text-gray-400 block">Amazon.com Inc.</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SECCIÓN 3: FORMULACIÓN -->
+    <section id="sec-formulacion" class="content-section hidden space-y-4">
+      <div class="retro-panel rounded-lg p-6 border-cyan-500/50">
+        <h2 class="text-2xl md:text-3xl font-bold text-white neon-glow mb-4">
+          3. Formulación
+        </h2>
+        <div class="border border-dashed border-cyan-700/60 bg-black/40 p-8 rounded text-center">
+          <p class="text-cyan-400 tracking-wider uppercase text-lg">[ En construcción ]</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 4: ENTRADA DE DATOS -->
+    <section id="sec-entrada-datos" class="content-section hidden space-y-4">
+      <div class="retro-panel rounded-lg p-6 border-cyan-500/50">
+        <h2 class="text-2xl md:text-3xl font-bold text-white neon-glow mb-4">
+          4. Entrada de datos
+        </h2>
+        <div class="border border-dashed border-cyan-700/60 bg-black/40 p-8 rounded text-center">
+          <p class="text-cyan-400 tracking-wider uppercase text-lg">[ En construcción ]</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 5: TRES ESCENARIOS -->
+    <section id="sec-tres-escenarios" class="content-section hidden space-y-4">
+      <div class="retro-panel rounded-lg p-6 border-cyan-500/50">
+        <h2 class="text-2xl md:text-3xl font-bold text-white neon-glow mb-4">
+          5. Tres escenarios
+        </h2>
+        <div class="border border-dashed border-cyan-700/60 bg-black/40 p-8 rounded text-center">
+          <p class="text-cyan-400 tracking-wider uppercase text-lg">[ En construcción ]</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 6: SOLUCIÓN DE REFERENCIA -->
+    <section id="sec-solucion-referencia" class="content-section hidden space-y-4">
+      <div class="retro-panel rounded-lg p-6 border-cyan-500/50">
+        <h2 class="text-2xl md:text-3xl font-bold text-white neon-glow mb-4">
+          6. Solución de referencia
+        </h2>
+        <div class="border border-dashed border-cyan-700/60 bg-black/40 p-8 rounded text-center">
+          <p class="text-cyan-400 tracking-wider uppercase text-lg">[ En construcción ]</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 7: GCP VS GC -->
+    <section id="sec-gcp-vs-gc" class="content-section hidden space-y-4">
+      <div class="retro-panel rounded-lg p-6 border-cyan-500/50">
+        <h2 class="text-2xl md:text-3xl font-bold text-white neon-glow mb-4">
+          7. GCP vs GC
+        </h2>
+        <div class="border border-dashed border-cyan-700/60 bg-black/40 p-8 rounded text-center">
+          <p class="text-cyan-400 tracking-wider uppercase text-lg">[ En construcción ]</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 8: ANÁLISIS DE ERRORES -->
+    <section id="sec-analisis-errores" class="content-section hidden space-y-4">
+      <div class="retro-panel rounded-lg p-6 border-cyan-500/50">
+        <h2 class="text-2xl md:text-3xl font-bold text-white neon-glow mb-4">
+          8. Análisis de errores
+        </h2>
+        <div class="border border-dashed border-cyan-700/60 bg-black/40 p-8 rounded text-center">
+          <p class="text-cyan-400 tracking-wider uppercase text-lg">[ En construcción ]</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 9: MÓDULO QA -->
+    <section id="sec-modulo-qa" class="content-section hidden space-y-4">
+      <div class="retro-panel rounded-lg p-6 border-cyan-500/50">
+        <h2 class="text-2xl md:text-3xl font-bold text-white neon-glow mb-4">
+          9. Módulo QA
+        </h2>
+        <div class="border border-dashed border-cyan-700/60 bg-black/40 p-8 rounded text-center">
+          <p class="text-cyan-400 tracking-wider uppercase text-lg">[ En construcción ]</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 10: CONCLUSIONES Y REFERENCIAS -->
+    <section id="sec-conclusiones-referencias" class="content-section hidden space-y-4">
+      <div class="retro-panel rounded-lg p-6 border-cyan-500/50">
+        <h2 class="text-2xl md:text-3xl font-bold text-white neon-glow mb-4">
+          10. Conclusiones y Referencias
+        </h2>
+        <div class="border border-dashed border-cyan-700/60 bg-black/40 p-8 rounded text-center">
+          <p class="text-cyan-400 tracking-wider uppercase text-lg">[ En construcción ]</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Pie de Página Arcade -->
+  <footer class="border-t border-cyan-900/60 bg-black/80 py-4 text-center text-xs text-cyan-500">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-2">
+      <div>
+        <span>DAT-242 MÉTODOS NUMÉRICOS · CARRERA DE INFORMÁTICA · UMSA</span>
+      </div>
+      <div>
+        <span>CARTERA DE MARKOWITZ // GC & GCP (JACOBI)</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Lógica de interfaz -->
+  <script src="js/ui.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,103 @@
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap');
+
+:root {
+  --retro-cyan: #00f0ff;
+  --retro-cyan-dim: #0284c7;
+  --retro-cyan-glow: rgba(0, 240, 255, 0.35);
+  --retro-bg-dark: #050a0f;
+  --retro-panel-bg: rgba(10, 20, 30, 0.85);
+  --retro-border: #0ea5e9;
+}
+
+body {
+  font-family: 'Share Tech Mono', monospace, ui-monospace, SFMono-Regular;
+  background-color: var(--retro-bg-dark);
+  color: #e0f2fe;
+  background-image: 
+    radial-gradient(ellipse at 50% 0%, rgba(14, 165, 233, 0.15) 0%, transparent 70%),
+    linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+  background-size: 100% 100%, 32px 32px, 32px 32px;
+  min-height: 100vh;
+}
+
+/* CRT Scanline Overlay */
+.scanlines {
+  position: relative;
+}
+.scanlines::after {
+  content: " ";
+  display: block;
+  position: fixed;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+  background-size: 100% 4px;
+  z-index: 50;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* Retro Glows */
+.neon-glow {
+  text-shadow: 0 0 8px rgba(0, 240, 255, 0.7), 0 0 20px rgba(0, 240, 255, 0.4);
+}
+
+.neon-box {
+  border: 1px solid var(--retro-cyan);
+  box-shadow: 0 0 12px var(--retro-cyan-glow), inset 0 0 12px rgba(0, 240, 255, 0.08);
+}
+
+.retro-panel {
+  background-color: var(--retro-panel-bg);
+  border: 1px solid rgba(14, 165, 233, 0.4);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
+}
+
+/* Retro Buttons */
+.nav-btn {
+  transition: all 0.2s ease-in-out;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.nav-btn:hover {
+  background-color: rgba(0, 240, 255, 0.15);
+  border-color: var(--retro-cyan);
+  box-shadow: 0 0 10px var(--retro-cyan-glow);
+  color: #ffffff;
+}
+
+.nav-btn.active {
+  background-color: rgba(0, 240, 255, 0.25);
+  border-color: var(--retro-cyan);
+  color: #00f0ff;
+  box-shadow: 0 0 14px rgba(0, 240, 255, 0.5), inset 0 0 8px rgba(0, 240, 255, 0.2);
+  font-weight: bold;
+}
+
+/* Terminal Cursor Blink */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.cursor-blink {
+  animation: blink 1s infinite;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #050a0f;
+}
+::-webkit-scrollbar-thumb {
+  background: #0284c7;
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #00f0ff;
+}
+
