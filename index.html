@@ -1374,14 +1374,313 @@
     </section>
 
     <!-- SECCIÓN 10: CONCLUSIONES Y REFERENCIAS -->
-    <section id="sec-conclusiones-referencias" class="content-section hidden space-y-4">
+    <section id="sec-conclusiones-referencias" class="content-section hidden space-y-6">
       <div class="retro-panel rounded-lg p-6 border-cyan-500/50">
-        <h2 class="text-2xl md:text-3xl font-bold text-white neon-glow mb-4">
+        <div class="flex items-center space-x-2 text-cyan-400 text-sm mb-3">
+          <span class="cursor-blink">></span>
+          <span>SÍNTESIS TEÓRICO-PRÁCTICA // CONCLUSIONES TÉCNICAS, FINANCIERAS Y BIBLIOGRAFÍA</span>
+        </div>
+
+        <h2 class="text-2xl md:text-3xl font-bold text-white neon-glow mb-2">
           10. Conclusiones y Referencias
         </h2>
-        <div class="border border-dashed border-cyan-700/60 bg-black/40 p-8 rounded text-center">
-          <p class="text-cyan-400 tracking-wider uppercase text-lg">[ En construcción ]</p>
+        
+        <p class="text-xs text-cyan-300 mb-6">
+          Análisis integrador de los resultados empíricos obtenidos en los tres escenarios de la cartera de Markowitz, evaluación del precondicionador diagonal de Suñagua (2020) y referencias académicas en formato APA.
+        </p>
+
+        <!-- SUBPARTE 1: CONCLUSIONES TÉCNICAS Y NUMÉRICAS -->
+        <div class="space-y-4 mb-8">
+          <h3 class="text-lg font-bold text-cyan-300 flex items-center gap-2 border-b border-cyan-800 pb-2">
+            <span>10.1 Conclusiones Técnicas y de Álgebra Lineal Numérica</span>
+          </h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+            
+            <!-- Tarjeta 1: Relación kappa(A) e iteraciones -->
+            <div class="border border-cyan-800 bg-black/60 p-4 rounded-lg flex flex-col justify-between">
+              <div>
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="px-2 py-0.5 bg-cyan-950 border border-cyan-500 text-cyan-300 text-xs font-mono font-bold rounded">κ(A)</span>
+                  <h4 class="text-sm font-bold text-white">Condicionamiento Espectral y Convergencia</h4>
+                </div>
+                <p class="text-xs text-gray-300 leading-relaxed mb-3">
+                  La cota teórica de convergencia de Gradientes Conjugados en normas de energía establece que el factor de contracción por iteración satisface:
+                </p>
+                <div class="bg-black/90 p-2.5 rounded border border-cyan-900 text-center text-xs font-mono text-cyan-300 mb-3">
+                  ‖eₖ‖_A / ‖e₀‖_A ≤ 2 · [ (√κ - 1) / (√κ + 1) ]ᵏ
+                </div>
+                <p class="text-xs text-gray-300 leading-relaxed">
+                  En el <strong>Escenario Ideal</strong> (κ ≈ 13.97), el factor de contracción es estrecho (~0.577), garantizando una rápida reducción del error. 
+                  En el <strong>Escenario Mal Condicionado</strong> (κ ≈ 2000.98), el factor teórico sube a ~0.956. Aunque en dimensión finita (n = 4) el subespacio de Krylov abarca el espacio euclídeo en 4 pasos, la acumulación de errores de redondeo degrada el residuo de GC sin precondicionar a 1.06e-8, mientras que con Jacobi alcanza 7.88e-14.
+                </p>
+              </div>
+              <div class="mt-3 pt-2 border-t border-cyan-950 text-[11px] text-cyan-400 font-mono">
+                * Conforme a Golub &amp; Van Loan (2013) y Saad (2003).
+              </div>
+            </div>
+
+            <!-- Tarjeta 2: Ganancia del Precondicionador Jacobi -->
+            <div class="border border-emerald-800 bg-black/60 p-4 rounded-lg flex flex-col justify-between">
+              <div>
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="px-2 py-0.5 bg-emerald-950 border border-emerald-500 text-emerald-300 text-xs font-mono font-bold rounded">M = diag(A)</span>
+                  <h4 class="text-sm font-bold text-white">Eficacia del Precondicionador de Suñagua</h4>
+                </div>
+                <p class="text-xs text-gray-300 leading-relaxed mb-3">
+                  El precondicionador diagonal de Jacobi implementado bajo el esquema de <strong>Suñagua (2020)</strong> actúa como un escalamiento simétrico implícito:
+                </p>
+                <div class="bg-black/90 p-2.5 rounded border border-emerald-900 text-center text-xs font-mono text-emerald-300 mb-3">
+                  Ã = M⁻¹/² · A · M⁻¹/²
+                </div>
+                <p class="text-xs text-gray-300 leading-relaxed">
+                  En el escenario mal condicionado, el desbalance extremo de escalas introducido en el activo GOOGL (varianza inflada x400) es neutralizado con costo <span class="font-mono text-emerald-300">O(n)</span> por iteración (división por la diagonal). 
+                  El número de condición espectral cae de <strong>κ(A) ≈ 2000.98</strong> a <strong>κ(M⁻¹A) ≈ 10.97</strong> (reducción de más de <strong>182 veces</strong>), alcanzando precisión de máquina sin ningún paso de factorización costoso.
+                </p>
+              </div>
+              <div class="mt-3 pt-2 border-t border-emerald-950 text-[11px] text-emerald-400 font-mono">
+                * Reducción de 182x en el espectro matricial.
+              </div>
+            </div>
+
+            <!-- Tarjeta 3: Cholesky vs Métodos Iterativos -->
+            <div class="border border-cyan-800 bg-black/60 p-4 rounded-lg flex flex-col justify-between">
+              <div>
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="px-2 py-0.5 bg-cyan-950 border border-cyan-500 text-cyan-300 text-xs font-mono font-bold rounded">A = L·Lᵀ</span>
+                  <h4 class="text-sm font-bold text-white">Método Directo vs Métodos Iterativos</h4>
+                </div>
+                <p class="text-xs text-gray-300 leading-relaxed mb-3">
+                  La factorización directa de Cholesky proveyó la solución exacta de referencia (residuo ‖Ax - b‖₂ &lt; 1e-16).
+                </p>
+                <ul class="text-xs text-gray-300 space-y-2 mb-3">
+                  <li>
+                    <strong class="text-cyan-200">• Precisión Absoluta:</strong> En sistemas pequeños (n = 4), Cholesky es insuperable en costo y exactitud. El error absoluto de GCP respecto a Cholesky fue <span class="font-mono text-emerald-400">‖Ea‖₂ &lt; 1e-13</span>.
+                  </li>
+                  <li>
+                    <strong class="text-cyan-200">• Escalabilidad en Gran Dimensión:</strong> Para carteras con miles de activos o matrices dispersas, Cholesky requiere O(n³) operaciones y memoria densa, mientras que GCP Jacobi requiere solo productos matriz-vector O(n² o n no nulos), posicionándose como el método de elección en Big Data financiero.
+                  </li>
+                </ul>
+              </div>
+              <div class="mt-3 pt-2 border-t border-cyan-950 text-[11px] text-cyan-400 font-mono">
+                * Error relativo de GCP vs Cholesky: Er &lt; 1e-14.
+              </div>
+            </div>
+
+          </div>
         </div>
+
+        <!-- SUBPARTE 2: CONCLUSIONES FINANCIERAS Y DE GESTIÓN DE CARTERAS -->
+        <div class="space-y-4 mb-8">
+          <h3 class="text-lg font-bold text-cyan-300 flex items-center gap-2 border-b border-cyan-800 pb-2">
+            <span>10.2 Conclusiones Financieras y de Gestión de Riesgo (Markowitz)</span>
+          </h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+            
+            <!-- Tarjeta 1: Efecto del estrés en A y b -->
+            <div class="border border-amber-800/80 bg-black/60 p-4 rounded-lg flex flex-col justify-between">
+              <div>
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="px-2 py-0.5 bg-amber-950 border border-amber-500 text-amber-300 text-xs font-mono font-bold rounded">ESTRÉS</span>
+                  <h4 class="text-sm font-bold text-white">Impacto del Shock Macroeconómico</h4>
+                </div>
+                <p class="text-xs text-gray-300 leading-relaxed mb-3">
+                  En el <strong>Escenario Bajo Estrés</strong>, modelar un shock bajista (+50% volatilidad ⇒ Covarianzas x2.25; -50% retornos esperados ⇒ b x0.5) produjo una contracción del vector no normalizado x por un factor exacto:
+                </p>
+                <div class="bg-black/90 p-2.5 rounded border border-amber-900 text-center text-xs font-mono text-amber-300 mb-3">
+                  x_estrés = (0.50 / 2.25) · x_ideal ≈ 0.2222 · x_ideal
+                </div>
+                <p class="text-xs text-gray-300 leading-relaxed">
+                  Financieramente, esto significa que el capital apalancado óptimo o exposición bruta se reduce en un <strong>77.8%</strong> para mitigar el riesgo sistémico. 
+                  Sin embargo, al ser una transformación homotética uniforme, los pesos normalizados (w = x / ∑x) se conservan exactamente iguales, demostrando que shocks simétricos no alteran las preferencias relativas entre activos.
+                </p>
+              </div>
+              <div class="mt-3 pt-2 border-t border-amber-950 text-[11px] text-amber-400 font-mono">
+                * Desapalancamiento masivo con estructura idéntica.
+              </div>
+            </div>
+
+            <!-- Tarjeta 2: Límites por ruido en retornos (Michaud / Best & Grauer) -->
+            <div class="border border-rose-800/80 bg-black/60 p-4 rounded-lg flex flex-col justify-between">
+              <div>
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="px-2 py-0.5 bg-rose-950 border border-rose-500 text-rose-300 text-xs font-mono font-bold rounded">SENSIBILIDAD</span>
+                  <h4 class="text-sm font-bold text-white">Ruido en Estimaciones e Hiper-sensibilidad</h4>
+                </div>
+                <p class="text-xs text-gray-300 leading-relaxed mb-3">
+                  El panel de sensibilidad de la Sección 8 demostró la vulnerabilidad intrínseca del optimizador de media-varianza como <em>"maximizador de errores"</em> (Michaud, 1989; Best &amp; Grauer, 1991):
+                </p>
+                <ul class="text-xs text-gray-300 space-y-1.5 mb-3">
+                  <li>• Un error de estimación de solo <strong>+5% en b(AAPL)</strong> incrementó su peso en la cartera en <strong>+8.79 puntos porcentuales</strong> (de 63.97% a 72.76%).</li>
+                  <li>• Un shock asimétrico de <strong>+10%</strong> elevó su ponderación en <strong>+17.11 pp</strong> (a 81.08%).</li>
+                  <li>• Una reducción de <strong>-10%</strong> desplomó su peso a <strong>44.83%</strong> (-19.14 pp).</li>
+                </ul>
+                <p class="text-xs text-gray-300 leading-relaxed">
+                  Esto comprueba que la precisión del solver numérico es necesaria pero no suficiente: debe complementarse con modelos de estimación robusta (Black-Litterman o contracción bayesiana) para evitar reasignaciones espurias en producción.
+                </p>
+              </div>
+              <div class="mt-3 pt-2 border-t border-rose-950 text-[11px] text-rose-400 font-mono">
+                * Elevada elasticidad peso-retorno en Markowitz.
+              </div>
+            </div>
+
+            <!-- Tarjeta 3: Diversificación y Cobertura -->
+            <div class="border border-cyan-800 bg-black/60 p-4 rounded-lg flex flex-col justify-between">
+              <div>
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="px-2 py-0.5 bg-cyan-950 border border-cyan-500 text-cyan-300 text-xs font-mono font-bold rounded">COBERTURA</span>
+                  <h4 class="text-sm font-bold text-white">Estructura de Correlación y Diversificación</h4>
+                </div>
+                <p class="text-xs text-gray-300 leading-relaxed mb-3">
+                  El mapa de calor de correlación reveló coeficientes positivos moderados entre los gigantes tecnológicos:
+                </p>
+                <div class="bg-black/90 p-2.5 rounded border border-cyan-900 text-center text-xs font-mono text-cyan-300 mb-3">
+                  R̄ ≈ +0.66 &nbsp;|&nbsp; R_máx(AAPL/MSFT) = 0.72 &nbsp;|&nbsp; R_mín(AAPL/AMZN) = 0.61
+                </div>
+                <p class="text-xs text-gray-300 leading-relaxed">
+                  Al ser todas las correlaciones estrictamente menores a la unidad (Rᵢⱼ &lt; 1), la teoría de Markowitz comprueba que la varianza global de la cartera es inferior a la combinación lineal de riesgos individuales. 
+                  La solución óptima arrojó una posición corta en <strong>AMZN (-12.81%)</strong>, la cual actúa como cobertura (hedge) para maximizar el ratio de Sharpe ante las altas ponderaciones de AAPL (63.97%) y GOOGL (35.03%).
+                </p>
+              </div>
+              <div class="mt-3 pt-2 border-t border-cyan-950 text-[11px] text-cyan-400 font-mono">
+                * Beneficio cuantitativo de la frontera eficiente.
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- SUBPARTE 3: CUADRO COMPARATIVO CONSOLIDADO DE ESCENARIOS -->
+        <div class="border border-cyan-800 bg-black/60 rounded-lg p-4 overflow-x-auto mb-8">
+          <h3 class="text-sm font-bold text-cyan-300 uppercase tracking-wider mb-3 flex items-center justify-between font-mono">
+            <span>10.3 Cuadro Resumen Comparativo de Escenarios Reales</span>
+            <span class="text-xs text-gray-400 font-normal">Datos consolidados del sistema</span>
+          </h3>
+
+          <table class="w-full text-xs text-left border-collapse font-mono">
+            <thead>
+              <tr class="text-cyan-400 border-b border-cyan-800 bg-cyan-950/40">
+                <th class="p-2.5">Escenario</th>
+                <th class="p-2.5 text-center">κ(A) Base</th>
+                <th class="p-2.5 text-center">κ(M⁻¹A) Jacobi</th>
+                <th class="p-2.5 text-center">Iteraciones (GC / GCP)</th>
+                <th class="p-2.5 text-center">Residuo GCP (‖r‖/‖b‖)</th>
+                <th class="p-2.5">Efecto Financiero Principal</th>
+                <th class="p-2.5 text-center">Diagnóstico Numérico</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-cyan-950 text-gray-200">
+              <tr class="hover:bg-cyan-950/20">
+                <td class="p-2.5 font-bold text-cyan-300">1. Ideal</td>
+                <td class="p-2.5 text-center">13.97</td>
+                <td class="p-2.5 text-center text-emerald-400">10.97</td>
+                <td class="p-2.5 text-center">4 / 4</td>
+                <td class="p-2.5 text-center font-mono">7.74e-17</td>
+                <td class="p-2.5 text-gray-300">Régimen normal: alta ponderación en AAPL y GOOGL, AMZN en cobertura.</td>
+                <td class="p-2.5 text-center text-emerald-400 font-bold">Bien condicionada (SPD)</td>
+              </tr>
+              <tr class="hover:bg-cyan-950/20">
+                <td class="p-2.5 font-bold text-amber-300">2. Bajo estrés</td>
+                <td class="p-2.5 text-center">13.97</td>
+                <td class="p-2.5 text-center text-emerald-400">10.97</td>
+                <td class="p-2.5 text-center">4 / 4</td>
+                <td class="p-2.5 text-center font-mono">8.35e-17</td>
+                <td class="p-2.5 text-gray-300">Shock bajista: contracción de exposición al 22.2% con pesos relativos invariantes.</td>
+                <td class="p-2.5 text-center text-amber-400 font-bold">Escalamiento homotético</td>
+              </tr>
+              <tr class="hover:bg-cyan-950/20">
+                <td class="p-2.5 font-bold text-rose-300">3. Mal condicionado</td>
+                <td class="p-2.5 text-center text-rose-400 font-bold">2000.98</td>
+                <td class="p-2.5 text-center text-emerald-400 font-bold">10.97</td>
+                <td class="p-2.5 text-center text-emerald-400 font-bold">4 / 4</td>
+                <td class="p-2.5 text-center font-mono text-emerald-300">7.88e-14</td>
+                <td class="p-2.5 text-gray-300">Desbalance de escala en GOOGL. Jacobi recupera precisión de máquina (182x mejora).</td>
+                <td class="p-2.5 text-center text-rose-400 font-bold">Aceleración GCP crítica</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- SUBPARTE 4: REFERENCIAS BIBLIOGRÁFICAS EN FORMATO APA -->
+        <div class="space-y-4">
+          <h3 class="text-lg font-bold text-cyan-300 flex items-center gap-2 border-b border-cyan-800 pb-2">
+            <span>10.4 Referencias Bibliográficas (Normas APA 7.ª edición)</span>
+          </h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
+            
+            <!-- Referencia 1: Suñagua -->
+            <div class="border border-cyan-900 bg-black/70 p-4 rounded-lg flex flex-col justify-between hover:border-cyan-500 transition-all">
+              <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="text-cyan-400 font-bold text-[11px] uppercase tracking-wider">[ARTÍCULO CIENTÍFICO]</span>
+                  <span class="text-[10px] bg-cyan-950 border border-cyan-800 text-gray-400 px-1.5 py-0.5 rounded">UMSA · 2020</span>
+                </div>
+                <p class="text-gray-200 leading-relaxed">
+                  Suñagua S., P. (2020). Resolución de sistemas de ecuaciones lineales mediante el método del gradiente conjugado precondicionado. 
+                  <em>Revista Boliviana de Matemática – UMSA</em>, <em>04</em>, 2–7.
+                </p>
+                <p class="text-gray-400 text-[11px] leading-relaxed">
+                  <strong>Aporte al proyecto:</strong> Base matemática y formulación algorítmica para la deducción del método de Gradientes Conjugados Precondicionado (GCP) con precondicionador diagonal de Jacobi M = diag(A) y cálculo espectral de κ(M⁻¹A).
+                </p>
+              </div>
+            </div>
+
+            <!-- Referencia 2: Golub & Van Loan -->
+            <div class="border border-cyan-900 bg-black/70 p-4 rounded-lg flex flex-col justify-between hover:border-cyan-500 transition-all">
+              <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="text-cyan-400 font-bold text-[11px] uppercase tracking-wider">[LIBRO DE TEXTO CLÁSICO]</span>
+                  <span class="text-[10px] bg-cyan-950 border border-cyan-800 text-gray-400 px-1.5 py-0.5 rounded">4.ª EDICIÓN</span>
+                </div>
+                <p class="text-gray-200 leading-relaxed">
+                  Golub, G. H., &amp; Van Loan, C. F. (2013). <em>Matrix Computations</em> (4th ed.). Johns Hopkins University Press.
+                </p>
+                <p class="text-gray-400 text-[11px] leading-relaxed">
+                  <strong>Aporte al proyecto:</strong> Tratamiento riguroso de la factorización directa de Cholesky (Cap. 4), análisis de sensibilidad y número de condición espectral κ(A), y propiedades de convergencia de métodos de Krylov en matrices simétricas definidas positivas.
+                </p>
+              </div>
+            </div>
+
+            <!-- Referencia 3: Saad -->
+            <div class="border border-cyan-900 bg-black/70 p-4 rounded-lg flex flex-col justify-between hover:border-cyan-500 transition-all">
+              <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="text-cyan-400 font-bold text-[11px] uppercase tracking-wider">[TRATADO NUMÉRICO]</span>
+                  <span class="text-[10px] bg-cyan-950 border border-cyan-800 text-gray-400 px-1.5 py-0.5 rounded">SIAM · 2.ª EDICIÓN</span>
+                </div>
+                <p class="text-gray-200 leading-relaxed">
+                  Saad, Y. (2003). <em>Iterative Methods for Sparse Linear Systems</em> (2nd ed.). Society for Industrial and Applied Mathematics (SIAM). https://doi.org/10.1137/1.9780898718003
+                </p>
+                <p class="text-gray-400 text-[11px] leading-relaxed">
+                  <strong>Aporte al proyecto:</strong> Teoría de subespacios de Krylov, gradientes conjugados con precondicionamiento por bloques y diagonales, y análisis de distribución de autovalores para acelerar tasas de convergencia iterativas.
+                </p>
+              </div>
+            </div>
+
+            <!-- Referencia 4: Markowitz y Yahoo Finance -->
+            <div class="border border-cyan-900 bg-black/70 p-4 rounded-lg flex flex-col justify-between hover:border-cyan-500 transition-all">
+              <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="text-cyan-400 font-bold text-[11px] uppercase tracking-wider">[FINANZAS CUANTITATIVAS &amp; DATOS]</span>
+                  <span class="text-[10px] bg-cyan-950 border border-cyan-800 text-gray-400 px-1.5 py-0.5 rounded">HISTÓRICO 2 AÑOS</span>
+                </div>
+                <p class="text-gray-200 leading-relaxed">
+                  Markowitz, H. (1952). Portfolio Selection. <em>The Journal of Finance</em>, <em>7</em>(1), 77–91. https://doi.org/10.2307/2975974
+                </p>
+                <p class="text-gray-200 leading-relaxed">
+                  Yahoo Finance. (2024). <em>Historical Market Quotations for AAPL, MSFT, GOOGL, and AMZN</em> [Conjunto de datos extraído vía yfinance]. Yahoo Finance API. https://finance.yahoo.com/
+                </p>
+                <p class="text-gray-400 text-[11px] leading-relaxed">
+                  <strong>Aporte al proyecto:</strong> Modelo de selección óptima de cartera de media-varianza y series temporales de 252 días bursátiles de cotizaciones de cierre ajustadas para el cálculo de retornos anualizados (b) y matrices de covarianza (A).
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
       </div>
     </section>
 
