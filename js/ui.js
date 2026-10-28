@@ -320,6 +320,131 @@ document.addEventListener('DOMContentLoaded', () => {
     if (calcStatusMsg) {
       calcStatusMsg.innerHTML = `<span class="text-cyan-400">✓ Escenario cargado:</span> [${escenario.nombre}] cargado en matriz A y vector b.`;
     }
+
+    // 4. Actualizar diagnóstico numérico en Sección 3
+    actualizarDiagnosticoSeccion3(escenario.A, escenario.nombre);
+  }
+
+  // =========================================================================
+  // 4. DIAGNÓSTICO MATRICIAL (SECCIÓN 3)
+  // =========================================================================
+  const diagEscenarioBadge = document.getElementById('diag-escenario-badge');
+  const diagSimetriaStatus = document.getElementById('diag-simetria-status');
+  const diagSimetriaDesc = document.getElementById('diag-simetria-desc');
+  const diagSylvesterStatus = document.getElementById('diag-sylvester-status');
+  const diagMenoresVals = document.getElementById('diag-menores-vals');
+  const diagAutovaloresStatus = document.getElementById('diag-autovalores-status');
+  const diagAutovaloresVals = document.getElementById('diag-autovalores-vals');
+  const diagKappaVal = document.getElementById('diag-kappa-val');
+  const diagKappaDesc = document.getElementById('diag-kappa-desc');
+  const btnRecalcularDiag = document.getElementById('btn-recalcular-diag');
+
+  /**
+   * Actualiza en tiempo real el panel de diagnóstico de la Sección 3 para la matriz A.
+   * @param {number[][]} A - Matriz 4x4
+   * @param {string} nombreEscenario - Nombre del escenario a rotular
+   */
+  function actualizarDiagnosticoSeccion3(A, nombreEscenario = 'Personalizado') {
+    if (!A || !window.LinAlg) return;
+
+    if (diagEscenarioBadge) {
+      diagEscenarioBadge.textContent = nombreEscenario.toUpperCase();
+    }
+
+    // 1. Simetría
+    const esSimetrica = window.LinAlg.isSymmetric(A, 1e-8);
+    let diffMax = 0;
+    for (let i = 0; i < A.length; i++) {
+      for (let j = i + 1; j < A.length; j++) {
+        diffMax = Math.max(diffMax, Math.abs(A[i][j] - A[j][i]));
+      }
+    }
+
+    if (diagSimetriaStatus) {
+      if (esSimetrica) {
+        diagSimetriaStatus.className = 'text-sm font-bold text-emerald-400 flex items-center gap-1.5 font-mono';
+        diagSimetriaStatus.innerHTML = '<span>●</span> <span>SÍ (Simétrica)</span>';
+      } else {
+        diagSimetriaStatus.className = 'text-sm font-bold text-rose-400 flex items-center gap-1.5 font-mono';
+        diagSimetriaStatus.innerHTML = '<span>▲</span> <span>NO SIMÉTRICA</span>';
+      }
+    }
+    if (diagSimetriaDesc) {
+      diagSimetriaDesc.textContent = `max |aᵢⱼ - aⱼᵢ| = ${diffMax.toExponential(2)}`;
+    }
+
+    // 2. Menores principales (Criterio de Sylvester)
+    try {
+      const menores = window.LinAlg.principalMinors(A);
+      const todosPositivos = menores.every(m => m > 0);
+      if (diagSylvesterStatus) {
+        if (todosPositivos) {
+          diagSylvesterStatus.className = 'text-sm font-bold text-emerald-400 flex items-center gap-1.5 font-mono';
+          diagSylvesterStatus.innerHTML = '<span>●</span> <span>Sylvester: SPD Válida</span>';
+        } else {
+          diagSylvesterStatus.className = 'text-sm font-bold text-rose-400 flex items-center gap-1.5 font-mono';
+          diagSylvesterStatus.innerHTML = '<span>▲</span> <span>No SPD (Δₖ ≤ 0)</span>';
+        }
+      }
+      if (diagMenoresVals) {
+        diagMenoresVals.innerHTML = menores
+          .map((m, idx) => {
+            const fmt = Math.abs(m) < 0.001 ? m.toExponential(2) : m.toFixed(6);
+            const ok = m > 0;
+            return `<div class="${ok ? 'text-cyan-300' : 'text-rose-400'}">Δ${idx + 1} = ${fmt} (${ok ? '> 0' : '≤ 0'})</div>`;
+          })
+          .join('');
+      }
+    } catch (e) {
+      console.warn("Error en cálculo de menores de Sylvester:", e);
+    }
+
+    // 3. Autovalores (Jacobi Cíclico)
+    try {
+      const { eigenvalues } = window.LinAlg.eigenSymmetric(A);
+      const lambdaMin = eigenvalues[0];
+
+      if (diagAutovaloresStatus) {
+        if (lambdaMin > 0) {
+          diagAutovaloresStatus.className = 'text-sm font-bold text-emerald-400 flex items-center gap-1.5 font-mono';
+          diagAutovaloresStatus.innerHTML = '<span>●</span> <span>λₘᵢₙ > 0 (SPD)</span>';
+        } else {
+          diagAutovaloresStatus.className = 'text-sm font-bold text-rose-400 flex items-center gap-1.5 font-mono';
+          diagAutovaloresStatus.innerHTML = '<span>▲</span> <span>λₘᵢₙ ≤ 0 (No SPD)</span>';
+        }
+      }
+      if (diagAutovaloresVals) {
+        diagAutovaloresVals.innerHTML = eigenvalues
+          .map((ev, idx) => `<div>λ${idx + 1} = ${ev.toFixed(6)}</div>`)
+          .join('');
+      }
+
+      // 4. Número de Condición kappa(A)
+      const kappa = window.LinAlg.condNumber(A);
+      if (diagKappaVal) {
+        diagKappaVal.textContent = isFinite(kappa) ? `κ(A) ≈ ${kappa.toFixed(3)}` : 'κ(A) = ∞';
+      }
+      if (diagKappaDesc) {
+        if (kappa < 50) {
+          diagKappaDesc.className = 'text-[11px] text-emerald-400 font-mono mt-2 pt-2 border-t border-cyan-950';
+          diagKappaDesc.textContent = 'λₘₐₓ/λₘᵢₙ (Bien condicionada)';
+        } else if (kappa < 500) {
+          diagKappaDesc.className = 'text-[11px] text-amber-400 font-mono mt-2 pt-2 border-t border-cyan-950';
+          diagKappaDesc.textContent = 'λₘₐₓ/λₘᵢₙ (Condición moderada)';
+        } else {
+          diagKappaDesc.className = 'text-[11px] text-rose-400 font-mono mt-2 pt-2 border-t border-cyan-950';
+          diagKappaDesc.textContent = 'λₘₐₓ/λₘᵢₙ (Mal condicionada)';
+        }
+      }
+    } catch (e) {
+      console.warn("Error en cálculo espectral:", e);
+    }
+  }
+
+  if (btnRecalcularDiag) {
+    btnRecalcularDiag.addEventListener('click', () => {
+      actualizarDiagnosticoSeccion3(leerMatrizA(), 'Entrada actual');
+    });
   }
 
   if (btnCargarIdeal) {

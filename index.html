@@ -389,6 +389,86 @@
             </div>
           </div>
         </div>
+
+        <!-- Diagnóstico Numérico del Escenario Cargado -->
+        <div class="mt-6 border border-cyan-800/80 bg-black/60 rounded-lg p-5 space-y-4">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-cyan-900 pb-3">
+            <div>
+              <h3 class="text-base font-bold text-cyan-300 flex items-center gap-2">
+                <span>DIAGNÓSTICO NUMÉRICO DEL ESCENARIO CARGADO</span>
+                <span id="diag-escenario-badge" class="text-xs bg-cyan-950 border border-cyan-500 text-cyan-300 px-2 py-0.5 rounded font-mono">1. IDEAL</span>
+              </h3>
+              <p class="text-xs text-gray-400 mt-0.5">
+                Evaluación con Álgebra Lineal pura (Sylvester y Jacobi cíclico) sobre la matriz A activa.
+              </p>
+            </div>
+            <button id="btn-recalcular-diag" type="button" class="text-xs px-3 py-1 bg-cyan-950/80 border border-cyan-700 hover:border-cyan-400 text-cyan-300 rounded font-mono cursor-pointer transition-all">
+              🔄 Actualizar Diagnóstico
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            
+            <!-- 1. Simetría -->
+            <div class="border border-cyan-900 bg-cyan-950/30 p-3.5 rounded flex flex-col justify-between">
+              <div>
+                <span class="text-xs text-gray-400 uppercase tracking-wider block mb-1">1. Simetría (A = Aᵀ)</span>
+                <div id="diag-simetria-status" class="text-sm font-bold text-emerald-400 flex items-center gap-1.5 font-mono">
+                  <span>●</span> <span>SÍ (Simétrica)</span>
+                </div>
+              </div>
+              <p id="diag-simetria-desc" class="text-[11px] text-gray-300 font-mono mt-2 pt-2 border-t border-cyan-950">
+                ‖A - Aᵀ‖ &lt; 1e-8
+              </p>
+            </div>
+
+            <!-- 2. Menores Principales (Sylvester) -->
+            <div class="border border-cyan-900 bg-cyan-950/30 p-3.5 rounded flex flex-col justify-between">
+              <div>
+                <span class="text-xs text-gray-400 uppercase tracking-wider block mb-1">2. Menores Principales</span>
+                <div id="diag-sylvester-status" class="text-sm font-bold text-emerald-400 flex items-center gap-1.5 font-mono">
+                  <span>●</span> <span>Sylvester: SPD Válida</span>
+                </div>
+              </div>
+              <div id="diag-menores-vals" class="text-[11px] text-cyan-300 font-mono mt-2 pt-2 border-t border-cyan-950 space-y-0.5">
+                <div>Δ₁ = 0.050625 (&gt; 0)</div>
+                <div>Δ₂ = 0.001381 (&gt; 0)</div>
+                <div>Δ₃ = 4.95e-5 (&gt; 0)</div>
+                <div>Δ₄ = 2.29e-6 (&gt; 0)</div>
+              </div>
+            </div>
+
+            <!-- 3. Autovalores (Jacobi Cíclico) -->
+            <div class="border border-cyan-900 bg-cyan-950/30 p-3.5 rounded flex flex-col justify-between">
+              <div>
+                <span class="text-xs text-gray-400 uppercase tracking-wider block mb-1">3. Autovalores λᵢ (Jacobi)</span>
+                <div id="diag-autovalores-status" class="text-sm font-bold text-cyan-300 flex items-center gap-1.5 font-mono">
+                  <span>●</span> <span>λₘᵢₙ &gt; 0 (SPD)</span>
+                </div>
+              </div>
+              <div id="diag-autovalores-vals" class="text-[11px] text-cyan-300 font-mono mt-2 pt-2 border-t border-cyan-950 space-y-0.5">
+                <div>λ₁ = 0.014827</div>
+                <div>λ₂ = 0.023078</div>
+                <div>λ₃ = 0.032371</div>
+                <div>λ₄ = 0.207077</div>
+              </div>
+            </div>
+
+            <!-- 4. Número de Condición kappa(A) -->
+            <div class="border border-cyan-900 bg-cyan-950/30 p-3.5 rounded flex flex-col justify-between">
+              <div>
+                <span class="text-xs text-gray-400 uppercase tracking-wider block mb-1">4. Número de Condición</span>
+                <div id="diag-kappa-val" class="text-lg font-bold text-white neon-glow font-mono">
+                  κ(A) ≈ 13.966
+                </div>
+              </div>
+              <p id="diag-kappa-desc" class="text-[11px] text-emerald-400 font-mono mt-2 pt-2 border-t border-cyan-950">
+                λₘₐₓ / λₘᵢₙ (Bien condicionada)
+              </p>
+            </div>
+
+          </div>
+        </div>
       </div>
     </section>
 
@@ -811,7 +891,8 @@
     </div>
   </footer>
 
-  <!-- Lógica de interfaz -->
+  <!-- Álgebra lineal y Lógica de interfaz -->
+  <script src="js/linalg.js"></script>
   <script src="js/ui.js"></script>
 </body>
 </html>
