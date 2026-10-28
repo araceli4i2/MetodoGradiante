@@ -115,6 +115,448 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // =========================================================================
+  // SISTEMA DE NOTIFICACIONES RETRO (TOASTS EN EL DOM - NUNCA ALERT())
+  // =========================================================================
+  let toastContainer = null;
+  let ultimoToastInfo = { mensaje: '', tipo: '', timestamp: 0 };
+
+  function escapeHtml(str) {
+    if (typeof str !== 'string') return '';
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  function obtenerToastContainer() {
+    if (!toastContainer || !document.body.contains(toastContainer)) {
+      toastContainer = document.getElementById('retro-toast-container');
+      if (!toastContainer) {
+        toastContainer = document.createElement('div');
+        toastContainer.id = 'retro-toast-container';
+        toastContainer.className = 'fixed top-4 right-4 z-50 flex flex-col gap-2.5 max-w-sm sm:max-w-md w-full pointer-events-none px-4';
+        document.body.appendChild(toastContainer);
+      }
+    }
+    return toastContainer;
+  }
+
+  /**
+   * Muestra una notificación retro tipo toast en el DOM.
+   * Cumple con la regla estricta: nunca invoca la función alert() nativa.
+   * @param {string} mensaje - Mensaje descriptivo del toast
+   * @param {'error'|'warning'|'success'|'info'} [tipo='error'] - Severidad
+   * @param {number} [duracion=5000] - Tiempo en ms antes de auto-desaparecer (0 para persistente)
+   * @param {string} [tituloPersonalizado=null] - Encabezado personalizado
+   */
+  function mostrarToast(mensaje, tipo = 'error', duracion = 5000, tituloPersonalizado = null) {
+    const ahora = Date.now();
+    // Prevenir duplicados inmediatos en menos de 1.2 segundos
+    if (ultimoToastInfo.mensaje === mensaje && ultimoToastInfo.tipo === tipo && (ahora - ultimoToastInfo.timestamp < 1200)) {
+      return;
+    }
+    ultimoToastInfo = { mensaje, tipo, timestamp: ahora };
+
+    const container = obtenerToastContainer();
+    const toast = document.createElement('div');
+
+    let borderColor, textColor, bgGlow, headerText, iconSymbol;
+    switch (tipo) {
+      case 'warning':
+        borderColor = 'border-amber-500';
+        textColor = 'text-amber-200';
+        bgGlow = 'shadow-[0_0_18px_rgba(245,158,11,0.45)]';
+        headerText = tituloPersonalizado || 'ADVERTENCIA // SISTEMA';
+        iconSymbol = '◆';
+        break;
+      case 'success':
+        borderColor = 'border-emerald-500';
+        textColor = 'text-emerald-200';
+        bgGlow = 'shadow-[0_0_18px_rgba(16,185,129,0.45)]';
+        headerText = tituloPersonalizado || 'ÉXITO // OPERACIÓN COMPLETADA';
+        iconSymbol = '●';
+        break;
+      case 'info':
+        borderColor = 'border-cyan-500';
+        textColor = 'text-cyan-200';
+        bgGlow = 'shadow-[0_0_18px_rgba(0,240,255,0.45)]';
+        headerText = tituloPersonalizado || 'NOTIFICACIÓN // TERMINAL';
+        iconSymbol = '>';
+        break;
+      case 'error':
+      default:
+        borderColor = 'border-rose-500';
+        textColor = 'text-rose-200';
+        bgGlow = 'shadow-[0_0_18px_rgba(244,63,94,0.5)]';
+        headerText = tituloPersonalizado || 'ERROR // DATOS INVÁLIDOS';
+        iconSymbol = '▲';
+        break;
+    }
+
+    toast.className = `retro-toast pointer-events-auto flex items-start justify-between gap-3 p-3.5 rounded-lg border bg-black/95 ${borderColor} ${textColor} ${bgGlow} font-mono text-xs backdrop-blur-md`;
+
+    toast.innerHTML = `
+      <div class="flex items-start gap-2.5">
+        <span class="text-base font-bold leading-none select-none">${iconSymbol}</span>
+        <div>
+          <div class="text-[11px] font-bold uppercase tracking-wider leading-none mb-1 opacity-90">${headerText}</div>
+          <div class="text-xs text-gray-200 leading-snug break-words">${escapeHtml(mensaje)}</div>
+        </div>
+      </div>
+      <button type="button" class="toast-close ml-2 text-gray-400 hover:text-white transition-colors cursor-pointer text-base leading-none select-none" title="Cerrar">&times;</button>
+    `;
+
+    function cerrarToast() {
+      if (toast.classList.contains('toast-fade-out')) return;
+      toast.classList.add('toast-fade-out');
+      setTimeout(() => {
+        if (toast.parentElement) {
+          toast.remove();
+        }
+      }, 250);
+    }
+
+    const btnCerrar = toast.querySelector('.toast-close');
+    if (btnCerrar) {
+      btnCerrar.addEventListener('click', cerrarToast);
+    }
+
+    container.appendChild(toast);
+
+    if (duracion > 0) {
+      setTimeout(cerrarToast, duracion);
+    }
+  }
+
+  function limpiarToasts() {
+    const container = obtenerToastContainer();
+    if (container) {
+      container.innerHTML = '';
+    }
+  }
+
+  // =========================================================================
+  // GESTIÓN DE RESALTADO DE CELDAS PROBLEMÁTICAS
+  // =========================================================================
+  function resaltarCelda(elementId, mensaje = '') {
+    const input = document.getElementById(elementId);
+    if (!input) return;
+
+    input.classList.add('cell-error-highlight');
+    if (mensaje) {
+      input.title = mensaje;
+    }
+
+    const onInputHandler = () => {
+      input.classList.remove('cell-error-highlight');
+      input.title = '';
+      input.removeEventListener('input', onInputHandler);
+    };
+    input.addEventListener('input', onInputHandler);
+  }
+
+  function limpiarTodosLosResaltados() {
+    const elementos = document.querySelectorAll('.cell-error-highlight');
+    elementos.forEach(el => {
+      el.classList.remove('cell-error-highlight');
+      el.title = '';
+    });
+  }
+
+  // =========================================================================
+  // GESTIÓN DE RESULTADOS OBSOLETOS ANTE ENTRADAS INVÁLIDAS
+  // =========================================================================
+  function asegurarBannerObsoleto(secId, bannerId, titulo, errorMsg) {
+    const sec = document.getElementById(secId);
+    if (!sec) return;
+
+    let banner = document.getElementById(bannerId);
+    if (!banner) {
+      banner = document.createElement('div');
+      banner.id = bannerId;
+      banner.className = 'banner-obsoleto bg-rose-950/90 border border-rose-500 text-rose-200 p-3 rounded-lg mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 font-mono text-xs shadow-[0_0_15px_rgba(244,63,94,0.4)]';
+      const retroPanel = sec.querySelector('.retro-panel');
+      if (retroPanel) {
+        const subtitle = retroPanel.querySelector('p');
+        if (subtitle && subtitle.parentElement) {
+          subtitle.parentElement.insertAdjacentElement('afterend', banner);
+        } else {
+          retroPanel.prepend(banner);
+        }
+      }
+    }
+    banner.classList.remove('hidden');
+    banner.innerHTML = `
+      <div class="flex items-start sm:items-center gap-2.5">
+        <span class="text-rose-400 font-bold text-lg leading-none">▲</span>
+        <div>
+          <span class="font-bold text-rose-300 uppercase tracking-wider">${titulo}</span>
+          <p class="text-gray-300 text-[11px] mt-0.5 leading-snug">
+            Los datos de entrada actuales contienen errores (<span class="text-rose-200 font-bold">${escapeHtml(errorMsg)}</span>). Los valores y gráficos mostrados a continuación corresponden al último cálculo válido y están <strong>OBSOLETOS</strong>.
+          </p>
+        </div>
+      </div>
+      <span class="px-2.5 py-1 bg-rose-900 border border-rose-500 text-rose-100 rounded text-[10px] font-bold uppercase tracking-wider self-start sm:self-center shadow-[0_0_8px_rgba(244,63,94,0.5)] shrink-0">OBSOLETO</span>
+    `;
+  }
+
+  function marcarResultadosObsoletos(errorMsg) {
+    // 1. Mostrar banners en secciones dependientes de resultados
+    asegurarBannerObsoleto('sec-solucion-referencia', 'banner-obsoleto-sec6', 'Solución de Referencia Obsoleta', errorMsg);
+    asegurarBannerObsoleto('sec-gcp-vs-gc', 'banner-obsoleto-sec7', 'Resultados Iterativos Obsoletos', errorMsg);
+    asegurarBannerObsoleto('sec-analisis-errores', 'banner-obsoleto-sec8', 'Análisis de Errores y Sensibilidad Obsoletos', errorMsg);
+
+    // 2. Aplicar estilo visual atenuado a tablas y gráficos obsoletos
+    const targets = [
+      document.getElementById('tbody-referencia')?.parentElement,
+      document.getElementById('chart-residuos')?.parentElement,
+      document.getElementById('tbody-errores-variable')?.parentElement,
+      document.getElementById('tbody-comparativa-escenarios')?.parentElement,
+      document.getElementById('tbody-sensibilidad')?.parentElement,
+      document.getElementById('table-heatmap-correlacion')
+    ];
+    targets.forEach(el => {
+      if (el) el.classList.add('resultado-obsoleto');
+    });
+
+    // 3. Actualizar badges a estado obsoleto
+    const refResNorma = document.getElementById('ref-residuo-norma');
+    if (refResNorma) {
+      refResNorma.innerHTML = '<span class="text-rose-400 font-bold">▲ OBSOLETO (Entrada Inválida)</span>';
+    }
+
+    const badgeResumen = document.getElementById('badge-comparativa-resumen');
+    if (badgeResumen) {
+      badgeResumen.innerHTML = '<span class="text-rose-400 font-bold">▲ RESULTADOS OBSOLETOS</span>';
+    }
+
+    const gcBadge = document.getElementById('gc-badge-convergio');
+    if (gcBadge) {
+      gcBadge.className = 'text-[10px] px-2 py-0.5 rounded font-mono font-bold bg-rose-950 border border-rose-500 text-rose-300';
+      gcBadge.textContent = '▲ OBSOLETO';
+    }
+
+    const gcpBadge = document.getElementById('gcp-badge-convergio');
+    if (gcpBadge) {
+      gcpBadge.className = 'text-[10px] px-2 py-0.5 rounded font-mono font-bold bg-rose-950 border border-rose-500 text-rose-300';
+      gcpBadge.textContent = '▲ OBSOLETO';
+    }
+
+    const badgeResGlobal = document.getElementById('err-residuo-global-gcp');
+    if (badgeResGlobal) {
+      badgeResGlobal.innerHTML = '<span class="text-rose-400 font-bold">▲ OBSOLETO</span>';
+    }
+
+    const badgeSens = document.getElementById('badge-sensibilidad-actual');
+    if (badgeSens) {
+      badgeSens.className = 'px-2 py-0.5 text-xs font-mono font-bold rounded bg-rose-950 border border-rose-500 text-rose-300';
+      badgeSens.textContent = '▲ OBSOLETO';
+    }
+
+    // 4. Mensaje en consola de sección 4
+    if (calcStatusMsg) {
+      calcStatusMsg.innerHTML = `<span class="text-rose-400 font-bold">▲ ENTRADA INVÁLIDA:</span> ${escapeHtml(errorMsg)} &mdash; <span class="text-amber-300 font-mono font-bold">[RESULTADOS MARCADOS COMO OBSOLETOS]</span>`;
+    }
+  }
+
+  function restaurarResultadosValidos() {
+    document.querySelectorAll('.banner-obsoleto').forEach(b => b.classList.add('hidden'));
+    document.querySelectorAll('.resultado-obsoleto').forEach(el => el.classList.remove('resultado-obsoleto'));
+  }
+
+  function resetearDiagnosticoInvalido() {
+    if (diagEscenarioBadge) diagEscenarioBadge.textContent = 'DATOS INVÁLIDOS';
+    if (diagSimetriaStatus) {
+      diagSimetriaStatus.className = 'text-sm font-bold text-rose-400 flex items-center gap-1.5 font-mono';
+      diagSimetriaStatus.innerHTML = '<span>▲</span> <span>DATOS INVÁLIDOS</span>';
+    }
+    if (diagSimetriaDesc) diagSimetriaDesc.textContent = 'Corrija los campos vacíos o no numéricos.';
+    if (diagSylvesterStatus) {
+      diagSylvesterStatus.className = 'text-sm font-bold text-rose-400 flex items-center gap-1.5 font-mono';
+      diagSylvesterStatus.innerHTML = '<span>▲</span> <span>NO EVALUABLE</span>';
+    }
+    if (diagMenoresVals) diagMenoresVals.innerHTML = '<div class="text-rose-400">Δₖ = N/D</div>';
+    if (diagAutovaloresStatus) {
+      diagAutovaloresStatus.className = 'text-sm font-bold text-rose-400 flex items-center gap-1.5 font-mono';
+      diagAutovaloresStatus.innerHTML = '<span>▲</span> <span>NO EVALUABLE</span>';
+    }
+    if (diagAutovaloresVals) diagAutovaloresVals.innerHTML = '<div class="text-rose-400">λᵢ = N/D</div>';
+    if (diagKappaVal) diagKappaVal.textContent = 'κ(A) = N/D';
+    if (diagKappaDesc) {
+      diagKappaDesc.className = 'text-[11px] text-rose-400 font-mono mt-2 pt-2 border-t border-cyan-950';
+      diagKappaDesc.textContent = 'Esperando matriz válida...';
+    }
+  }
+
+  // =========================================================================
+  // VALIDACIONES DE ENTRADA (CAMPOS VACÍOS, NO NUMÉRICOS, SIMETRÍA, SPD)
+  // =========================================================================
+  function validarEntradas() {
+    // 1. Validar cuadrícula 4x4 de la Matriz A (campos vacíos y no numéricos)
+    for (let i = 0; i < 4; i++) {
+      for (let j = 0; j < 4; j++) {
+        const id = `mat-a-${i}-${j}`;
+        const input = document.getElementById(id);
+        if (!input) continue;
+
+        const raw = input.value.trim();
+        if (raw === '') {
+          return {
+            valido: false,
+            error: `La celda A[${i + 1}, ${j + 1}] (${ACTIVOS_INFO[i].ticker} - ${ACTIVOS_INFO[j].ticker}) está vacía. Ingrese un valor numérico.`,
+            celdas: [id]
+          };
+        }
+
+        const num = Number(raw);
+        if (isNaN(num) || !isFinite(num)) {
+          return {
+            valido: false,
+            error: `La celda A[${i + 1}, ${j + 1}] (${ACTIVOS_INFO[i].ticker} - ${ACTIVOS_INFO[j].ticker}) contiene un valor no numérico ("${raw}").`,
+            celdas: [id]
+          };
+        }
+      }
+    }
+
+    // 2. Validar vector b de retornos esperados (campos vacíos y no numéricos)
+    for (let i = 0; i < 4; i++) {
+      const id = `vec-b-${i}`;
+      const input = document.getElementById(id);
+      if (!input) continue;
+
+      const raw = input.value.trim();
+      if (raw === '') {
+        return {
+          valido: false,
+          error: `El campo del retorno esperado b[${i + 1}] (${ACTIVOS_INFO[i].ticker}) está vacío. Ingrese un valor numérico.`,
+          celdas: [id]
+        };
+      }
+
+      const num = Number(raw);
+      if (isNaN(num) || !isFinite(num)) {
+        return {
+          valido: false,
+          error: `El retorno esperado b[${i + 1}] (${ACTIVOS_INFO[i].ticker}) contiene un valor no numérico ("${raw}").`,
+          celdas: [id]
+        };
+      }
+    }
+
+    // 3. Validar Parámetros de Solver (Tolerancia y Nmáx)
+    const inputTol = document.getElementById('input-tol');
+    if (inputTol) {
+      const rawTol = inputTol.value.trim();
+      const numTol = Number(rawTol);
+      if (rawTol === '' || isNaN(numTol) || numTol <= 0) {
+        return {
+          valido: false,
+          error: 'La tolerancia de convergencia debe ser un número estrictamente positivo (ej. 1e-6).',
+          celdas: ['input-tol']
+        };
+      }
+    }
+
+    const inputMaxIter = document.getElementById('input-max-iter');
+    if (inputMaxIter) {
+      const rawMax = inputMaxIter.value.trim();
+      const numMax = Number(rawMax);
+      if (rawMax === '' || isNaN(numMax) || numMax <= 0 || !Number.isInteger(numMax)) {
+        return {
+          valido: false,
+          error: 'El número máximo de iteraciones (Nmáx) debe ser un número entero positivo (ej. 100).',
+          celdas: ['input-max-iter']
+        };
+      }
+    }
+
+    // 4. Validar vector inicial x0 personalizado si está activo
+    if (selectX0 && selectX0.value === 'custom') {
+      for (let i = 0; i < 4; i++) {
+        const id = `x0-custom-${i}`;
+        const input = document.getElementById(id);
+        if (input) {
+          const raw = input.value.trim();
+          const num = Number(raw);
+          if (raw === '' || isNaN(num) || !isFinite(num)) {
+            return {
+              valido: false,
+              error: `El vector inicial x₀[${i + 1}] para ${ACTIVOS_INFO[i].ticker} debe ser un número válido.`,
+              celdas: [id]
+            };
+          }
+        }
+      }
+    }
+
+    // 5. Construir matrices numéricas
+    const A = leerMatrizA();
+    const b = leerVectorB();
+    const x0 = leerVectorX0();
+    const params = leerParametros();
+
+    // 6. Validar Simetría (A = Aᵀ con tolerancia 1e-8)
+    for (let i = 0; i < 4; i++) {
+      for (let j = i + 1; j < 4; j++) {
+        const diff = Math.abs(A[i][j] - A[j][i]);
+        if (diff > 1e-8) {
+          return {
+            valido: false,
+            error: `Matriz no simétrica: A[${i + 1}, ${j + 1}] (${A[i][j]}) ≠ A[${j + 1}, ${i + 1}] (${A[j][i]}) con discrepancia |aᵢⱼ - aⱼᵢ| = ${diff.toExponential(2)}. La matriz de covarianzas debe ser estrictamente simétrica.`,
+            celdas: [`mat-a-${i}-${j}`, `mat-a-${j}-${i}`],
+            A,
+            b,
+            x0,
+            params
+          };
+        }
+      }
+    }
+
+    // 7. Validar Definición Positiva: Varianzas diagonales A[i][i] > 0
+    for (let i = 0; i < 4; i++) {
+      if (A[i][i] <= 0) {
+        return {
+          valido: false,
+          error: `Matriz no definida positiva: La varianza anualizada del activo ${ACTIVOS_INFO[i].ticker} en la diagonal A[${i + 1}, ${i + 1}] es ${A[i][i]} ≤ 0. Las varianzas deben ser estrictamente positivas.`,
+          celdas: [`mat-a-${i}-${i}`],
+          A,
+          b,
+          x0,
+          params
+        };
+      }
+    }
+
+    // 8. Validar Criterio de Sylvester (Todos los menores principales Δₖ > 0)
+    if (window.LinAlg && typeof window.LinAlg.principalMinors === 'function') {
+      try {
+        const menores = window.LinAlg.principalMinors(A);
+        for (let k = 0; k < menores.length; k++) {
+          if (menores[k] <= 0) {
+            return {
+              valido: false,
+              error: `Criterio de Sylvester violado: El menor principal Δ${k + 1} = ${menores[k].toFixed(6)} es menor o igual a cero. La matriz no es definida positiva (SPD).`,
+              celdas: [`mat-a-${k}-${k}`],
+              A,
+              b,
+              x0,
+              params
+            };
+          }
+        }
+      } catch (errSylvester) {
+        console.warn("Error al calcular menores de Sylvester:", errSylvester);
+      }
+    }
+
+    return { valido: true, A, b, x0, params };
+  }
+
+  // =========================================================================
   // 2. GESTIÓN DE ENTRADA DE DATOS (SECCIÓN 4)
   // =========================================================================
   const selectX0 = document.getElementById('select-x0');
@@ -262,6 +704,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   async function aplicarEscenario(idEscenario) {
+    limpiarTodosLosResaltados();
+    restaurarResultadosValidos();
+
     const { datos, origen } = await obtenerEscenariosData();
     const lista = Array.isArray(datos.escenarios) 
       ? datos.escenarios 
@@ -294,6 +739,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (preDetalleB) {
       preDetalleB.textContent = formatearVectorPre(escenario.b, datos.activos);
     }
+
+    // Notificación toast informativa
+    mostrarToast(`Escenario "${escenario.nombre}" cargado correctamente.`, 'info', 2500);
 
     // Ejecutar cálculo automático para actualizar todas las secciones
     ejecutarCalculo(escenario.nombre);
@@ -526,18 +974,43 @@ document.addEventListener('DOMContentLoaded', () => {
   function ejecutarCalculo(nombreEscenario = 'Personalizado') {
     if (!window.LinAlg || !window.Solvers) return;
 
+    // 0. Validar Entradas Exhaustivamente
+    const val = validarEntradas();
+
+    if (!val.valido) {
+      limpiarTodosLosResaltados();
+      if (val.celdas && val.celdas.length > 0) {
+        val.celdas.forEach(id => resaltarCelda(id, val.error));
+      }
+      mostrarToast(val.error, 'error', 6500);
+      marcarResultadosObsoletos(val.error);
+
+      // Si tenemos A numérico parcial (ej. asimétrica o no SPD), actualizar diagnóstico para reflejarlo
+      if (val.A) {
+        actualizarDiagnosticoSeccion3(val.A, nombreEscenario + ' [INVÁLIDO]');
+      } else {
+        resetearDiagnosticoInvalido();
+      }
+      return;
+    }
+
+    // Si es válido, limpiar resaltados y banderas de obsolescencia
+    limpiarTodosLosResaltados();
+    restaurarResultadosValidos();
+
+    const A = val.A;
+    const b = val.b;
+    const x0 = val.x0;
+    const params = val.params;
+
+    // 1. Actualizar Diagnóstico de Sección 3
+    actualizarDiagnosticoSeccion3(A, nombreEscenario);
+
+    // 2. Ejecutar Cholesky (Solución exacta de referencia)
+    let xRef, L, normResRef;
     try {
-      const A = leerMatrizA();
-      const b = leerVectorB();
-      const x0 = leerVectorX0();
-      const params = leerParametros();
-
-      // 1. Actualizar Diagnóstico de Sección 3
-      actualizarDiagnosticoSeccion3(A, nombreEscenario);
-
-      // 2. Ejecutar Cholesky (Solución exacta de referencia)
-      const xRef = window.LinAlg.solveCholesky(A, b);
-      const L = window.LinAlg.cholesky(A);
+      xRef = window.LinAlg.solveCholesky(A, b);
+      L = window.LinAlg.cholesky(A);
 
       // Cálculo del residuo de Cholesky ‖Ax - b‖₂
       const AxRef = window.LinAlg.matVec(A, xRef);
@@ -545,8 +1018,25 @@ document.addEventListener('DOMContentLoaded', () => {
       for (let i = 0; i < b.length; i++) {
         diffRef.push(AxRef[i] - b[i]);
       }
-      const normResRef = window.LinAlg.norm2(diffRef);
+      normResRef = window.LinAlg.norm2(diffRef);
+    } catch (choleskyError) {
+      console.warn("Fallo capturado en solveCholesky:", choleskyError);
+      
+      const match = choleskyError.message.match(/\[(\d+),\s*(\d+)\]/);
+      if (match) {
+        const row = parseInt(match[1], 10) - 1;
+        const col = parseInt(match[2], 10) - 1;
+        if (row >= 0 && row < 4 && col >= 0 && col < 4) {
+          resaltarCelda(`mat-a-${row}-${col}`, choleskyError.message);
+        }
+      }
 
+      mostrarToast(`Error en Cholesky: ${choleskyError.message}`, 'error', 6500);
+      marcarResultadosObsoletos(choleskyError.message);
+      return;
+    }
+
+    try {
       // Normalización de pesos de referencia: w_i = x_i / ∑ x_j
       const sumXRef = xRef.reduce((acc, val) => acc + val, 0);
       const wRef = xRef.map(val => (sumXRef !== 0 ? val / sumXRef : 0));
@@ -674,9 +1164,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     } catch (error) {
       console.warn("Aviso en el cálculo numérico:", error);
-      if (calcStatusMsg) {
-        calcStatusMsg.innerHTML = `<span class="text-amber-400">▲ Aviso:</span> ${error.message}`;
-      }
+      mostrarToast(`Aviso en cálculo numérico: ${error.message}`, 'error', 6500);
+      marcarResultadosObsoletos(error.message);
     }
   }
 
@@ -1252,7 +1741,14 @@ document.addEventListener('DOMContentLoaded', () => {
     aplicarEscenario,
     ejecutarCalculo,
     actualizarHeatmapCorrelacion,
-    actualizarPanelSensibilidad
+    actualizarPanelSensibilidad,
+    mostrarToast,
+    limpiarToasts,
+    validarEntradas,
+    resaltarCelda,
+    limpiarTodosLosResaltados,
+    marcarResultadosObsoletos,
+    restaurarResultadosValidos
   };
 
   // Iniciar en Sección 1: Inicio
