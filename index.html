@@ -8,6 +8,9 @@
   <!-- Tailwind CSS por CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   
+  <!-- Chart.js por CDN para visualización de convergencia -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
   <!-- Estilos personalizados retro/arcade -->
   <link rel="stylesheet" href="css/retro.css">
 </head>
@@ -818,38 +821,454 @@
     </section>
 
     <!-- SECCIÓN 6: SOLUCIÓN DE REFERENCIA -->
-    <section id="sec-solucion-referencia" class="content-section hidden space-y-4">
+    <section id="sec-solucion-referencia" class="content-section hidden space-y-6">
       <div class="retro-panel rounded-lg p-6 border-cyan-500/50">
-        <h2 class="text-2xl md:text-3xl font-bold text-white neon-glow mb-4">
-          6. Solución de referencia
-        </h2>
-        <div class="border border-dashed border-cyan-700/60 bg-black/40 p-8 rounded text-center">
-          <p class="text-cyan-400 tracking-wider uppercase text-lg">[ En construcción ]</p>
+        <div class="flex items-center space-x-2 text-cyan-400 text-sm mb-3">
+          <span class="cursor-blink">></span>
+          <span>SOLUCIÓN EXACTA // MÉTODO DIRECTO DE CHOLESKY</span>
         </div>
+
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+          <div>
+            <h2 class="text-2xl md:text-3xl font-bold text-white neon-glow">
+              6. Solución de referencia
+            </h2>
+            <p class="text-xs text-cyan-300 mt-1">
+              Método directo: Factorización de Cholesky <span class="font-mono text-white">A = L·Lᵀ</span> (sustitución hacia adelante <span class="font-mono">L·y = b</span> y atrás <span class="font-mono">Lᵀ·x = y</span>).
+            </p>
+          </div>
+
+          <div class="bg-black/70 border border-cyan-500/60 px-3.5 py-1.5 rounded text-xs flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span class="text-gray-300">Residuo de Cholesky:</span>
+            <span id="ref-residuo-norma" class="font-mono text-emerald-400 font-bold">‖Ax - b‖ ≈ 0</span>
+          </div>
+        </div>
+
+        <!-- Tabla de Pesos de Referencia -->
+        <div class="border border-cyan-800 bg-black/60 rounded-lg p-4 overflow-x-auto">
+          <h3 class="text-sm font-bold text-cyan-300 mb-3 uppercase tracking-wider flex items-center justify-between">
+            <span>Vector de Asignación Óptima (Referencia Exacta)</span>
+            <span class="text-[11px] text-gray-400 font-normal">wᵢ = xᵢ / ∑ xⱼ</span>
+          </h3>
+
+          <table class="w-full text-xs text-left border-collapse font-mono">
+            <thead>
+              <tr class="text-cyan-400 border-b border-cyan-900/80">
+                <th class="p-2.5">Activo</th>
+                <th class="p-2.5">Empresa</th>
+                <th class="p-2.5 text-right">Peso no norm. (x_ref)</th>
+                <th class="p-2.5 text-right">Peso norm. (w_ref)</th>
+                <th class="p-2.5 text-right">Porcentaje (%)</th>
+                <th class="p-2.5 text-center">Posición</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-referencia" class="divide-y divide-cyan-950 text-gray-200">
+              <!-- Se inyecta dinámicamente con Cholesky -->
+            </tbody>
+            <tfoot>
+              <tr class="border-t border-cyan-700/80 text-cyan-300 font-bold bg-cyan-950/20">
+                <td class="p-2.5" colspan="2">TOTAL CARTERA</td>
+                <td id="tfoot-ref-sum-x" class="p-2.5 text-right">--</td>
+                <td id="tfoot-ref-sum-w" class="p-2.5 text-right">1.000000</td>
+                <td id="tfoot-ref-sum-pct" class="p-2.5 text-right">100.00 %</td>
+                <td class="p-2.5 text-center text-emerald-400 text-[10px]">BALANCEADA</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <!-- Descomposición L de Cholesky -->
+        <div class="border border-cyan-800/80 bg-black/50 p-4 rounded-lg">
+          <div class="flex justify-between items-center border-b border-cyan-900 pb-2 mb-2">
+            <span class="text-xs font-bold text-cyan-300 uppercase tracking-wider">
+              Factor Triangular Inferior L (A = L·Lᵀ)
+            </span>
+            <span class="text-[11px] text-gray-400 font-mono">Lᵢᵢ &gt; 0</span>
+          </div>
+          <pre id="pre-cholesky-l" class="bg-black/90 p-3 rounded border border-cyan-900 text-cyan-200 overflow-x-auto text-[11px] font-mono leading-relaxed"></pre>
+        </div>
+
       </div>
     </section>
 
     <!-- SECCIÓN 7: GCP VS GC -->
-    <section id="sec-gcp-vs-gc" class="content-section hidden space-y-4">
+    <section id="sec-gcp-vs-gc" class="content-section hidden space-y-6">
       <div class="retro-panel rounded-lg p-6 border-cyan-500/50">
-        <h2 class="text-2xl md:text-3xl font-bold text-white neon-glow mb-4">
-          7. GCP vs GC
-        </h2>
-        <div class="border border-dashed border-cyan-700/60 bg-black/40 p-8 rounded text-center">
-          <p class="text-cyan-400 tracking-wider uppercase text-lg">[ En construcción ]</p>
+        <div class="flex items-center space-x-2 text-cyan-400 text-sm mb-3">
+          <span class="cursor-blink">></span>
+          <span>COMPARATIVA ITERATIVA // GRADIENTES CONJUGADOS (GC) VS GCP JACOBI</span>
         </div>
+
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+          <div>
+            <h2 class="text-2xl md:text-3xl font-bold text-white neon-glow">
+              7. GCP vs GC
+            </h2>
+            <p class="text-xs text-cyan-300 mt-1">
+              Contraste de velocidad de convergencia, número de iteraciones y evolución de la norma residual relativa ‖r‖₂ / ‖b‖₂.
+            </p>
+          </div>
+
+          <div id="badge-comparativa-resumen" class="bg-black/80 border border-cyan-500/60 px-3 py-1.5 rounded text-xs font-mono text-cyan-200">
+            <!-- Resumen dinámico -->
+          </div>
+        </div>
+
+        <!-- Tarjetas comparativas GC vs GCP -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          
+          <!-- Columna GC Clásico -->
+          <div class="border border-cyan-800 bg-black/60 rounded-lg p-4 flex flex-col justify-between">
+            <div>
+              <div class="flex justify-between items-center mb-2 border-b border-cyan-900 pb-2">
+                <h3 class="text-sm font-bold text-cyan-400 flex items-center gap-2">
+                  <span>GRADIENTES CONJUGADOS (GC)</span>
+                </h3>
+                <span id="gc-badge-convergio" class="text-[10px] px-2 py-0.5 rounded font-mono font-bold"></span>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2 text-xs font-mono my-3 bg-cyan-950/20 p-2.5 rounded border border-cyan-900/60">
+                <div>
+                  <span class="text-gray-400 block text-[10px]">Iteraciones:</span>
+                  <span id="gc-iteraciones-val" class="text-base text-cyan-300 font-bold">0</span>
+                </div>
+                <div>
+                  <span class="text-gray-400 block text-[10px]">Residuo final:</span>
+                  <span id="gc-residuo-val" class="text-base text-cyan-300 font-bold">0</span>
+                </div>
+              </div>
+
+              <div class="text-xs font-mono">
+                <span class="text-gray-400 block mb-1">Vector solución x_GC:</span>
+                <pre id="gc-vector-x" class="bg-black/90 p-2 rounded border border-cyan-900 text-cyan-200 text-[11px]"></pre>
+              </div>
+            </div>
+            <div class="text-[10px] text-gray-400 mt-3 pt-2 border-t border-cyan-950">
+              * Método de Krylov clásico sin matriz de precondicionamiento (M = I).
+            </div>
+          </div>
+
+          <!-- Columna GCP Jacobi -->
+          <div class="border border-emerald-800 bg-black/60 rounded-lg p-4 flex flex-col justify-between">
+            <div>
+              <div class="flex justify-between items-center mb-2 border-b border-emerald-900 pb-2">
+                <h3 class="text-sm font-bold text-emerald-400 flex items-center gap-2">
+                  <span>GC PRECONDICIONADO (GCP - JACOBI)</span>
+                </h3>
+                <span id="gcp-badge-convergio" class="text-[10px] px-2 py-0.5 rounded font-mono font-bold"></span>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2 text-xs font-mono my-3 bg-emerald-950/20 p-2.5 rounded border border-emerald-900/60">
+                <div>
+                  <span class="text-gray-400 block text-[10px]">Iteraciones:</span>
+                  <span id="gcp-iteraciones-val" class="text-base text-emerald-300 font-bold">0</span>
+                </div>
+                <div>
+                  <span class="text-gray-400 block text-[10px]">Residuo final:</span>
+                  <span id="gcp-residuo-val" class="text-base text-emerald-300 font-bold">0</span>
+                </div>
+              </div>
+
+              <div class="text-xs font-mono">
+                <span class="text-gray-400 block mb-1">Vector solución x_GCP:</span>
+                <pre id="gcp-vector-x" class="bg-black/90 p-2 rounded border border-emerald-900 text-emerald-200 text-[11px]"></pre>
+              </div>
+            </div>
+            <div class="text-[10px] text-gray-400 mt-3 pt-2 border-t border-emerald-950">
+              * Precondicionador diagonal de Jacobi M = diag(A) según Suñagua (2020).
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Gráfico Chart.js: Historial de Residuos Relativos (Escala Logarítmica) -->
+        <div class="border border-cyan-800 bg-black/60 p-4 md:p-5 rounded-lg">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-3">
+            <h3 class="text-sm font-bold text-cyan-300 uppercase tracking-wider flex items-center gap-2">
+              <span>Evolución de la Norma Residual Relativa: ‖rₖ‖₂ / ‖b‖₂</span>
+            </h3>
+            <span class="text-[11px] text-cyan-400 font-mono">
+              Eje Y: Escala Logarítmica (log₁₀)
+            </span>
+          </div>
+
+          <div class="w-full h-72 md:h-80 relative bg-black/80 rounded border border-cyan-950 p-2">
+            <canvas id="chart-residuos"></canvas>
+          </div>
+          <p class="text-[11px] text-gray-400 mt-2 font-mono">
+            Línea horizontal roja discontinua: Tolerancia de parada configurada (‖r‖/‖b‖ = 1e-6).
+          </p>
+        </div>
+
       </div>
     </section>
 
     <!-- SECCIÓN 8: ANÁLISIS DE ERRORES -->
-    <section id="sec-analisis-errores" class="content-section hidden space-y-4">
+    <section id="sec-analisis-errores" class="content-section hidden space-y-6">
       <div class="retro-panel rounded-lg p-6 border-cyan-500/50">
-        <h2 class="text-2xl md:text-3xl font-bold text-white neon-glow mb-4">
-          8. Análisis de errores
-        </h2>
-        <div class="border border-dashed border-cyan-700/60 bg-black/40 p-8 rounded text-center">
-          <p class="text-cyan-400 tracking-wider uppercase text-lg">[ En construcción ]</p>
+        <div class="flex items-center space-x-2 text-cyan-400 text-sm mb-3">
+          <span class="cursor-blink">></span>
+          <span>PRECISIÓN NUMÉRICA // ERRORES Y COMPARATIVA DE ESCENARIOS</span>
         </div>
+
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+          <div>
+            <h2 class="text-2xl md:text-3xl font-bold text-white neon-glow">
+              8. Análisis de errores
+            </h2>
+            <p class="text-xs text-cyan-300 mt-1">
+              Evaluación del error absoluto (Ea), error relativo (Er), error porcentual (Ep) y comparación integral entre escenarios.
+            </p>
+          </div>
+
+          <!-- Residuo global badge -->
+          <div class="bg-black/80 border border-cyan-500/60 px-3.5 py-1.5 rounded text-xs flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span class="text-gray-300">Residuo Relativo Global GCP:</span>
+            <span id="err-residuo-global-gcp" class="font-mono text-emerald-400 font-bold">‖b - AxGCP‖/‖b‖ ≈ 0</span>
+          </div>
+        </div>
+
+        <!-- SUBPARTE 1: TABLA DE ERRORES POR VARIABLE (PARA EL ESCENARIO/CONFIGURACIÓN ACTUAL) -->
+        <div class="border border-cyan-800 bg-black/60 rounded-lg p-4 overflow-x-auto">
+          <h3 class="text-sm font-bold text-cyan-300 mb-3 uppercase tracking-wider flex items-center justify-between">
+            <span>1. Errores por Variable (GCP vs Referencia Cholesky)</span>
+            <span class="text-[11px] text-gray-400 font-normal">Ea = |xref - xGCP| &nbsp;|&nbsp; Er = Ea / |xref| &nbsp;|&nbsp; Ep = Er &times; 100%</span>
+          </h3>
+
+          <table class="w-full text-xs text-left border-collapse font-mono">
+            <thead>
+              <tr class="text-cyan-400 border-b border-cyan-900/80">
+                <th class="p-2.5">Activo</th>
+                <th class="p-2.5">Empresa</th>
+                <th class="p-2.5 text-right">x_ref (Cholesky)</th>
+                <th class="p-2.5 text-right">x_GCP</th>
+                <th class="p-2.5 text-right">Error Absoluto (Ea)</th>
+                <th class="p-2.5 text-right">Error Relativo (Er)</th>
+                <th class="p-2.5 text-right">Error Porcentual (Ep)</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-errores-variable" class="divide-y divide-cyan-950 text-gray-200">
+              <!-- Se llena dinámicamente -->
+            </tbody>
+            <tfoot>
+              <tr class="border-t border-cyan-700/80 text-cyan-300 font-bold bg-cyan-950/20">
+                <td class="p-2.5" colspan="4">NORMA EUCLÍDEA GLOBAL ‖x_ref - x_GCP‖₂</td>
+                <td id="tfoot-norm-ea" class="p-2.5 text-right text-emerald-400">--</td>
+                <td class="p-2.5 text-right" colspan="2" id="tfoot-global-err-rel">--</td>
+              </tr>
+            </tfoot>
+          </table>
+          <p class="text-[11px] text-gray-400 mt-2 font-mono">
+            * Si x_ref = 0, el error relativo y porcentual se indica como "no definido" para evitar indeterminación numérica.
+          </p>
+        </div>
+
+        <!-- SUBPARTE 2: TABLA COMPARATIVA DE 3 COLUMNAS (IDEAL, BAJO ESTRÉS, MAL CONDICIONADO) -->
+        <div class="border border-cyan-800 bg-black/60 rounded-lg p-4 overflow-x-auto mt-6">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-cyan-900 pb-3 mb-3">
+            <div>
+              <h3 class="text-sm font-bold text-cyan-300 uppercase tracking-wider">
+                2. Tabla Comparativa Multiescenario (Ejecución Automática de los 3 Escenarios)
+              </h3>
+              <p class="text-xs text-gray-400 mt-0.5">
+                Evaluación simultánea de los tres regímenes financieros con Cholesky, GC y GCP Jacobi.
+              </p>
+            </div>
+            <span class="text-[10px] bg-cyan-950 border border-cyan-700 text-cyan-400 px-2 py-0.5 rounded font-mono">
+              Auto-computado
+            </span>
+          </div>
+
+          <table class="w-full text-xs text-left border-collapse font-mono">
+            <thead>
+              <tr class="text-cyan-400 border-b border-cyan-800 bg-cyan-950/40">
+                <th class="p-2.5 w-1/4">Métrica / Característica</th>
+                <th class="p-2.5 w-1/4 text-center border-l border-cyan-900 text-cyan-300 font-bold">1. Ideal</th>
+                <th class="p-2.5 w-1/4 text-center border-l border-cyan-900 text-amber-300 font-bold">2. Bajo estrés</th>
+                <th class="p-2.5 w-1/4 text-center border-l border-cyan-900 text-rose-300 font-bold">3. Mal condicionado</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-comparativa-escenarios" class="divide-y divide-cyan-950 text-gray-200">
+              <!-- Se inyecta dinámicamente con los 3 escenarios -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- SUBPARTE 3: PANEL DE SENSIBILIDAD (PERTURBACIÓN DE b EN ±5% Y ±10%) -->
+        <div class="border border-cyan-800 bg-black/60 rounded-lg p-4 md:p-5 mt-6">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-cyan-900 pb-3 mb-4">
+            <div>
+              <h3 class="text-sm font-bold text-cyan-300 uppercase tracking-wider flex items-center gap-2">
+                <span>3. Panel de Sensibilidad Financiera (Perturbación de b en ±5% y ±10%)</span>
+              </h3>
+              <p class="text-xs text-gray-400 mt-0.5">
+                Evalúa el impacto de la incertidumbre en los retornos esperados (b) sobre la asignación de pesos normalizados (w = x / ∑x).
+              </p>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-[11px] text-gray-400 font-mono">Perturbación activa:</span>
+              <span id="badge-sensibilidad-actual" class="px-2 py-0.5 text-xs font-mono font-bold rounded bg-cyan-950 border border-cyan-500 text-cyan-300">
+                0% (Base)
+              </span>
+            </div>
+          </div>
+
+          <!-- Controles de Sensibilidad -->
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center bg-cyan-950/20 p-3.5 rounded border border-cyan-900/60 mb-4">
+            
+            <!-- Selector de activo / alcance -->
+            <div class="md:col-span-5 flex flex-col gap-1">
+              <label for="select-sensibilidad-activo" class="text-xs text-cyan-300 font-bold uppercase tracking-wider">
+                Activo / Vector a perturbar:
+              </label>
+              <select id="select-sensibilidad-activo" class="bg-black border border-cyan-700 text-cyan-200 text-xs rounded px-2.5 py-1.5 focus:border-cyan-400 focus:outline-none font-mono">
+                <option value="0" selected>AAPL (Activo 1) - Mayor retorno relativo</option>
+                <option value="1">MSFT (Activo 2) - Retorno moderado</option>
+                <option value="2">GOOGL (Activo 3) - Alta ponderación</option>
+                <option value="3">AMZN (Activo 4) - Posición de cobertura</option>
+                <option value="all">Todos los activos simultáneamente (Escalamiento uniforme)</option>
+              </select>
+            </div>
+
+            <!-- Botones de perturbación rápida -->
+            <div class="md:col-span-7 flex flex-wrap items-center justify-end gap-1.5">
+              <span class="text-xs text-gray-400 font-mono mr-1">Rango rápido:</span>
+              <button id="btn-pert-m10" type="button" class="btn-sens-quick px-2.5 py-1 text-xs font-mono rounded bg-black/80 border border-rose-600/70 hover:border-rose-400 text-rose-300 transition-all cursor-pointer">
+                -10%
+              </button>
+              <button id="btn-pert-m5" type="button" class="btn-sens-quick px-2.5 py-1 text-xs font-mono rounded bg-black/80 border border-amber-600/70 hover:border-amber-400 text-amber-300 transition-all cursor-pointer">
+                -5%
+              </button>
+              <button id="btn-pert-0" type="button" class="btn-sens-quick px-2.5 py-1 text-xs font-mono rounded bg-cyan-950 border border-cyan-400 text-cyan-200 font-bold transition-all cursor-pointer shadow-[0_0_8px_rgba(0,240,255,0.3)]">
+                0% Base
+              </button>
+              <button id="btn-pert-p5" type="button" class="btn-sens-quick px-2.5 py-1 text-xs font-mono rounded bg-black/80 border border-emerald-600/70 hover:border-emerald-400 text-emerald-300 transition-all cursor-pointer">
+                +5%
+              </button>
+              <button id="btn-pert-p10" type="button" class="btn-sens-quick px-2.5 py-1 text-xs font-mono rounded bg-black/80 border border-cyan-600/70 hover:border-cyan-400 text-cyan-300 transition-all cursor-pointer">
+                +10%
+              </button>
+            </div>
+
+          </div>
+
+          <!-- Tabla de Resultados de Sensibilidad -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-xs text-left border-collapse font-mono">
+              <thead>
+                <tr class="text-cyan-400 border-b border-cyan-900/80 bg-cyan-950/30">
+                  <th class="p-2.5">Activo</th>
+                  <th class="p-2.5 text-right">b Base</th>
+                  <th class="p-2.5 text-right">b Perturbado</th>
+                  <th class="p-2.5 text-right">x Perturbado</th>
+                  <th class="p-2.5 text-right">w Base (%)</th>
+                  <th class="p-2.5 text-right">w Perturbado (%)</th>
+                  <th class="p-2.5 text-right">Cambio Δw (p.p.)</th>
+                  <th class="p-2.5 text-center">Variación %</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-sensibilidad" class="divide-y divide-cyan-950 text-gray-200">
+                <!-- Se llena dinámicamente -->
+              </tbody>
+              <tfoot>
+                <tr class="border-t border-cyan-700/80 text-cyan-300 font-bold bg-cyan-950/20">
+                  <td class="p-2.5" colspan="3">SUMA DE LA CARTERA</td>
+                  <td id="tfoot-sens-sum-x" class="p-2.5 text-right">--</td>
+                  <td class="p-2.5 text-right">100.00 %</td>
+                  <td id="tfoot-sens-sum-w" class="p-2.5 text-right">100.00 %</td>
+                  <td id="tfoot-sens-sum-dw" class="p-2.5 text-right">0.00 pp</td>
+                  <td class="p-2.5 text-center text-emerald-400 text-[10px]">PRESERVA NORMALIZACIÓN</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <!-- Nota interpretativa de sensibilidad -->
+          <div id="sensibilidad-interpretacion" class="mt-4 bg-cyan-950/20 border-l-2 border-cyan-400 p-3 text-xs text-gray-300 leading-relaxed font-mono">
+            <!-- Texto dinámico -->
+          </div>
+
+        </div>
+
+        <!-- SUBPARTE 4: MAPA DE CALOR DE CORRELACIÓN (DERIVADA DE A) -->
+        <div class="border border-cyan-800 bg-black/60 rounded-lg p-4 md:p-5 mt-6">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-cyan-900 pb-3 mb-4">
+            <div>
+              <h3 class="text-sm font-bold text-cyan-300 uppercase tracking-wider flex items-center gap-2">
+                <span>4. Mapa de Calor (Heatmap) de la Matriz de Correlación R</span>
+              </h3>
+              <p class="text-xs text-gray-400 mt-0.5">
+                Normalización estandarizada de la covarianza: <span class="text-cyan-200 font-mono">Rᵢⱼ = aᵢⱼ / √(aᵢᵢ · aⱼⱼ)</span>. Refleja el grado de co-movimiento entre activos independientemente de su escala de volatilidad.
+              </p>
+            </div>
+            <div class="text-[11px] text-cyan-400 font-mono bg-cyan-950 border border-cyan-700 px-2 py-0.5 rounded">
+              -1.0 ≤ Rᵢⱼ ≤ +1.0
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            
+            <!-- Heatmap 4x4 Table -->
+            <div class="lg:col-span-7 overflow-x-auto">
+              <table id="table-heatmap-correlacion" class="w-full text-xs text-center border-collapse font-mono border border-cyan-900">
+                <!-- Se inyecta dinámicamente -->
+              </table>
+
+              <!-- Leyenda de colores del Heatmap -->
+              <div class="flex flex-wrap items-center justify-between gap-2 mt-3 pt-3 border-t border-cyan-950 text-[10px] font-mono text-gray-400">
+                <span class="text-cyan-300 font-bold">Escala de Intensidad:</span>
+                <div class="flex items-center gap-3">
+                  <div class="flex items-center gap-1">
+                    <span class="w-3 h-3 rounded bg-cyan-950 border border-cyan-800 inline-block"></span>
+                    <span>Baja (&lt; 0.50)</span>
+                  </div>
+                  <div class="flex items-center gap-1">
+                    <span class="w-3 h-3 rounded bg-cyan-900/60 border border-cyan-600 inline-block"></span>
+                    <span>Moderada (0.50 - 0.70)</span>
+                  </div>
+                  <div class="flex items-center gap-1">
+                    <span class="w-3 h-3 rounded bg-cyan-500/30 border border-cyan-400 inline-block"></span>
+                    <span>Alta (&gt; 0.70)</span>
+                  </div>
+                  <div class="flex items-center gap-1">
+                    <span class="w-3 h-3 rounded bg-cyan-400/80 border border-cyan-200 inline-block"></span>
+                    <span>Perfecta (1.00)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Panel de Estadísticas y Diagnóstico de Correlación -->
+            <div class="lg:col-span-5 bg-cyan-950/20 border border-cyan-900/80 p-4 rounded-lg space-y-3">
+              <h4 class="text-xs font-bold text-cyan-300 uppercase tracking-wider border-b border-cyan-900 pb-1.5">
+                Métricas de Co-movimiento y Diversificación
+              </h4>
+
+              <div class="space-y-2 text-xs font-mono">
+                <div class="flex justify-between items-center">
+                  <span class="text-gray-400">Correlación promedio (i ≠ j):</span>
+                  <span id="heatmap-avg-corr" class="text-cyan-300 font-bold">--</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-gray-400">Par con máxima correlación:</span>
+                  <span id="heatmap-max-pair" class="text-rose-300 font-bold">--</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-gray-400">Par con menor correlación:</span>
+                  <span id="heatmap-min-pair" class="text-emerald-300 font-bold">--</span>
+                </div>
+              </div>
+
+              <div id="heatmap-insight" class="text-[11px] text-gray-300 leading-relaxed border-t border-cyan-900/80 pt-2 font-mono">
+                <!-- Se llena dinámicamente con interpretación financiera -->
+              </div>
+            </div>
+
+          </div>
+        </div>
+
       </div>
     </section>
 
