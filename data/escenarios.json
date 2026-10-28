@@ -1,0 +1,66 @@
+{
+  "activos": [
+    "AAPL",
+    "MSFT",
+    "GOOGL",
+    "AMZN"
+  ],
+  "fecha_extraccion": "2026-10-28",
+  "escenarios": [
+    {
+      "id": "ideal",
+      "nombre": "Ideal",
+      "descripcion": "Escenario base de mercado con matriz de covarianzas anualizadas y vector de retornos esperados reales obtenidos de cotizaciones históricas a 2 años.",
+      "condicion_kappa": 13.9663,
+      "A": [
+        [0.050625, 0.038556, 0.03978, 0.042548],
+        [0.038556, 0.056644, 0.04402, 0.048695],
+        [0.03978, 0.04402, 0.073984, 0.053965],
+        [0.042548, 0.048695, 0.053965, 0.0961]
+      ],
+      "b": [
+        0.245,
+        0.221,
+        0.268,
+        0.215
+      ]
+    },
+    {
+      "id": "bajo_estres",
+      "nombre": "Bajo estrés",
+      "descripcion": "Escenario de estrés financiero: volatilidades anualizadas incrementadas en 50% (covarianzas multiplicadas por 2.25) y retornos esperados reducidos al 50% debido al shock y aversión al riesgo en el mercado.",
+      "condicion_kappa": 13.9663,
+      "A": [
+        [0.113906, 0.086751, 0.089505, 0.095733],
+        [0.086751, 0.127449, 0.099045, 0.109564],
+        [0.089505, 0.099045, 0.166464, 0.121421],
+        [0.095733, 0.109564, 0.121421, 0.216225]
+      ],
+      "b": [
+        0.1225,
+        0.1105,
+        0.134,
+        0.1075
+      ]
+    },
+    {
+      "id": "mal_condicionado",
+      "nombre": "Mal condicionado",
+      "descripcion": "Escenario de mal condicionamiento numérico mediante transformación D·A·D (reescalado del activo GOOGL por factor 20). Preserva simetría y definición positiva (SPD), pero eleva el número de condición κ(A) para evaluar el precondicionador Jacobi.",
+      "condicion_kappa": 2000.977,
+      "A": [
+        [0.050625, 0.038556, 0.7956, 0.042548],
+        [0.038556, 0.056644, 0.8804, 0.048695],
+        [0.7956, 0.8804, 29.5936, 1.0793],
+        [0.042548, 0.048695, 1.0793, 0.0961]
+      ],
+      "b": [
+        0.245,
+        0.221,
+        5.36,
+        0.215
+      ]
+    }
+  ]
+}
+
