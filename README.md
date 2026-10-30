@@ -208,6 +208,6 @@ Para publicar este proyecto de forma permanente en GitHub Pages, siga este proce
 - **Golub, G. H., & Van Loan, C. F.** (2013). *Matrix Computations* (4th ed.). Johns Hopkins University Press.
 - **Markowitz, H.** (1952). Portfolio Selection. *The Journal of Finance*, *7*(1), 77–91. https://doi.org/10.2307/2975974
 - **Saad, Y.** (2003). *Iterative Methods for Sparse Linear Systems* (2nd ed.). Society for Industrial and Applied Mathematics (SIAM). https://doi.org/10.1137/1.9780898718003
-- **Suñagua S., P.** (2020). Resolución de sistemas de ecuaciones lineales mediante el método del gradiente conjugado precondicionado. *Revista Boliviana de Matemática – UMSA*, *04*, 2–7.
-- **Yahoo Finance.** (2024). *Historical Market Quotations for AAPL, MSFT, GOOGL, and AMZN* [Conjunto de datos extraído vía yfinance]. Yahoo Finance API. https://finance.yahoo.com/
+- **Suñagua S., P.** (2020). Método de Gradientes Conjugados Precondicionado. *Revista Boliviana de Matemática – UMSA*, *04*, 2–7.
+- **Yahoo Finance.** (2026). *Historical Market Quotations for AAPL, MSFT, GOOGL, and AMZN* [Conjunto de datos extraído vía yfinance]. Yahoo Finance API. https://finance.yahoo.com/
 

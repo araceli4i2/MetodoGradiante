@@ -50,12 +50,107 @@ const DATOS_ESCENARIOS_RESPALDO = {
   ]
 };
 
-const ACTIVOS_INFO = [
-  { ticker: "AAPL", empresa: "Apple Inc." },
-  { ticker: "MSFT", empresa: "Microsoft Corp." },
-  { ticker: "GOOGL", empresa: "Alphabet Inc." },
-  { ticker: "AMZN", empresa: "Amazon.com Inc." }
+// =========================================================================
+// CATÁLOGO DE ACTIVOS FINANCIEROS (MARKOWITZ S&P 500)
+// =========================================================================
+const ACTIVOS = [
+  {
+    indice: 0,
+    ticker: "AAPL",
+    nombre: "Apple Inc.",
+    logo: "assets/logos/appl.webp",
+    alt: "Logo de Apple Inc."
+  },
+  {
+    indice: 1,
+    ticker: "MSFT",
+    nombre: "Microsoft Corp.",
+    logo: "assets/logos/msft.webp",
+    alt: "Logo de Microsoft Corp."
+  },
+  {
+    indice: 2,
+    ticker: "GOOGL",
+    nombre: "Alphabet Inc.",
+    logo: "assets/logos/googl.webp",
+    alt: "Logo de Alphabet Inc."
+  },
+  {
+    indice: 3,
+    ticker: "AMZN",
+    nombre: "Amazon.com Inc.",
+    logo: "assets/logos/amzn.webp",
+    alt: "Logo de Amazon.com Inc."
+  }
 ];
+
+// Asignación de propiedades por ticker para acceso rápido
+ACTIVOS.AAPL = ACTIVOS[0];
+ACTIVOS.MSFT = ACTIVOS[1];
+ACTIVOS.GOOGL = ACTIVOS[2];
+ACTIVOS.AMZN = ACTIVOS[3];
+
+// Retrocompatibilidad con ACTIVOS_INFO existente
+const ACTIVOS_INFO = ACTIVOS.map(a => ({ ticker: a.ticker, empresa: a.nombre }));
+
+/**
+ * Función auxiliar que genera el HTML de la pieza "logo + ticker + nombre"
+ * @param {number|string} idOrTicker Índice (0..3) o ticker ('AAPL', etc.)
+ * @param {'grande'|'pequeno'} tamano 'grande' para tarjetas; 'pequeno' para tablas y matrices
+ * @param {Object} opciones { mostrarNombre: boolean, claseExtra: string, formatoTabla: boolean }
+ * @returns {string} Fragmento HTML con imagen, alt, dimensiones fijas y badge de respaldo
+ */
+function renderActivoWidget(idOrTicker, tamano = 'pequeno', opciones = {}) {
+  let activo = null;
+  if (typeof idOrTicker === 'number') {
+    activo = ACTIVOS[idOrTicker] || null;
+  } else if (typeof idOrTicker === 'string') {
+    const t = idOrTicker.trim().toUpperCase();
+    activo = ACTIVOS.find(a => a.ticker === t) || ACTIVOS[parseInt(t, 10)] || null;
+  }
+  if (!activo) return `<span>${idOrTicker}</span>`;
+
+  const { mostrarNombre = true, claseExtra = '', formatoTabla = false } = opciones;
+
+  if (tamano === 'grande') {
+    return `
+      <div class="inline-flex items-center gap-3 ${claseExtra}">
+        <div class="w-10 h-10 rounded-lg bg-white/95 p-1 border border-cyan-400/50 shrink-0 flex items-center justify-center shadow-[0_0_8px_rgba(6,182,212,0.25)] relative overflow-hidden">
+          <img src="${activo.logo}" alt="${activo.alt}" width="32" height="32" class="w-8 h-8 object-contain"
+            onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.classList.remove('hidden');" />
+          <span class="hidden absolute inset-0 flex items-center justify-center bg-cyan-950 text-cyan-300 font-mono text-[10px] font-bold">
+            ${activo.ticker}
+          </span>
+        </div>
+        <div class="flex flex-col min-w-0 text-left">
+          <span class="font-mono font-bold text-sm text-cyan-200 tracking-wider">${activo.ticker}</span>
+          ${mostrarNombre ? `<span class="text-xs text-gray-300 truncate font-sans">${activo.nombre}</span>` : ''}
+        </div>
+      </div>
+    `.trim();
+  }
+
+  // tamano === 'pequeno' (para tablas, celdas y matrices)
+  return `
+    <div class="inline-flex items-center gap-2 ${claseExtra} align-middle">
+      <div class="w-6 h-6 rounded bg-white/95 p-0.5 border border-cyan-500/40 shrink-0 flex items-center justify-center shadow-[0_0_4px_rgba(6,182,212,0.2)] relative overflow-hidden">
+        <img src="${activo.logo}" alt="${activo.alt}" width="18" height="18" class="w-4 h-4 object-contain"
+          onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.classList.remove('hidden');" />
+        <span class="hidden absolute inset-0 flex items-center justify-center bg-cyan-950 text-cyan-300 font-mono text-[8px] font-bold leading-none">
+          ${activo.ticker.slice(0, 3)}
+        </span>
+      </div>
+      <span class="font-mono font-bold text-cyan-200 text-xs">${activo.ticker}</span>
+      ${mostrarNombre ? `<span class="text-[11px] text-gray-400 font-sans font-normal hidden xl:inline">(${activo.nombre})</span>` : ''}
+    </div>
+  `.trim();
+}
+
+if (typeof window !== 'undefined') {
+  window.ACTIVOS = ACTIVOS;
+  window.ACTIVOS_INFO = ACTIVOS_INFO;
+  window.renderActivoWidget = renderActivoWidget;
+}
 
 // =========================================================================
 // URL OFICIAL DEL REPOSITORIO Y DESPLIEGUE (Fuente única: README.md)
@@ -843,6 +938,7 @@ document.addEventListener('DOMContentLoaded', () => {
     cacheEscenariosData = lista;
     actualizarTarjetasEscenarios(lista);
     actualizarTablaComparativaSeccion3(lista);
+    actualizarTablaResumenSeccion10(lista);
 
     const escenario = lista.find(e => e.id === idEscenario) || lista[0];
     if (!escenario) return;
@@ -1001,6 +1097,63 @@ document.addEventListener('DOMContentLoaded', () => {
    * calculando con LinAlg.js desde los datos de cada escenario (independiente del escenario activo):
    * ‖A − Aᵀ‖, menores principales Δ₁…Δ₄ (Sylvester), autovalores λ₁…λ₄, λmin y conclusión SPD.
    */
+  /**
+   * Actualiza en vivo el Cuadro Resumen Comparativo de Escenarios (Tabla 10.3 en Sección 10)
+   * calculando con LinAlg y Solvers: κ(A), κ(M⁻¹A), iteraciones (GC / GCP) y residuo relativo final de GCP.
+   */
+  function actualizarTablaResumenSeccion10(escenarios) {
+    const tbody = document.getElementById('tbody-resumen-sec10');
+    if (!tbody || !escenarios || !window.LinAlg || !window.Solvers) return;
+
+    const lista = Array.isArray(escenarios) ? escenarios : Object.values(escenarios);
+    if (lista.length < 3) return;
+
+    const metaFilas = [
+      {
+        color: 'text-cyan-300',
+        efecto: 'Régimen normal: alta ponderación en AAPL y GOOGL, AMZN en cobertura.',
+        diagClase: 'text-emerald-400 font-bold',
+        diagTexto: 'Bien condicionada (SPD)'
+      },
+      {
+        color: 'text-amber-300',
+        efecto: 'Contracción de retornos asimétrica (-30% AAPL/MSFT, -50% GOOGL/AMZN) y contagio en correlación.',
+        diagClase: 'text-amber-400 font-bold',
+        diagTexto: 'SPD bajo estrés'
+      },
+      {
+        color: 'text-rose-300',
+        efecto: 'Desbalance de escala en GOOGL. Jacobi recupera precisión de máquina (182x mejora).',
+        diagClase: 'text-emerald-400 font-bold',
+        diagTexto: 'Mejor precisión final con GCP (iteraciones empatadas con tol 1e-6)'
+      }
+    ];
+
+    const filasHtml = lista.map((esc, idx) => {
+      const A = esc.A;
+      const b = esc.b;
+      const condA = window.LinAlg.condNumber(A);
+      const condMA = window.Solvers.condPrecond(A);
+      const resGC = window.Solvers.solveGC(A, b, [0, 0, 0, 0], 1e-6, 100);
+      const resGCP = window.Solvers.solveGCP(A, b, [0, 0, 0, 0], 1e-6, 100);
+      const meta = metaFilas[idx] || metaFilas[0];
+      const condAClase = idx === 2 ? 'text-rose-400 font-bold' : '';
+
+      return `
+              <tr class="hover:bg-cyan-950/20">
+                <td class="p-2.5 font-bold ${meta.color}">${idx + 1}. ${esc.nombre}</td>
+                <td class="p-2.5 text-center ${condAClase}">${condA.toFixed(2)}</td>
+                <td class="p-2.5 text-center text-emerald-400">${condMA.toFixed(2)}</td>
+                <td class="p-2.5 text-center">${resGC.iteraciones} / ${resGCP.iteraciones}</td>
+                <td class="p-2.5 text-center font-mono text-cyan-200">${resGCP.residuoRelativo.toExponential(2)}</td>
+                <td class="p-2.5 text-gray-300">${meta.efecto}</td>
+                <td class="p-2.5 text-center ${meta.diagClase}">${meta.diagTexto}</td>
+              </tr>`;
+    }).join('');
+
+    tbody.innerHTML = filasHtml;
+  }
+
   function actualizarTablaComparativaSeccion3(escenarios) {
     const tbody = document.getElementById('tbody-comparativa-sec3');
     if (!tbody || !escenarios || !window.LinAlg) return;
@@ -1500,8 +1653,8 @@ document.addEventListener('DOMContentLoaded', () => {
           const esLarga = xi >= 0;
           return `
             <tr class="hover:bg-cyan-950/30 transition-colors">
-              <td class="p-2.5 text-cyan-300 font-bold">${ACTIVOS_INFO[idx].ticker}</td>
-              <td class="p-2.5 text-gray-300">${ACTIVOS_INFO[idx].empresa}</td>
+              <td class="p-2.5">${renderActivoWidget(idx, 'pequeno', { mostrarNombre: false })}</td>
+              <td class="p-2.5 text-gray-300 font-sans">${ACTIVOS[idx].nombre}</td>
               <td class="p-2.5 text-right font-mono">${xi.toFixed(6)}</td>
               <td class="p-2.5 text-right font-mono text-cyan-200">${wi.toFixed(6)}</td>
               <td class="p-2.5 text-right font-mono ${pct >= 0 ? 'text-emerald-400' : 'text-rose-400'}">${pct.toFixed(2)} %</td>
@@ -1664,8 +1817,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       return `
         <tr class="hover:bg-cyan-950/30 transition-colors">
-          <td class="p-2.5 text-cyan-300 font-bold">${ACTIVOS_INFO[idx].ticker}</td>
-          <td class="p-2.5 text-gray-300">${ACTIVOS_INFO[idx].empresa}</td>
+          <td class="p-2.5">${renderActivoWidget(idx, 'pequeno', { mostrarNombre: false })}</td>
+          <td class="p-2.5 text-gray-300 font-sans">${ACTIVOS[idx].nombre}</td>
           <td class="p-2.5 text-right font-mono">${xref_i.toFixed(6)}</td>
           <td class="p-2.5 text-right font-mono text-emerald-300">${xgcp_i.toFixed(6)}</td>
           <td class="p-2.5 text-right font-mono text-cyan-200">${strEa}</td>
@@ -1911,7 +2064,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <thead>
         <tr class="text-cyan-400 bg-cyan-950/50 border-b border-cyan-800">
           <th class="p-2 border border-cyan-900/60 text-gray-500 font-bold">R</th>
-          ${ACTIVOS_INFO.map(a => `<th class="p-2 border border-cyan-900/60 font-bold">${a.ticker}</th>`).join('')}
+          ${ACTIVOS.map((a, idx) => `<th class="p-2 border border-cyan-900/60 font-bold"><div class="flex justify-center">${renderActivoWidget(idx, 'pequeno', { mostrarNombre: false })}</div></th>`).join('')}
         </tr>
       </thead>
       <tbody>
@@ -1921,7 +2074,7 @@ document.addEventListener('DOMContentLoaded', () => {
     for (let i = 0; i < n; i++) {
       tableHtml += `
         <tr class="hover:bg-cyan-950/20">
-          <td class="p-2 bg-cyan-950/30 border border-cyan-900/60 font-bold text-cyan-300">${ACTIVOS_INFO[i].ticker}</td>
+          <td class="p-2 bg-cyan-950/30 border border-cyan-900/60 font-bold text-cyan-300">${renderActivoWidget(i, "pequeno", { mostrarNombre: false })}</td>
       `;
       for (let j = 0; j < n; j++) {
         const val = R[i][j];
@@ -2121,7 +2274,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return `
         <tr class="hover:bg-cyan-950/20 transition-colors ${estaPerturbado ? 'bg-cyan-950/30' : ''}">
           <td class="p-2.5 font-bold ${estaPerturbado ? 'text-cyan-300' : 'text-gray-300'}">
-            ${act.ticker} <span class="text-[10px] text-gray-500 font-normal">(${act.empresa})</span>
+            ${renderActivoWidget(i, 'pequeno', { mostrarNombre: true })}
           </td>
           <td class="p-2.5 text-right font-mono text-gray-300">${b0.toFixed(4)}</td>
           <td class="p-2.5 text-right font-mono ${estaPerturbado ? 'text-cyan-300 font-bold' : 'text-gray-400'}">${bp.toFixed(4)}</td>
@@ -2200,6 +2353,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btnRecalcularDiag.addEventListener('click', () => {
       ejecutarCalculo('Personalizado');
       actualizarTablaComparativaSeccion3(cacheEscenariosData || DATOS_ESCENARIOS_RESPALDO.escenarios);
+    actualizarTablaResumenSeccion10(cacheEscenariosData || DATOS_ESCENARIOS_RESPALDO.escenarios);
     });
   }
 
@@ -2249,6 +2403,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Inicializar tarjetas y tabla comparativa de Sección 3 con respaldo inmediato
   actualizarTarjetasEscenarios(DATOS_ESCENARIOS_RESPALDO.escenarios);
   actualizarTablaComparativaSeccion3(DATOS_ESCENARIOS_RESPALDO.escenarios);
+    actualizarTablaResumenSeccion10(DATOS_ESCENARIOS_RESPALDO.escenarios);
 
   // Inicializar todo con el escenario Ideal
   aplicarEscenario('ideal');
