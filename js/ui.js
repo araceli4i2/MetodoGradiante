@@ -1479,6 +1479,375 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // =========================================================================
+  // GRÁFICOS COMPLEMENTARIOS CHART.JS (SECCIONES 6 Y 8)
+  // =========================================================================
+  let chartPesosInstance = null;
+  let chartAutovaloresInstance = null;
+  let modoVistaPesos = 'activo';
+
+  /**
+   * Renderiza el gráfico de barras horizontales de pesos normalizados (Sección 6)
+   * con verdes para positivos, rojos para negativos (rotulado "larga" / "corta"),
+   * advertencia financiera para Mal condicionado, y soporte para comparar los 3 escenarios.
+   */
+  async function renderizarGraficoPesos(xRefActual, nombreEscenario) {
+    const canvas = document.getElementById('chart-pesos-normalizados');
+    if (!canvas || typeof Chart === 'undefined') return;
+
+    const tickers = ACTIVOS_INFO.map(a => a.ticker);
+
+    // Requisito 2: Mostrar nota visible cuando se muestre el escenario Mal condicionado
+    const notaMal = document.getElementById('nota-mal-condicionado-pesos');
+    if (notaMal) {
+      const mostrarNota = modoVistaPesos === 'comparar' ||
+        modoVistaPesos === 'mal_condicionado' ||
+        (modoVistaPesos === 'activo' && (
+          (nombreEscenario && /mal/i.test(nombreEscenario)) ||
+          (escenarioSeleccionadoId === 'mal_condicionado')
+        ));
+      if (mostrarNota) {
+        notaMal.classList.remove('hidden');
+      } else {
+        notaMal.classList.add('hidden');
+      }
+    }
+
+    if (chartPesosInstance) {
+      chartPesosInstance.destroy();
+    }
+
+    const ctx = canvas.getContext('2d');
+
+    if (modoVistaPesos === 'comparar') {
+      // Modo comparativo: calcular pesos para Ideal, Bajo estrés y Mal condicionado
+      const { datos } = await obtenerEscenariosData();
+      const escenarios = Array.isArray(datos.escenarios) ? datos.escenarios : Object.values(datos.escenarios);
+
+      const nombresSeries = ['1. Ideal', '2. Bajo estrés', '3. Mal condicionado'];
+      const paletas = [
+        { posBg: 'rgba(16, 185, 129, 0.85)', posBorder: '#10b981', negBg: 'rgba(244, 63, 94, 0.85)', negBorder: '#f43f5e' },
+        { posBg: 'rgba(52, 211, 153, 0.85)', posBorder: '#34d399', negBg: 'rgba(251, 113, 133, 0.85)', negBorder: '#fb7185' },
+        { posBg: 'rgba(110, 231, 183, 0.85)', posBorder: '#6ee7b7', negBg: 'rgba(253, 164, 175, 0.85)', negBorder: '#fda4af' }
+      ];
+
+      const datasets = escenarios.slice(0, 3).map((esc, sIdx) => {
+        let xVec = null;
+        try {
+          xVec = window.LinAlg.solveCholesky(esc.A, esc.b);
+        } catch (e) {
+          xVec = [0, 0, 0, 0];
+        }
+        const sumX = xVec.reduce((a, v) => a + v, 0);
+        const wPct = xVec.map(v => (sumX !== 0 ? (v / sumX) * 100 : 0));
+        const pal = paletas[sIdx];
+
+        return {
+          label: nombresSeries[sIdx] || esc.nombre,
+          data: wPct,
+          backgroundColor: wPct.map(v => (v >= 0 ? pal.posBg : pal.negBg)),
+          borderColor: wPct.map(v => (v >= 0 ? pal.posBorder : pal.negBorder)),
+          borderWidth: 1.5
+        };
+      });
+
+      chartPesosInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: tickers,
+          datasets: datasets
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              labels: {
+                color: '#e0f2fe',
+                font: { family: 'Share Tech Mono, monospace', size: 11 }
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const val = context.parsed.x;
+                  const tipoPos = val >= 0 ? 'larga' : 'corta';
+                  return ` ${context.dataset.label}: ${val >= 0 ? '+' : ''}${val.toFixed(2)}% [posición ${tipoPos}]`;
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: 'Peso Normalizado wᵢ (%)',
+                color: '#00f0ff',
+                font: { family: 'Share Tech Mono, monospace', size: 11 }
+              },
+              grid: { color: 'rgba(14, 165, 233, 0.15)' },
+              ticks: {
+                color: '#94a3b8',
+                font: { family: 'Share Tech Mono, monospace' },
+                callback: function(v) { return `${v}%`; }
+              }
+            },
+            y: {
+              grid: { color: 'rgba(14, 165, 233, 0.15)' },
+              ticks: {
+                color: '#e0f2fe',
+                font: { family: 'Share Tech Mono, monospace', weight: 'bold' }
+              }
+            }
+          }
+        }
+      });
+      return;
+    }
+
+    // Modo individual (Activo, Ideal, Bajo estrés o Mal condicionado)
+    let vectorBase = xRefActual;
+    let labelEsc = nombreEscenario || 'Escenario activo';
+
+    if (modoVistaPesos !== 'activo') {
+      const { datos } = await obtenerEscenariosData();
+      const escenarios = Array.isArray(datos.escenarios) ? datos.escenarios : Object.values(datos.escenarios);
+      const escSel = escenarios.find(e => e.id === modoVistaPesos);
+      if (escSel) {
+        labelEsc = escSel.nombre;
+        try {
+          vectorBase = window.LinAlg.solveCholesky(escSel.A, escSel.b);
+        } catch (e) {
+          vectorBase = xRefActual;
+        }
+      }
+    }
+
+    const sumX = vectorBase && Array.isArray(vectorBase)
+      ? vectorBase.reduce((a, v) => a + v, 0)
+      : 1;
+    const wPct = vectorBase && Array.isArray(vectorBase)
+      ? vectorBase.map(v => (sumX !== 0 ? (v / sumX) * 100 : 0))
+      : [0, 0, 0, 0];
+
+    // Requisito 3: Rotular explícitamente en el eje Y si es posición larga o corta
+    const labelsEjeY = tickers.map((t, i) => {
+      const tipo = wPct[i] >= 0 ? 'larga' : 'corta';
+      return `${t} [${tipo}]`;
+    });
+
+    const bgColors = wPct.map(v => (v >= 0 ? 'rgba(16, 185, 129, 0.85)' : 'rgba(244, 63, 94, 0.85)'));
+    const borderColors = wPct.map(v => (v >= 0 ? '#10b981' : '#f43f5e'));
+
+    chartPesosInstance = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labelsEjeY,
+        datasets: [
+          {
+            label: `Pesos normalizados — ${labelEsc}`,
+            data: wPct,
+            backgroundColor: bgColors,
+            borderColor: borderColors,
+            borderWidth: 1.5,
+            borderRadius: 3
+          }
+        ]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            labels: {
+              color: '#e0f2fe',
+              font: { family: 'Share Tech Mono, monospace', size: 11 }
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const val = context.parsed.x;
+                const tipoPos = val >= 0 ? 'larga' : 'corta';
+                return ` ${context.label}: ${val >= 0 ? '+' : ''}${val.toFixed(2)}% [posición ${tipoPos}]`;
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            title: {
+              display: true,
+              text: 'Peso Normalizado wᵢ (%)',
+              color: '#00f0ff',
+              font: { family: 'Share Tech Mono, monospace', size: 11 }
+            },
+            grid: { color: 'rgba(14, 165, 233, 0.15)' },
+            ticks: {
+              color: '#94a3b8',
+              font: { family: 'Share Tech Mono, monospace' },
+              callback: function(v) { return `${v}%`; }
+            }
+          },
+          y: {
+            grid: { color: 'rgba(14, 165, 233, 0.15)' },
+            ticks: {
+              color: '#e0f2fe',
+              font: { family: 'Share Tech Mono, monospace', weight: 'bold' }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  /**
+   * Renderiza el gráfico del espectro de autovalores de A vs M⁻¹A en escala logarítmica (Sección 8)
+   * calculados con eigenSymmetric de LinAlg para el escenario activo.
+   */
+  function renderizarGraficoAutovalores(A) {
+    const canvas = document.getElementById('chart-autovalores');
+    if (!canvas || typeof Chart === 'undefined') return;
+
+    const n = A.length;
+    // 1. Autovalores de la matriz original A
+    const resEigA = window.LinAlg.eigenSymmetric(A);
+    const lambdasA = [...resEigA.eigenvalues].sort((a, b) => a - b);
+    const minA = lambdasA[0];
+    const maxA = lambdasA[n - 1];
+    const kappaA = minA > 0 ? maxA / minA : Infinity;
+
+    // 2. Matriz simétrica semejante para Jacobi M = diag(A): Ã_ij = A_ij / sqrt(A_ii * A_jj)
+    const Atilde = Array.from({ length: n }, () => new Array(n));
+    for (let i = 0; i < n; i++) {
+      const diagI = A[i][i] > 0 ? Math.sqrt(A[i][i]) : 1;
+      for (let j = 0; j < n; j++) {
+        const diagJ = A[j][j] > 0 ? Math.sqrt(A[j][j]) : 1;
+        Atilde[i][j] = A[i][j] / (diagI * diagJ);
+      }
+    }
+    const resEigMA = window.LinAlg.eigenSymmetric(Atilde);
+    const lambdasMA = [...resEigMA.eigenvalues].sort((a, b) => a - b);
+    const minMA = lambdasMA[0];
+    const maxMA = lambdasMA[n - 1];
+    const kappaMA = minMA > 0 ? maxMA / minMA : Infinity;
+
+    // Actualizar título con números de condición en vivo
+    const titleBadge = document.getElementById('autovalores-cond-title');
+    if (titleBadge) {
+      titleBadge.innerHTML = `κ(A) ≈ <span class="text-rose-400 font-bold">${kappaA.toFixed(2)}</span> &nbsp;|&nbsp; κ(M⁻¹A) ≈ <span class="text-emerald-400 font-bold">${kappaMA.toFixed(2)}</span>`;
+    }
+
+    // Requisito 1: Texto de apoyo dinámico y prudente
+    const factorMejora = kappaMA > 0 ? (kappaA / kappaMA).toFixed(1) : '1.0';
+    const dynSpan = document.getElementById('autovalores-texto-dinamico');
+    if (dynSpan) {
+      dynSpan.textContent = `En el escenario activo, Jacobi cambia κ de ${kappaA.toFixed(2)} a ${kappaMA.toFixed(2)} (factor ${factorMejora}x). La mejora es grande cuando el mal condicionamiento viene del escalamiento diagonal (escenario Mal condicionado) y modesta cuando viene de correlaciones (Ideal y Estrés).`;
+    }
+
+    if (chartAutovaloresInstance) {
+      chartAutovaloresInstance.destroy();
+    }
+
+    const ctx = canvas.getContext('2d');
+    const labels = ['λ₁ (mín)', 'λ₂', 'λ₃', 'λ₄ (máx)'];
+
+    // Requisito 3: Distinguir autovalores por forma geométrica (triángulo vs círculo) y texto explícito
+    chartAutovaloresInstance = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: `▲ λ(A) [triángulo rojo] — κ(A) ≈ ${kappaA.toFixed(2)}`,
+            data: lambdasA,
+            borderColor: '#f43f5e',
+            backgroundColor: 'rgba(244, 63, 94, 0.15)',
+            borderDash: [5, 4],
+            borderWidth: 2,
+            pointStyle: 'triangle',
+            pointRadius: 8,
+            pointHoverRadius: 10,
+            pointBackgroundColor: '#f43f5e',
+            pointBorderColor: '#ffffff',
+            pointBorderWidth: 1.5,
+            tension: 0.1
+          },
+          {
+            label: `● λ(M⁻¹A) Jacobi [círculo verde] — κ(M⁻¹A) ≈ ${kappaMA.toFixed(2)}`,
+            data: lambdasMA,
+            borderColor: '#10b981',
+            backgroundColor: 'rgba(16, 185, 129, 0.15)',
+            borderWidth: 2,
+            pointStyle: 'circle',
+            pointRadius: 7,
+            pointHoverRadius: 9,
+            pointBackgroundColor: '#10b981',
+            pointBorderColor: '#ffffff',
+            pointBorderWidth: 1.5,
+            tension: 0.1
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            labels: {
+              usePointStyle: true,
+              pointStyle: true,
+              color: '#e0f2fe',
+              font: { family: 'Share Tech Mono, monospace', size: 11 }
+            }
+          },
+          tooltip: {
+            usePointStyle: true,
+            callbacks: {
+              label: function(context) {
+                const val = context.parsed.y;
+                const valStr = val >= 100 || val < 0.01 ? val.toExponential(4) : val.toFixed(5);
+                return ` ${context.dataset.label.split('—')[0].trim()}: ${valStr}`;
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            ticks: {
+              color: '#00f0ff',
+              font: { family: 'Share Tech Mono, monospace', weight: 'bold' }
+            },
+            grid: { color: 'rgba(14, 165, 233, 0.15)' }
+          },
+          y: {
+            type: 'logarithmic',
+            title: {
+              display: true,
+              text: 'Autovalor λ (Escala Logarítmica log₁₀)',
+              color: '#00f0ff',
+              font: { family: 'Share Tech Mono, monospace', size: 11 }
+            },
+            ticks: {
+              color: '#94a3b8',
+              font: { family: 'Share Tech Mono, monospace' },
+              callback: function(value) {
+                const num = Number(value);
+                if (num === 0.01 || num === 0.1 || num === 1 || num === 10 || num === 100) {
+                  return num.toString();
+                }
+                return num.toExponential(0);
+              }
+            },
+            grid: { color: 'rgba(14, 165, 233, 0.15)' }
+          }
+        }
+      }
+    });
+  }
+
   /**
    * Actualiza la tabla de Residuo Relativo por Iteración (Sección 7)
    * Columnas: k, ‖rₖ‖/‖b‖ (GC Estándar), ‖rₖ‖/‖b‖ (GCP Jacobi), Ventaja de Precisión GCP
@@ -2269,9 +2638,13 @@ document.addEventListener('DOMContentLoaded', () => {
       actualizarComparativaTresEscenarios();
 
       // 8. Actualizar Sección 8: Panel de Sensibilidad y Heatmap de Correlación
-      ultimoCalculo = { A, b, xRef, resGC, resGCP };
+      ultimoCalculo = { A, b, xRef, resGC, resGCP, nombreEscenario };
       actualizarHeatmapCorrelacion(A);
       actualizarPanelSensibilidad(estadoSensibilidad.deltaPct, estadoSensibilidad.target);
+
+      // 9. Actualizar Gráficos Complementarios (Sección 6: Pesos normalizados, Sección 8: Espectro autovalores)
+      renderizarGraficoPesos(xRef, nombreEscenario);
+      renderizarGraficoAutovalores(A);
 
       // Estado en consola terminal de Sección 4
       if (calcStatusMsg) {
@@ -2889,6 +3262,19 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Selector multiescenario para el gráfico de pesos de Sección 6
+  const selPesos = document.getElementById('select-comparar-pesos');
+  if (selPesos) {
+    selPesos.addEventListener('change', () => {
+      modoVistaPesos = selPesos.value;
+      if (ultimoCalculo && ultimoCalculo.xRef) {
+        renderizarGraficoPesos(ultimoCalculo.xRef, ultimoCalculo.nombreEscenario || 'Escenario activo');
+      } else {
+        renderizarGraficoPesos(null, 'Escenario activo');
+      }
+    });
+  }
+
   // Controles del Panel Sticky HUD (Desktop y Móvil)
   const stickyBtnCalcular = document.getElementById('sticky-btn-calcular');
   if (stickyBtnCalcular) {
@@ -3007,7 +3393,9 @@ document.addEventListener('DOMContentLoaded', () => {
     animarCeldasRecalculadas,
     actualizarTablaTraza,
     renderizarVistaTraza,
-    estadoTraza
+    estadoTraza,
+    renderizarGraficoPesos,
+    renderizarGraficoAutovalores
   };
 
   // Iniciar en la sección solicitada por query param / hash o en Sección 1: Inicio

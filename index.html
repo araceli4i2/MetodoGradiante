@@ -1422,6 +1422,53 @@
             class="bg-black/90 p-3 rounded border border-cyan-900 text-cyan-200 overflow-x-auto text-[11px] font-mono leading-relaxed"></pre>
         </div>
 
+        <!-- Gráfico: Distribución de Pesos Normalizados (Barras Horizontales) -->
+        <div class="border border-cyan-800 bg-black/60 p-4 md:p-5 rounded-lg space-y-3">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-cyan-900/60 pb-3">
+            <div>
+              <div class="flex items-center gap-2 text-xs text-cyan-400 font-mono">
+                <span class="cursor-blink">></span>
+                <span class="font-bold uppercase tracking-wider">ESTRUCTURA DE CAPITAL // ASIGNACIÓN DE PESOS</span>
+              </div>
+              <h3 class="text-base md:text-lg font-bold text-white flex items-center gap-2 mt-0.5">
+                <span>Distribución de Pesos Normalizados de la Cartera</span>
+              </h3>
+            </div>
+
+            <!-- Selector de comparación multiescenario -->
+            <div class="flex items-center gap-2">
+              <label for="select-comparar-pesos" class="text-xs text-gray-300 font-mono">Vista:</label>
+              <select id="select-comparar-pesos"
+                class="bg-black border border-cyan-700 text-cyan-200 text-xs rounded px-2.5 py-1.5 focus:border-cyan-400 focus:outline-none font-mono">
+                <option value="activo" selected>Escenario activo (en vivo)</option>
+                <option value="comparar">Comparar 3 escenarios lado a lado</option>
+                <option value="ideal">1. Ideal</option>
+                <option value="bajo_estres">2. Bajo estrés</option>
+                <option value="mal_condicionado">3. Mal condicionado</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Nota visible cuando se muestre el escenario Mal condicionado -->
+          <div id="nota-mal-condicionado-pesos" class="hidden p-2.5 rounded bg-amber-950/40 border border-amber-600/80 text-amber-200 text-xs font-mono">
+            ⚠️ <span class="font-bold">Advertencia financiera:</span> En este escenario GOOGL está reescalado ×20 (D·A·D) para provocar mal condicionamiento; sus pesos no representan una cartera real.
+          </div>
+
+          <div class="w-full h-64 sm:h-72 md:h-80 relative bg-black/80 rounded border border-cyan-950 p-2">
+            <canvas id="chart-pesos-normalizados"></canvas>
+          </div>
+
+          <!-- Texto de apoyo de 2 líneas -->
+          <div class="text-[11px] text-gray-300 font-mono leading-relaxed pt-2 border-t border-cyan-950 space-y-1">
+            <p>
+              • <strong class="text-emerald-400">Barras verdes [larga]:</strong> posiciones largas (compra de activos con peso positivo wᵢ &gt; 0). <strong class="text-rose-400">Barras rojas [corta]:</strong> posiciones cortas (wᵢ &lt; 0), donde el modelo financia la cartera vendiendo activos prestados.
+            </p>
+            <p>
+              • <strong class="text-cyan-300">Importancia financiera:</strong> El selector multiescenario revela cómo los choques de retorno y covarianza fuerzan rotaciones extremas de capital sin variar los activos subyacentes.
+            </p>
+          </div>
+        </div>
+
       </div>
     </section>
 
@@ -1748,13 +1795,47 @@
           </table>
         </div>
 
-        <!-- SUBPARTE 3: PANEL DE SENSIBILIDAD (PERTURBACIÓN DE b EN ±5% Y ±10%) -->
+        <!-- SUBPARTE 3: ESPECTRO DE AUTOVALORES (ESCALA LOGARÍTMICA) -->
+        <div class="border border-cyan-800 bg-black/60 rounded-lg p-4 md:p-5 mt-6 space-y-3">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-cyan-900/60 pb-3">
+            <div>
+              <div class="flex items-center gap-2 text-xs text-cyan-400 font-mono">
+                <span class="cursor-blink">></span>
+                <span class="font-bold uppercase tracking-wider">3. ANÁLISIS ESPECTRAL // MATRIZ A VS PRECONDICIONADA M⁻¹A</span>
+              </div>
+              <h3 class="text-base md:text-lg font-bold text-white flex items-center gap-2 mt-0.5">
+                <span>Espectro de autovalores</span>
+              </h3>
+            </div>
+
+            <!-- Título dinámico con los números de condición del escenario activo -->
+            <div id="autovalores-cond-title" class="px-3 py-1.5 rounded bg-black/90 border border-cyan-700 text-xs font-mono text-cyan-200">
+              κ(A) ≈ -- &nbsp;|&nbsp; κ(M⁻¹A) ≈ --
+            </div>
+          </div>
+
+          <div class="w-full h-64 sm:h-72 md:h-80 relative bg-black/80 rounded border border-cyan-950 p-2">
+            <canvas id="chart-autovalores"></canvas>
+          </div>
+
+          <!-- Texto de apoyo de 2 líneas -->
+          <div class="text-[11px] text-gray-300 font-mono leading-relaxed pt-2 border-t border-cyan-950 space-y-1">
+            <p>
+              • <strong class="text-rose-400">▲ Triángulos rojos [λ(A)]:</strong> autovalores de la matriz original. <strong class="text-emerald-400">● Círculos verdes [λ(M⁻¹A)]:</strong> autovalores precondicionados con Jacobi en escala logarítmica.
+            </p>
+            <p id="autovalores-texto-apoyo">
+              • <strong class="text-cyan-300">Importancia numérica:</strong> <span id="autovalores-texto-dinamico">En el escenario activo, Jacobi cambia κ de -- a -- (factor --x). La mejora es grande cuando el mal condicionamiento viene del escalamiento diagonal (escenario Mal condicionado) y modesta cuando viene de correlaciones (Ideal y Estrés).</span>
+            </p>
+          </div>
+        </div>
+
+        <!-- SUBPARTE 4: PANEL DE SENSIBILIDAD (PERTURBACIÓN DE b EN ±5% Y ±10%) -->
         <div class="border border-cyan-800 bg-black/60 rounded-lg p-4 md:p-5 mt-6">
           <div
             class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-cyan-900 pb-3 mb-4">
             <div>
               <h3 class="text-sm font-bold text-cyan-300 uppercase tracking-wider flex items-center gap-2">
-                <span>3. Panel de Sensibilidad Financiera (Perturbación de b en ±5% y ±10%)</span>
+                <span>4. Panel de Sensibilidad Financiera (Perturbación de b en ±5% y ±10%)</span>
               </h3>
               <p class="text-xs text-gray-400 mt-0.5">
                 Evalúa el impacto de la incertidumbre en los retornos esperados (b) sobre la asignación de pesos
