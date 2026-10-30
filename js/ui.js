@@ -24,15 +24,15 @@ const DATOS_ESCENARIOS_RESPALDO = {
     {
       "id": "bajo_estres",
       "nombre": "Bajo estrés",
-      "descripcion": "Escenario de estrés financiero: volatilidades anualizadas incrementadas en 50% (covarianzas multiplicadas por 2.25) y retornos esperados reducidos al 50% debido al shock y aversión al riesgo en el mercado.",
-      "condicion_kappa": 13.9663,
+      "descripcion": "Escenario de estrés financiero: descomposición A = D_σ·R·D_σ con volatilidades x1.5, contagio sistémico en correlaciones R_estrés = 0.6·R + 0.4·J (SPD garantizada) y reducción no uniforme de retornos esperados (-30% en AAPL/MSFT y -50% en GOOGL/AMZN).",
+      "condicion_kappa": 26.4076,
       "A": [
-        [0.113906, 0.086751, 0.089505, 0.095733],
-        [0.086751, 0.127449, 0.099045, 0.109564],
-        [0.089505, 0.099045, 0.166464, 0.121421],
-        [0.095733, 0.109564, 0.121421, 0.216225]
+        [0.113906, 0.100246, 0.108783, 0.120215],
+        [0.100246, 0.127449, 0.117689, 0.13214],
+        [0.108783, 0.117689, 0.166464, 0.148741],
+        [0.120215, 0.13214, 0.148741, 0.216225]
       ],
-      "b": [0.1225, 0.1105, 0.134, 0.1075]
+      "b": [0.1715, 0.1547, 0.134, 0.1075]
     },
     {
       "id": "mal_condicionado",
@@ -57,7 +57,122 @@ const ACTIVOS_INFO = [
   { ticker: "AMZN", empresa: "Amazon.com Inc." }
 ];
 
+// =========================================================================
+// URL OFICIAL DEL REPOSITORIO Y DESPLIEGUE (Fuente única: README.md)
+// =========================================================================
+const REPO_URL = "https://github.com/araceli4i2/MetodoGradiante";
+const SITE_URL = "https://araceli4i2.github.io/MetodoGradiante/";
+const DEPLOY_URL = SITE_URL; // alias de compatibilidad hacia atrás
+
+// Exponer en window para verificación y acceso global
+if (typeof window !== 'undefined') {
+  window.REPO_URL = REPO_URL;
+  window.SITE_URL = SITE_URL;
+  window.DEPLOY_URL = DEPLOY_URL;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+  // =========================================================================
+  // 0. VINCULACIÓN CENTRALIZADA DE ENLACES EXTERNOS (GITHUB Y DESPLIEGUE)
+  // =========================================================================
+  function inicializarEnlacesProyecto() {
+    // 1. Enlaces en Cabecera (Repositorio y Web Pública)
+    const headerRepoLink = document.getElementById('header-repo-link');
+    if (headerRepoLink) {
+      headerRepoLink.href = REPO_URL;
+      headerRepoLink.target = '_blank';
+      headerRepoLink.rel = 'noopener noreferrer';
+      headerRepoLink.setAttribute('aria-label', 'Abrir el repositorio de GitHub en una pestaña nueva');
+    }
+
+    const headerSiteLink = document.getElementById('header-site-link');
+    if (headerSiteLink) {
+      headerSiteLink.href = SITE_URL;
+      headerSiteLink.target = '_blank';
+      headerSiteLink.rel = 'noopener noreferrer';
+      headerSiteLink.setAttribute('aria-label', 'Abrir la web pública en una pestaña nueva');
+    }
+
+    // 2. Enlaces e información en Sección 1 (Inicio)
+    const inicioRepoLink = document.getElementById('inicio-repo-link');
+    if (inicioRepoLink) {
+      inicioRepoLink.href = REPO_URL;
+      inicioRepoLink.target = '_blank';
+      inicioRepoLink.rel = 'noopener noreferrer';
+      inicioRepoLink.setAttribute('aria-label', 'Abrir el repositorio de GitHub en una pestaña nueva');
+    }
+    const inicioRepoUrlText = document.getElementById('inicio-repo-url-text');
+    if (inicioRepoUrlText) {
+      inicioRepoUrlText.textContent = REPO_URL;
+    }
+
+    const inicioSiteLink = document.getElementById('inicio-site-link');
+    if (inicioSiteLink) {
+      inicioSiteLink.href = SITE_URL;
+      inicioSiteLink.target = '_blank';
+      inicioSiteLink.rel = 'noopener noreferrer';
+      inicioSiteLink.setAttribute('aria-label', 'Abrir el sitio web publicado en una pestaña nueva');
+    }
+    const inicioSiteUrlText = document.getElementById('inicio-site-url-text');
+    if (inicioSiteUrlText) {
+      inicioSiteUrlText.textContent = SITE_URL;
+    }
+
+    // Botón Copiar enlace del sitio web con navigator.clipboard y fallback
+    const btnCopiarSiteUrl = document.getElementById('btn-copiar-site-url');
+    if (btnCopiarSiteUrl) {
+      btnCopiarSiteUrl.addEventListener('click', async () => {
+        try {
+          if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(SITE_URL);
+          } else {
+            const textArea = document.createElement('textarea');
+            textArea.value = SITE_URL;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            textArea.style.top = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+          }
+          mostrarToast('¡Enlace del sitio web copiado al portapapeles!', 'success', 2500);
+        } catch (err) {
+          mostrarToast('No se pudo copiar automáticamente. URL: ' + SITE_URL, 'warning', 4000);
+        }
+      });
+    }
+
+    // 3. Enlaces y textos en Sección 10 (Conclusiones y Referencias - Recursos)
+    const sec10RepoLink = document.getElementById('sec10-repo-link');
+    if (sec10RepoLink) {
+      sec10RepoLink.href = REPO_URL;
+      sec10RepoLink.target = '_blank';
+      sec10RepoLink.rel = 'noopener noreferrer';
+      sec10RepoLink.setAttribute('aria-label', 'Abrir el repositorio de GitHub en una pestaña nueva');
+    }
+    const sec10RepoUrlText = document.getElementById('sec10-repo-url-text');
+    if (sec10RepoUrlText) {
+      sec10RepoUrlText.textContent = REPO_URL;
+    }
+
+    const sec10DeployLink = document.getElementById('sec10-deploy-link');
+    if (sec10DeployLink) {
+      sec10DeployLink.href = SITE_URL;
+      sec10DeployLink.target = '_blank';
+      sec10DeployLink.rel = 'noopener noreferrer';
+      sec10DeployLink.setAttribute('aria-label', 'Abrir el sitio web desplegado en GitHub Pages en una pestaña nueva');
+    }
+    const sec10DeployUrlText = document.getElementById('sec10-deploy-url-text');
+    if (sec10DeployUrlText) {
+      sec10DeployUrlText.textContent = SITE_URL;
+    }
+  }
+
+  // Ejecutar vinculación de URLs
+  inicializarEnlacesProyecto();
+
   // =========================================================================
   // 1. NAVEGACIÓN ENTRE SECCIONES
   // =========================================================================
@@ -103,9 +218,17 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       const target = btn.getAttribute('data-target');
       if (target) {
+        window.location.hash = target;
         navigateTo(target);
       }
     });
+  });
+
+  window.addEventListener('hashchange', () => {
+    const hash = (window.location.hash || '').replace('#', '');
+    if (hash && document.getElementById(hash)) {
+      navigateTo(hash);
+    }
   });
 
   if (mobileMenuBtn && mobileNav) {
@@ -123,11 +246,11 @@ document.addEventListener('DOMContentLoaded', () => {
   function escapeHtml(str) {
     if (typeof str !== 'string') return '';
     return str
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
+      .replace(/&/g, '\x26amp;')
+      .replace(/</g, '\x26lt;')
+      .replace(/>/g, '\x26gt;')
+      .replace(/"/g, '\x26quot;')
+      .replace(/'/g, '\x26#039;');
   }
 
   function obtenerToastContainer() {
@@ -205,7 +328,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="text-xs text-gray-200 leading-snug break-words">${escapeHtml(mensaje)}</div>
         </div>
       </div>
-      <button type="button" class="toast-close ml-2 text-gray-400 hover:text-white transition-colors cursor-pointer text-base leading-none select-none" title="Cerrar">&times;</button>
+      <button type="button" class="toast-close ml-2 text-gray-400 hover:text-white transition-colors cursor-pointer text-base leading-none select-none" title="Cerrar">×</button>
     `;
 
     function cerrarToast() {
@@ -357,7 +480,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 4. Mensaje en consola de sección 4
     if (calcStatusMsg) {
-      calcStatusMsg.innerHTML = `<span class="text-rose-400 font-bold">▲ ENTRADA INVÁLIDA:</span> ${escapeHtml(errorMsg)} &mdash; <span class="text-amber-300 font-mono font-bold">[RESULTADOS MARCADOS COMO OBSOLETOS]</span>`;
+      calcStatusMsg.innerHTML = `<span class="text-rose-400 font-bold">▲ ENTRADA INVÁLIDA:</span> ${escapeHtml(errorMsg)} — <span class="text-amber-300 font-mono font-bold">[RESULTADOS MARCADOS COMO OBSOLETOS]</span>`;
     }
   }
 
@@ -661,6 +784,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // =========================================================================
   // 3. GESTIÓN DE TRES ESCENARIOS (SECCIÓN 5)
   // =========================================================================
+  let escenarioSeleccionadoId = 'ideal';
+  let datosEditadosManualmente = false;
+
   const btnCargarIdeal = document.getElementById('btn-cargar-ideal');
   const btnCargarEstres = document.getElementById('btn-cargar-estres');
   const btnCargarMal = document.getElementById('btn-cargar-mal');
@@ -707,10 +833,16 @@ document.addEventListener('DOMContentLoaded', () => {
     limpiarTodosLosResaltados();
     restaurarResultadosValidos();
 
+    escenarioSeleccionadoId = idEscenario;
+    datosEditadosManualmente = false;
+
     const { datos, origen } = await obtenerEscenariosData();
     const lista = Array.isArray(datos.escenarios) 
       ? datos.escenarios 
       : Object.values(datos.escenarios);
+    cacheEscenariosData = lista;
+    actualizarTarjetasEscenarios(lista);
+    actualizarTablaComparativaSeccion3(lista);
 
     const escenario = lista.find(e => e.id === idEscenario) || lista[0];
     if (!escenario) return;
@@ -858,6 +990,207 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+
+  // =========================================================================
+  // 4b. TABLA COMPARATIVA SIMULTÁNEA DE LOS 3 ESCENARIOS EN SECCIÓN 3 Y TARJETAS SECCIÓN 5
+  // =========================================================================
+  let cacheEscenariosData = null;
+
+  /**
+   * Actualiza en vivo la tabla comparativa de los TRES escenarios simultáneamente en la Sección 3,
+   * calculando con LinAlg.js desde los datos de cada escenario (independiente del escenario activo):
+   * ‖A − Aᵀ‖, menores principales Δ₁…Δ₄ (Sylvester), autovalores λ₁…λ₄, λmin y conclusión SPD.
+   */
+  function actualizarTablaComparativaSeccion3(escenarios) {
+    const tbody = document.getElementById('tbody-comparativa-sec3');
+    if (!tbody || !escenarios || !window.LinAlg) return;
+
+    const lista = Array.isArray(escenarios) ? escenarios : Object.values(escenarios);
+    if (lista.length < 3) return;
+
+    const metricas = lista.map(esc => {
+      const A = esc.A;
+      let diffMax = 0;
+      for (let i = 0; i < A.length; i++) {
+        for (let j = 0; j < A.length; j++) {
+          diffMax = Math.max(diffMax, Math.abs(A[i][j] - A[j][i]));
+        }
+      }
+      const esSimetrica = window.LinAlg.isSymmetric(A, 1e-8);
+      const minors = window.LinAlg.principalMinors(A);
+      const { eigenvalues } = window.LinAlg.eigenSymmetric(A);
+      const lambdaMin = eigenvalues[0];
+      const lambdaMax = eigenvalues[eigenvalues.length - 1];
+      const todosMinorsPos = minors.every(m => m > 0);
+      const todosEigsPos = lambdaMin > 0;
+      const esSPD = esSimetrica && todosMinorsPos && todosEigsPos;
+      const kappaA = lambdaMax / lambdaMin;
+      const kappaM = window.Solvers && typeof window.Solvers.condPrecond === 'function'
+        ? window.Solvers.condPrecond(A)
+        : null;
+
+      return {
+        id: esc.id,
+        nombre: esc.nombre,
+        diffMax,
+        esSimetrica,
+        minors,
+        eigenvalues,
+        lambdaMin,
+        lambdaMax,
+        esSPD,
+        kappaA,
+        kappaM
+      };
+    });
+
+    const formatMinor = (m) => {
+      const ok = m > 0;
+      const valStr = Math.abs(m) < 1e-3 ? m.toExponential(4) : m.toFixed(6);
+      return `<span class="${ok ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}">${valStr}</span> <span class="text-gray-400 text-[10px]">(${ok ? '> 0' : '≤ 0'})</span>`;
+    };
+
+    const formatEig = (ev) => {
+      return `<span class="text-cyan-200">${ev.toFixed(6)}</span>`;
+    };
+
+    const filas = [
+      {
+        param: 'Asimetría ‖A − Aᵀ‖ (max |aᵢⱼ − aⱼᵢ|)',
+        desc: 'Simetría exacta requerida para Cholesky y GC/GCP',
+        vals: metricas.map(m => m.diffMax === 0 ? '<span class="text-emerald-400 font-bold">0.00e+00 (Exacta)</span>' : `<span class="text-cyan-300 font-bold">${m.diffMax.toExponential(2)}</span>`)
+      },
+      {
+        param: 'Menor principal Sylvester Δ₁ = det(A[1:1])',
+        desc: 'Varianza activo AAPL (a₁₁ > 0)',
+        vals: metricas.map(m => formatMinor(m.minors[0]))
+      },
+      {
+        param: 'Menor principal Sylvester Δ₂ = det(A[1:2, 1:2])',
+        desc: 'Determinante submatriz 2×2 (> 0)',
+        vals: metricas.map(m => formatMinor(m.minors[1]))
+      },
+      {
+        param: 'Menor principal Sylvester Δ₃ = det(A[1:3, 1:3])',
+        desc: 'Determinante submatriz 3×3 (> 0)',
+        vals: metricas.map(m => formatMinor(m.minors[2]))
+      },
+      {
+        param: 'Menor principal Sylvester Δ₄ = det(A)',
+        desc: 'Determinante total de la matriz de covarianzas (> 0)',
+        vals: metricas.map(m => formatMinor(m.minors[3]))
+      },
+      {
+        param: 'Autovalor λ₁ (λₘᵢₙ)',
+        desc: 'Autovalor mínimo calculado con Jacobi cíclico',
+        vals: metricas.map(m => `<span class="text-emerald-400 font-bold">${m.lambdaMin.toFixed(6)}</span> <span class="text-gray-400 text-[10px]">(> 0)</span>`)
+      },
+      {
+        param: 'Autovalor λ₂',
+        desc: 'Segundo autovalor espectral',
+        vals: metricas.map(m => formatEig(m.eigenvalues[1]))
+      },
+      {
+        param: 'Autovalor λ₃',
+        desc: 'Tercer autovalor espectral',
+        vals: metricas.map(m => formatEig(m.eigenvalues[2]))
+      },
+      {
+        param: 'Autovalor λ₄ (λₘₐₓ)',
+        desc: 'Autovalor máximo espectral',
+        vals: metricas.map(m => formatEig(m.eigenvalues[3]))
+      },
+      {
+        param: 'Autovalor mínimo λₘᵢₙ',
+        desc: 'Criterio espectral SPD: λₘᵢₙ > 0',
+        vals: metricas.map(m => `<span class="text-emerald-400 font-bold">${m.lambdaMin.toFixed(6)}</span> <span class="text-gray-400 text-[10px]">(> 0)</span>`)
+      },
+      {
+        param: 'Número de condición espectral κ(A)',
+        desc: 'λₘₐₓ / λₘᵢₙ (Sensibilidad y dispersión)',
+        vals: metricas.map(m => `<span class="text-white font-bold">${m.kappaA.toFixed(2)}</span>`)
+      },
+      {
+        param: 'Número de condición Jacobi κ(M⁻¹A)',
+        desc: 'Sistema precondicionado con M = diag(A)',
+        vals: metricas.map(m => m.kappaM !== null ? `<span class="text-emerald-400 font-bold">${m.kappaM.toFixed(2)}</span>` : '--')
+      },
+      {
+        param: '¿Simétrica y definida positiva (SPD)?',
+        desc: 'Condición necesaria y suficiente para Cholesky y CG',
+        vals: metricas.map(m => m.esSPD
+          ? '<span class="px-2 py-0.5 rounded text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-500 font-bold">✓ SÍ (SPD)</span>'
+          : '<span class="px-2 py-0.5 rounded text-[10px] bg-rose-950 text-rose-300 border border-rose-500 font-bold">✗ NO</span>'
+        )
+      }
+    ];
+
+    tbody.innerHTML = filas.map((fila, idx) => `
+      <tr class="hover:bg-cyan-950/20 transition-colors ${idx % 2 === 1 ? 'bg-black/30' : ''}">
+        <td class="p-2.5">
+          <div class="font-bold text-gray-200">${fila.param}</div>
+          <div class="text-[10px] text-gray-400 font-sans">${fila.desc}</div>
+        </td>
+        <td class="p-2.5 text-center font-mono">${fila.vals[0]}</td>
+        <td class="p-2.5 text-center font-mono border-l border-cyan-900/60">${fila.vals[1]}</td>
+        <td class="p-2.5 text-center font-mono border-l border-cyan-900/60">${fila.vals[2]}</td>
+      </tr>
+    `).join('');
+  }
+
+  /**
+   * Actualiza dinámicamente los números de condición e información de las tarjetas en Sección 5
+   * a partir de los datos reales de los escenarios (sin números fijos escritos a mano).
+   */
+  function actualizarTarjetasEscenarios(escenarios) {
+    if (!escenarios || !window.LinAlg) return;
+    const lista = Array.isArray(escenarios) ? escenarios : Object.values(escenarios);
+
+    const badgeIdeal = document.getElementById('card-ideal-kappa-badge');
+    const badgeEstres = document.getElementById('card-estres-kappa-badge');
+    const badgeMal = document.getElementById('card-mal-kappa-badge');
+    const condIdeal = document.getElementById('card-ideal-condicion');
+    const condEstres = document.getElementById('card-estres-condicion');
+    const condMal = document.getElementById('card-mal-condicion');
+
+    const escIdeal = lista.find(e => e.id === 'ideal') || lista[0];
+    const escEstres = lista.find(e => e.id === 'bajo_estres') || lista[1];
+    const escMal = lista.find(e => e.id === 'mal_condicionado') || lista[2];
+
+    if (escIdeal) {
+      const kappaA = window.LinAlg.condNumber(escIdeal.A);
+      const kappaM = window.Solvers && typeof window.Solvers.condPrecond === 'function'
+        ? window.Solvers.condPrecond(escIdeal.A)
+        : null;
+      if (badgeIdeal) badgeIdeal.textContent = `κ(A) ≈ ${kappaA.toFixed(2)}`;
+      if (condIdeal && kappaM !== null) {
+        condIdeal.textContent = `• Condición: κ(A) ≈ ${kappaA.toFixed(2)} | κ(M⁻¹A) ≈ ${kappaM.toFixed(2)}`;
+      }
+    }
+
+    if (escEstres) {
+      const kappaA = window.LinAlg.condNumber(escEstres.A);
+      const kappaM = window.Solvers && typeof window.Solvers.condPrecond === 'function'
+        ? window.Solvers.condPrecond(escEstres.A)
+        : null;
+      if (badgeEstres) badgeEstres.textContent = `κ(A) ≈ ${kappaA.toFixed(2)}`;
+      if (condEstres && kappaM !== null) {
+        condEstres.textContent = `• Condición: κ(A) ≈ ${kappaA.toFixed(2)} | κ(M⁻¹A) ≈ ${kappaM.toFixed(2)}`;
+      }
+    }
+
+    if (escMal) {
+      const kappaA = window.LinAlg.condNumber(escMal.A);
+      const kappaM = window.Solvers && typeof window.Solvers.condPrecond === 'function'
+        ? window.Solvers.condPrecond(escMal.A)
+        : null;
+      if (badgeMal) badgeMal.textContent = `κ(A) ≈ ${kappaA.toFixed(2)}`;
+      if (condMal && kappaM !== null) {
+        condMal.textContent = `• Condición: κ(A) ≈ ${kappaA.toFixed(2)} | κ(M⁻¹A) ≈ ${kappaM.toFixed(2)}`;
+      }
+    }
+  }
+
   // =========================================================================
   // 5. EJECUCIÓN DE MÉTODOS Y ACTUALIZACIÓN DE SECCIONES 6 Y 7
   // =========================================================================
@@ -967,6 +1300,121 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  /**
+   * Actualiza la tabla de Residuo Relativo por Iteración (Sección 7)
+   * Columnas: k, ‖rₖ‖/‖b‖ (GC Estándar), ‖rₖ‖/‖b‖ (GCP Jacobi), Ventaja de Precisión GCP
+   */
+  function actualizarTablaResiduosPorIteracion(historialGC, historialGCP) {
+    const tbody = document.getElementById('tbody-residuos-iteracion');
+    if (!tbody || !historialGC || !historialGCP) return;
+
+    const maxK = Math.max(historialGC.length, historialGCP.length);
+    let html = '';
+
+    for (let k = 0; k < maxK; k++) {
+      const valGC = historialGC[k];
+      const valGCP = historialGCP[k];
+
+      const strGC = valGC !== undefined ? valGC.toExponential(4) : '-';
+      const strGCP = valGCP !== undefined ? valGCP.toExponential(4) : '-';
+
+      let ventajaStr = '-';
+      if (valGC !== undefined && valGCP !== undefined && valGCP > 0) {
+        const razon = valGC / valGCP;
+        if (razon >= 1) {
+          ventajaStr = `<span class="text-emerald-400 font-bold">${razon >= 100 ? razon.toExponential(2) : razon.toFixed(2)}x más preciso</span>`;
+        } else {
+          ventajaStr = `<span class="text-cyan-300">${razon.toFixed(2)}x</span>`;
+        }
+      }
+
+      const etiquetaK = k === 0 ? 'k = 0 (x₀)' : `k = ${k}`;
+      const highlightRow = (k === maxK - 1)
+        ? 'bg-cyan-950/40 font-bold border-t border-cyan-800'
+        : 'hover:bg-cyan-950/20';
+
+      html += `
+        <tr class="${highlightRow} transition-colors">
+          <td class="p-2.5 text-center text-cyan-300 font-mono">${etiquetaK}</td>
+          <td class="p-2.5 text-right text-gray-300 font-mono">${strGC}</td>
+          <td class="p-2.5 text-right text-emerald-300 font-mono">${strGCP}</td>
+          <td class="p-2.5 text-center text-xs font-mono">${ventajaStr}</td>
+        </tr>
+      `;
+    }
+
+    tbody.innerHTML = html;
+  }
+
+  /**
+   * Ejecuta la demostración opcional con tolerancia estricta (1e-6, 1e-10, 1e-12) en Sección 7.
+   * La tolerancia oficial del desafío es 1e-6.
+   */
+  function actualizarDemostracionTolerancia(A_override, b_override, x0_override, maxIter_override) {
+    const selectTol = document.getElementById('select-demo-tol');
+    const demoGCIter = document.getElementById('demo-gc-iter');
+    const demoGCRes = document.getElementById('demo-gc-res');
+    const demoGCBadge = document.getElementById('demo-gc-badge');
+
+    const demoGCPIter = document.getElementById('demo-gcp-iter');
+    const demoGCPRes = document.getElementById('demo-gcp-res');
+    const demoGCPBadge = document.getElementById('demo-gcp-badge');
+
+    if (!selectTol) return;
+    const tolDemo = parseFloat(selectTol.value) || 1e-6;
+
+    let A = A_override;
+    let b = b_override;
+    let x0 = x0_override;
+    let maxIter = maxIter_override || 100;
+
+    if (!A || !b) {
+      if (ultimoCalculo && ultimoCalculo.A && ultimoCalculo.b) {
+        A = ultimoCalculo.A;
+        b = ultimoCalculo.b;
+      } else {
+        A = leerMatrizA();
+        b = leerVectorB();
+        x0 = leerVectorX0();
+        const p = leerParametros();
+        maxIter = p.maxIter;
+      }
+    }
+
+    if (!A || !b || !window.Solvers) return;
+
+    try {
+      const resGC = window.Solvers.solveGC(A, b, x0, tolDemo, maxIter);
+      const resGCP = window.Solvers.solveGCP(A, b, x0, tolDemo, maxIter);
+
+      if (demoGCIter) demoGCIter.textContent = `${resGC.iteraciones} it`;
+      if (demoGCRes) demoGCRes.textContent = resGC.residuoRelativo.toExponential(4);
+      if (demoGCBadge) {
+        if (resGC.convergio) {
+          demoGCBadge.className = 'text-[10px] px-1.5 py-0.5 rounded font-bold bg-emerald-950 border border-emerald-500 text-emerald-300';
+          demoGCBadge.textContent = '✓ CONVERGIÓ';
+        } else {
+          demoGCBadge.className = 'text-[10px] px-1.5 py-0.5 rounded font-bold bg-rose-950 border border-rose-500 text-rose-300';
+          demoGCBadge.textContent = '▲ NO CONVERGIÓ';
+        }
+      }
+
+      if (demoGCPIter) demoGCPIter.textContent = `${resGCP.iteraciones} it`;
+      if (demoGCPRes) demoGCPRes.textContent = resGCP.residuoRelativo.toExponential(4);
+      if (demoGCPBadge) {
+        if (resGCP.convergio) {
+          demoGCPBadge.className = 'text-[10px] px-1.5 py-0.5 rounded font-bold bg-emerald-950 border border-emerald-500 text-emerald-300';
+          demoGCPBadge.textContent = '✓ CONVERGIÓ';
+        } else {
+          demoGCPBadge.className = 'text-[10px] px-1.5 py-0.5 rounded font-bold bg-rose-950 border border-rose-500 text-rose-300';
+          demoGCPBadge.textContent = '▲ NO CONVERGIÓ';
+        }
+      }
+    } catch (e) {
+      console.warn("Aviso en demo de tolerancia:", e);
+    }
+  }
+
   // Estado para el panel de sensibilidad
   let estadoSensibilidad = { deltaPct: 0, target: '0' };
   let ultimoCalculo = null;
@@ -991,6 +1439,8 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         resetearDiagnosticoInvalido();
       }
+      // Actualizar la tabla comparativa multiescenario para que aplique el bloque de respaldo y muestre el aviso
+      actualizarComparativaTresEscenarios();
       return;
     }
 
@@ -1146,6 +1596,12 @@ document.addEventListener('DOMContentLoaded', () => {
       // 5. Gráfico Chart.js
       renderizarGraficoResiduos(resGC.historial, resGCP.historial, params.tol);
 
+      // 5.1. Actualizar Sección 7: Tabla de Residuo Relativo por Iteración
+      actualizarTablaResiduosPorIteracion(resGC.historial, resGCP.historial);
+
+      // 5.2. Actualizar Sección 7: Demostración con Tolerancia Estricta
+      actualizarDemostracionTolerancia(A, b, params.x0, params.maxIter);
+
       // 6. Actualizar Sección 8: Análisis de Errores por Variable
       actualizarErroresVariable(A, b, xRef, resGCP);
 
@@ -1257,27 +1713,79 @@ document.addEventListener('DOMContentLoaded', () => {
       if (lista.length < 3) return;
 
       const resultados = lista.map((esc, index) => {
-        const A = esc.A;
-        const b = esc.b;
-        const xRef = window.LinAlg.solveCholesky(A, b);
-        const resGC = window.Solvers.solveGC(A, b, [0, 0, 0, 0], 1e-6, 100);
-        const resGCP = window.Solvers.solveGCP(A, b, [0, 0, 0, 0], 1e-6, 100);
+        const esEditado = datosEditadosManualmente && (esc.id === escenarioSeleccionadoId);
+        let A = esc.A;
+        let b = esc.b;
+        if (esEditado) {
+          try {
+            const A_edit = leerMatrizA();
+            const b_edit = leerVectorB();
+            if (A_edit && A_edit.length === 4 && b_edit && b_edit.length === 4) {
+              A = A_edit;
+              b = b_edit;
+            }
+          } catch (e) {
+            console.warn("No se pudo leer matriz editada:", e);
+          }
+        }
+        let xRef, resGC, resGCP, kappaA, kappaM, normEa, Ep, wPct;
+        let usoRespaldo = false;
+        try {
+          xRef = window.LinAlg.solveCholesky(A, b);
+          resGC = window.Solvers.solveGC(A, b, [0, 0, 0, 0], 1e-6, 100);
+          resGCP = window.Solvers.solveGCP(A, b, [0, 0, 0, 0], 1e-6, 100);
 
-        const EaVec = xRef.map((v, i) => Math.abs(v - resGCP.x[i]));
-        const normEa = window.LinAlg.norm2(EaVec);
-        const normXRef = window.LinAlg.norm2(xRef);
-        const Ep = normXRef > 0 ? (normEa / normXRef) * 100 : 0;
+          const EaVec = xRef.map((v, i) => Math.abs(v - resGCP.x[i]));
+          normEa = window.LinAlg.norm2(EaVec);
+          const normXRef = window.LinAlg.norm2(xRef);
+          Ep = normXRef > 0 ? (normEa / normXRef) * 100 : 0;
 
-        const kappaA = window.LinAlg.condNumber(A);
-        const kappaM = window.Solvers.condPrecond(A);
+          kappaA = window.LinAlg.condNumber(A);
+          kappaM = window.Solvers.condPrecond(A);
+
+          const sumX = xRef.reduce((acc, v) => acc + v, 0);
+          wPct = xRef.map(v => (sumX !== 0 ? (v / sumX) * 100 : 0));
+        } catch (err) {
+          console.warn('Error resolviendo escenario en comparativa:', esc.id, err);
+          usoRespaldo = true;
+          const A_orig = esc.A;
+          const b_orig = esc.b;
+          xRef = window.LinAlg.solveCholesky(A_orig, b_orig);
+          resGC = window.Solvers.solveGC(A_orig, b_orig, [0, 0, 0, 0], 1e-6, 100);
+          resGCP = window.Solvers.solveGCP(A_orig, b_orig, [0, 0, 0, 0], 1e-6, 100);
+          const EaVec = xRef.map((v, i) => Math.abs(v - resGCP.x[i]));
+          normEa = window.LinAlg.norm2(EaVec);
+          const normXRef = window.LinAlg.norm2(xRef);
+          Ep = normXRef > 0 ? (normEa / normXRef) * 100 : 0;
+          kappaA = window.LinAlg.condNumber(A_orig);
+          kappaM = window.Solvers.condPrecond(A_orig);
+          const sumX = xRef.reduce((acc, v) => acc + v, 0);
+          wPct = xRef.map(v => (sumX !== 0 ? (v / sumX) * 100 : 0));
+        }
+
+        function clasificarAsignacion(pct) {
+          if (pct < 0) return `posición corta (${pct.toFixed(1)}%)`;
+          if (pct > 50) return `alta asignación (${pct.toFixed(1)}%)`;
+          if (pct >= 20) return `asignación moderada (${pct.toFixed(1)}%)`;
+          return `posición larga (${pct.toFixed(1)}%)`;
+        }
+
+        const tickers = ['AAPL', 'MSFT', 'GOOGL', 'AMZN'];
+        const pesosDescs = wPct.map((p, i) => `${tickers[i]}: ${clasificarAsignacion(p)}`).join(', ');
 
         let interpretacion = "";
         if (index === 0) {
-          interpretacion = "Cartera óptima en mercado normal: alta asignación en AAPL y GOOGL, moderada en MSFT y posición corta en AMZN. Ambos solvers convergen en 4 iteraciones con error mínimo.";
+          interpretacion = `Cartera óptima en mercado normal (κ(A) = ${kappaA.toFixed(2)}, κ(M⁻¹A) = ${kappaM.toFixed(2)}): ambos solvers convergen en ${resGCP.iteraciones} iteraciones con residuo final de ${resGC.residuoRelativo.toExponential(2)} (GC) y ${resGCP.residuoRelativo.toExponential(2)} (GCP). Distribución de pesos: ${pesosDescs}.`;
         } else if (index === 1) {
-          interpretacion = "Shock sistémico bajista: volatilidades infladas x1.5 (covarianzas x2.25) y retornos reducidos al 50%. Los pesos se contraen a ~22% del nivel base preservando simetría y convergencia rápida.";
+          interpretacion = `Shock de contagio y contracción asimétrica (κ(A) = ${kappaA.toFixed(2)}, κ(M⁻¹A) = ${kappaM.toFixed(2)}): ambos solvers convergen en ${resGCP.iteraciones} iteraciones con residuo final de ${resGC.residuoRelativo.toExponential(2)} (GC) y ${resGCP.residuoRelativo.toExponential(2)} (GCP). Distribución de pesos: ${pesosDescs}. En este escenario, el modelo concentra la cartera en los activos con menor recorte de retorno esperado (AAPL y MSFT, -30%) y toma posiciones cortas en los de mayor recorte (GOOGL y AMZN, -50%); es consecuencia de los supuestos del escenario, no una predicción de mercado.`;
         } else {
-          interpretacion = "Desbalance extremo de escala en el activo GOOGL (κ > 2000). El precondicionador diagonal Jacobi neutraliza el desbalance (κ reducido a 10.97) garantizando convergencia óptima.";
+          interpretacion = `Desbalance extremo de escala en el activo GOOGL. Con tol = 1e-6 ambos convergen en ${resGC.iteraciones} iteraciones (GC) y ${resGCP.iteraciones} iteraciones (GCP); el menor residuo de GCP (${resGCP.residuoRelativo.toExponential(2)} vs ${resGC.residuoRelativo.toExponential(2)}) es atribuible a que el redondeo se amplifica con κ(A) ≈ ${kappaA.toFixed(2)}, mientras que κ(M⁻¹A) ≈ ${kappaM.toFixed(2)}. Distribución de pesos: ${pesosDescs}.`;
+        }
+
+        if (usoRespaldo) {
+          interpretacion += " (aviso: la matriz editada no es definida positiva; se muestran los valores de respaldo del escenario)";
+        } else if (esEditado) {
+          interpretacion += " (valores recalculados con los datos actuales)";
         }
 
         return {
@@ -1289,7 +1797,8 @@ document.addEventListener('DOMContentLoaded', () => {
           Ep,
           kappaA,
           kappaM,
-          interpretacion
+          interpretacion,
+          usoRespaldo
         };
       });
 
@@ -1355,13 +1864,13 @@ document.addEventListener('DOMContentLoaded', () => {
         <tr class="hover:bg-cyan-950/20">
           <td class="p-2.5 font-bold text-gray-300">¿Convergió? (Tol = 1e-6)</td>
           <td class="p-2.5 text-center">
-            <span class="px-2 py-0.5 rounded text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-500 font-bold">✓ SÍ</span>
+            ${resultados[0].usoRespaldo ? '<span class="px-2 py-0.5 rounded text-[10px] bg-amber-950 text-amber-300 border border-amber-500 font-bold">▲ RESPALDO (NO SPD)</span>' : (resultados[0].resGCP.convergio ? '<span class="px-2 py-0.5 rounded text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-500 font-bold">✓ SÍ</span>' : '<span class="px-2 py-0.5 rounded text-[10px] bg-rose-950 text-rose-300 border border-rose-500 font-bold">✗ NO</span>')}
           </td>
           <td class="p-2.5 text-center border-l border-cyan-900">
-            <span class="px-2 py-0.5 rounded text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-500 font-bold">✓ SÍ</span>
+            ${resultados[1].usoRespaldo ? '<span class="px-2 py-0.5 rounded text-[10px] bg-amber-950 text-amber-300 border border-amber-500 font-bold">▲ RESPALDO (NO SPD)</span>' : (resultados[1].resGCP.convergio ? '<span class="px-2 py-0.5 rounded text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-500 font-bold">✓ SÍ</span>' : '<span class="px-2 py-0.5 rounded text-[10px] bg-rose-950 text-rose-300 border border-rose-500 font-bold">✗ NO</span>')}
           </td>
           <td class="p-2.5 text-center border-l border-cyan-900">
-            <span class="px-2 py-0.5 rounded text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-500 font-bold">✓ SÍ</span>
+            ${resultados[2].usoRespaldo ? '<span class="px-2 py-0.5 rounded text-[10px] bg-amber-950 text-amber-300 border border-amber-500 font-bold">▲ RESPALDO (NO SPD)</span>' : (resultados[2].resGCP.convergio ? '<span class="px-2 py-0.5 rounded text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-500 font-bold">✓ SÍ</span>' : '<span class="px-2 py-0.5 rounded text-[10px] bg-rose-950 text-rose-300 border border-rose-500 font-bold">✗ NO</span>')}
           </td>
         </tr>
         <tr class="hover:bg-cyan-950/20 bg-cyan-950/10">
@@ -1479,7 +1988,7 @@ document.addEventListener('DOMContentLoaded', () => {
       pInsight.innerHTML = `
         <span class="text-cyan-300 font-bold">Diagnóstico de Diversificación:</span> 
         La correlación media inter-activos es <strong class="text-white">${avgCorr.toFixed(4)}</strong>. 
-        Al ser todas las correlaciones estrictamente menores a 1.0 (<span class="text-cyan-200 font-mono">Rᵢⱼ &lt; 1</span>), 
+        Al ser todas las correlaciones estrictamente menores a 1.0 (<span class="text-cyan-200 font-mono">Rᵢⱼ < 1</span>), 
         la frontera eficiente de Markowitz reduce la varianza global de la cartera. 
         El par con menor correlación (<span class="text-emerald-300 font-bold">${minPair}</span>) aporta la mayor contribución marginal a la diversificación del riesgo.
       `;
@@ -1663,6 +2172,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // =========================================================================
   let debounceTimer = null;
   function dispararRecalculoAuto() {
+    datosEditadosManualmente = true;
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
       ejecutarCalculo('Personalizado');
@@ -1678,6 +2188,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (btnCalcular) {
     btnCalcular.addEventListener('click', () => {
+      datosEditadosManualmente = true;
       ejecutarCalculo('Personalizado');
       if (calcStatusMsg) {
         calcStatusMsg.innerHTML = `<span class="text-emerald-400">✓ Cálculo completado:</span> Solución de referencia y comparativa actualizadas.`;
@@ -1688,6 +2199,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnRecalcularDiag) {
     btnRecalcularDiag.addEventListener('click', () => {
       ejecutarCalculo('Personalizado');
+      actualizarTablaComparativaSeccion3(cacheEscenariosData || DATOS_ESCENARIOS_RESPALDO.escenarios);
     });
   }
 
@@ -1699,6 +2211,14 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   if (btnCargarMal) {
     btnCargarMal.addEventListener('click', () => aplicarEscenario('mal_condicionado'));
+  }
+
+  // Listener para el selector de demostración con tolerancia estricta (Sección 7)
+  const selectDemoTol = document.getElementById('select-demo-tol');
+  if (selectDemoTol) {
+    selectDemoTol.addEventListener('change', () => {
+      actualizarDemostracionTolerancia();
+    });
   }
 
   // Listeners para el Panel de Sensibilidad (Perturbación de b)
@@ -1726,6 +2246,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Inicializar tarjetas y tabla comparativa de Sección 3 con respaldo inmediato
+  actualizarTarjetasEscenarios(DATOS_ESCENARIOS_RESPALDO.escenarios);
+  actualizarTablaComparativaSeccion3(DATOS_ESCENARIOS_RESPALDO.escenarios);
+
   // Inicializar todo con el escenario Ideal
   aplicarEscenario('ideal');
 
@@ -1751,6 +2275,12 @@ document.addEventListener('DOMContentLoaded', () => {
     restaurarResultadosValidos
   };
 
-  // Iniciar en Sección 1: Inicio
-  navigateTo('sec-inicio');
+  // Iniciar en la sección solicitada por query param / hash o en Sección 1: Inicio
+  const urlParams = new URLSearchParams(window.location.search);
+  const targetInicial = urlParams.get('sec') || (window.location.hash || '').replace('#', '');
+  if (targetInicial && document.getElementById(targetInicial)) {
+    navigateTo(targetInicial);
+  } else {
+    navigateTo('sec-inicio');
+  }
 });

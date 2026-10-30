@@ -13,11 +13,19 @@ Exporta el resultado a data/escenarios.json.
 """
 
 import os
+import sys
 import json
 import datetime
 import numpy as np
 import pandas as pd
-import yfinance as yf
+try:
+    import yfinance as yf
+except ImportError:
+    yf = None
+
+# Asegurar codificación UTF-8 en consola Windows
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
 
 def verificar_matriz_spd(A, nombre_escenario):
     """
@@ -54,26 +62,29 @@ def obtener_datos_mercado(tickers, periodo="2y"):
     la descarga, utiliza un dataset histórico representativo calibrado a 2 años.
     """
     precios = None
-    try:
-        raw_data = yf.download(tickers=tickers, period=periodo, auto_adjust=False, progress=False)
-        if isinstance(raw_data.columns, pd.MultiIndex):
-            if "Adj Close" in raw_data.columns.get_level_values(0):
-                precios = raw_data["Adj Close"]
-            elif "Close" in raw_data.columns.get_level_values(0):
-                precios = raw_data["Close"]
+    if yf is not None:
+        try:
+            raw_data = yf.download(tickers=tickers, period=periodo, auto_adjust=False, progress=False)
+            if isinstance(raw_data.columns, pd.MultiIndex):
+                if "Adj Close" in raw_data.columns.get_level_values(0):
+                    precios = raw_data["Adj Close"]
+                elif "Close" in raw_data.columns.get_level_values(0):
+                    precios = raw_data["Close"]
+                else:
+                    precios = raw_data.xs("Adj Close", axis=1, level=1)
             else:
-                precios = raw_data.xs("Adj Close", axis=1, level=1)
-        else:
-            if "Adj Close" in raw_data:
-                precios = raw_data["Adj Close"]
-            elif "Close" in raw_data:
-                precios = raw_data["Close"]
-        
-        if precios is not None and len(precios) > 50:
-            precios = precios[tickers].dropna()
-    except Exception as e:
-        print(f"[Aviso] No se pudo descargar vía yfinance ({e}). Se utilizará la matriz calibrada de mercado.")
-        precios = None
+                if "Adj Close" in raw_data:
+                    precios = raw_data["Adj Close"]
+                elif "Close" in raw_data:
+                    precios = raw_data["Close"]
+            
+            if precios is not None and len(precios) > 50:
+                precios = precios[tickers].dropna()
+        except Exception as e:
+            print(f"[Aviso] No se pudo descargar vía yfinance ({e}). Se utilizará la matriz calibrada de mercado.")
+            precios = None
+    else:
+        print("[Aviso] yfinance no está instalado. Se utilizará la matriz calibrada de mercado.")
 
     if precios is not None and len(precios) > 50:
         retornos_diarios = precios.pct_change().dropna()
@@ -120,20 +131,89 @@ def main():
     # ESCENARIO 2: BAJO ESTRÉS
     # Justificación matemática y financiera:
     # En un contexto de crisis o choque sistémico de mercado:
-    # 1. La incertidumbre y aversión al riesgo incrementan la volatilidad de cada
-    #    activo en un 50% (sigma_estres = 1.5 * sigma_ideal).
-    #    Dado que Cov(i, j) = rho(i, j) * sigma_i * sigma_j, al multiplicar cada
-    #    volatilidad por 1.5, cada elemento de covarianza se escala por 1.5 * 1.5 = 2.25.
-    #    Equivalentemente: A_estres = D_vol * A_ideal * D_vol con D_vol = diag(1.5).
-    #    Esto garantiza de forma estricta que A_estres preserve la simetría y definición positiva (SPD).
-    # 2. Las expectativas macroeconómicas se deprimen, reduciendo los retornos esperados
-    #    en un 50% (b_estres = 0.5 * b_ideal).
+    # 1. Descomposición A = D_sigma · R · D_sigma:
+    #    D_sigma = diag(sigma) contiene las desviaciones estándar anualizadas de cada activo (sigma_i = sqrt(A_ii)).
+    #    R = D_sigma^(-1) · A · D_sigma^(-1) representa la matriz de correlaciones base.
+    # 2. Choque de estrés en riesgo:
+    #    - Volatilidades incrementadas en 50%: sigma_estres = 1.5 * sigma_ideal.
+    #    - Correlaciones bajo estrés: R_estres = 0.6·R + 0.4·J (donde J = 1·1^T es la matriz de unos).
+    #      Justificación matemática:
+    #      J es simétrica y semidefinida positiva (autovalores: [n, 0, 0, 0] con n=4).
+    #      Dado que R es simétrica y estrictamente definida positiva (autovalor mínimo > 0) y J >= 0,
+    #      la combinación lineal convexa c1·R + c2·J con coeficientes estrictamente positivos (0.6 > 0)
+    #      es ESTRICTAMENTE DEFINIDA POSITIVA (SPD). Para todo v != 0 en R^4:
+    #      v^T R_estres v = 0.6 (v^T R v) + 0.4 (v^T J v) >= 0.6 (v^T R v) > 0.
+    #      Financieramente, modela el contagio sistémico y co-movimiento extremo donde en pánico bursátil
+    #      las correlaciones tienden fuertemente hacia 1 (todos los activos se mueven juntos).
+    #      A_estres = D_sigma_estres · R_estres · D_sigma_estres (garantizada SPD por congruencia).
+    # 3. Vector de retornos esperados b_estres: reducción no uniforme.
+    #    Justificación financiera:
+    #    - AAPL y MSFT experimentan una contracción del 30% (-30%, factor 0.70) debido a la resiliencia
+    #      de sus modelos de negocio apoyados en ingresos recurrentes por software corporativo y servicios
+    #      ecosistémicos de alta retención.
+    #    - GOOGL y AMZN sufren una contracción más severa del 50% (-50%, factor 0.50) atribuible a
+    #      su alta sensibilidad a la reducción cíclica del gasto publicitario digital (Alphabet) y a
+    #      la compresión severa de márgenes operativos en retail y desaceleración cloud (Amazon).
     # =========================================================================
-    factor_volatilidad = 1.5
-    factor_covarianza = factor_volatilidad ** 2  # 2.25
-    A_estres = factor_covarianza * np.copy(A_ideal)
-    b_estres = 0.5 * np.copy(b_ideal)
-    kappa_estres, _ = verificar_matriz_spd(A_estres, "2. Bajo estrés")
+    # 1. Descomposición
+    sigma_ideal = np.sqrt(np.diag(A_ideal))
+    D_sigma = np.diag(sigma_ideal)
+    D_sigma_inv = np.diag(1.0 / sigma_ideal)
+    R = D_sigma_inv @ A_ideal @ D_sigma_inv
+    R = 0.5 * (R + R.T)
+    np.fill_diagonal(R, 1.0)
+
+    # 2. Estrés de volatilidad y correlaciones
+    sigma_estres = 1.5 * sigma_ideal
+    D_sigma_estres = np.diag(sigma_estres)
+    J = np.ones_like(R)
+    R_estres = 0.6 * R + 0.4 * J
+
+    A_estres = D_sigma_estres @ R_estres @ D_sigma_estres
+    A_estres = 0.5 * (A_estres + A_estres.T)
+
+    # 3. Vector b_estrés con reducción asimétrica
+    b_estres = np.array([
+        b_ideal[0] * 0.70,  # AAPL: -30% (resiliencia de ecosistema)
+        b_ideal[1] * 0.70,  # MSFT: -30% (ingresos recurrentes de software)
+        b_ideal[2] * 0.50,  # GOOGL: -50% (sensibilidad cíclica a publicidad)
+        b_ideal[3] * 0.50   # AMZN: -50% (compresión de márgenes retail y cloud)
+    ], dtype=float)
+
+    kappa_estres, autovalores_estres = verificar_matriz_spd(A_estres, "2. Bajo estrés")
+
+    # Función auxiliar para número de condición con precondicionador Jacobi M = diag(A)
+    def calcular_kappa_jacobi(matriz_spd):
+        diag_m = np.diag(matriz_spd)
+        d_inv_sqrt = np.diag(1.0 / np.sqrt(diag_m))
+        m_tilde = d_inv_sqrt @ matriz_spd @ d_inv_sqrt
+        eigs_tilde = np.linalg.eigvalsh(m_tilde)
+        return float(eigs_tilde[-1] / eigs_tilde[0])
+
+    kappa_M_inv_A_ideal = calcular_kappa_jacobi(A_ideal)
+    kappa_M_inv_A_estres = calcular_kappa_jacobi(A_estres)
+
+    # Soluciones de referencia y pesos normalizados
+    x_ideal = np.linalg.solve(A_ideal, b_ideal)
+    w_ideal = x_ideal / np.sum(x_ideal)
+
+    x_estres = np.linalg.solve(A_estres, b_estres)
+    w_estres = x_estres / np.sum(x_estres)
+
+    print("\n" + "=" * 78)
+    print("COMPARACIÓN DETALLADA: ESCENARIO IDEAL vs. ESCENARIO BAJO ESTRÉS")
+    print("=" * 78)
+    print(f"{'Métrica':<24} | {'Ideal':<20} | {'Bajo Estrés':<20} | {'Variación':<10}")
+    print("-" * 78)
+    print(f"{'κ(A)':<24} | {kappa_ideal:<20.4f} | {kappa_estres:<20.4f} | {kappa_estres / kappa_ideal:+.2f}x")
+    print(f"{'κ(M⁻¹A) [Jacobi]':<24} | {kappa_M_inv_A_ideal:<20.4f} | {kappa_M_inv_A_estres:<20.4f} | {kappa_M_inv_A_estres / kappa_M_inv_A_ideal:+.2f}x")
+    print("-" * 78)
+    for i, t in enumerate(tickers):
+        print(f"Solución x[{t}]          | {x_ideal[i]:<20.6f} | {x_estres[i]:<20.6f} | {x_estres[i] - x_ideal[i]:+8.4f}")
+    print("-" * 78)
+    for i, t in enumerate(tickers):
+        print(f"Peso w[{t}] (%)          | {w_ideal[i] * 100:<19.2f}% | {w_estres[i] * 100:<19.2f}% | {(w_estres[i] - w_ideal[i]) * 100:+7.2f} pp")
+    print("=" * 78)
 
     # =========================================================================
     # ESCENARIO 3: MAL CONDICIONADO
@@ -184,9 +264,9 @@ def main():
                 "id": "bajo_estres",
                 "nombre": "Bajo estrés",
                 "descripcion": (
-                    "Escenario de estrés financiero: volatilidades anualizadas incrementadas en 50% "
-                    "(covarianzas multiplicadas por 2.25) y retornos esperados reducidos al 50% "
-                    "debido al shock y aversión al riesgo en el mercado."
+                    "Escenario de estrés financiero: descomposición A = D_σ·R·D_σ con volatilidades x1.5, "
+                    "contagio sistémico en correlaciones R_estrés = 0.6·R + 0.4·J (SPD garantizada) y "
+                    "reducción no uniforme de retornos esperados (-30% en AAPL/MSFT y -50% en GOOGL/AMZN)."
                 ),
                 "condicion_kappa": float(round(kappa_estres, 4)),
                 "A": np.round(A_estres, 6).tolist(),

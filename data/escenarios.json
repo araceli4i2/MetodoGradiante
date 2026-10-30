@@ -5,7 +5,7 @@
     "GOOGL",
     "AMZN"
   ],
-  "fecha_extraccion": "2026-10-28",
+  "fecha_extraccion": "2026-10-29",
   "escenarios": [
     {
       "id": "ideal",
@@ -13,10 +13,30 @@
       "descripcion": "Escenario base de mercado con matriz de covarianzas anualizadas y vector de retornos esperados reales obtenidos de cotizaciones históricas a 2 años.",
       "condicion_kappa": 13.9663,
       "A": [
-        [0.050625, 0.038556, 0.03978, 0.042548],
-        [0.038556, 0.056644, 0.04402, 0.048695],
-        [0.03978, 0.04402, 0.073984, 0.053965],
-        [0.042548, 0.048695, 0.053965, 0.0961]
+        [
+          0.050625,
+          0.038556,
+          0.03978,
+          0.042548
+        ],
+        [
+          0.038556,
+          0.056644,
+          0.04402,
+          0.048695
+        ],
+        [
+          0.03978,
+          0.04402,
+          0.073984,
+          0.053965
+        ],
+        [
+          0.042548,
+          0.048695,
+          0.053965,
+          0.0961
+        ]
       ],
       "b": [
         0.245,
@@ -28,17 +48,37 @@
     {
       "id": "bajo_estres",
       "nombre": "Bajo estrés",
-      "descripcion": "Escenario de estrés financiero: volatilidades anualizadas incrementadas en 50% (covarianzas multiplicadas por 2.25) y retornos esperados reducidos al 50% debido al shock y aversión al riesgo en el mercado.",
-      "condicion_kappa": 13.9663,
+      "descripcion": "Escenario de estrés financiero: descomposición A = D_σ·R·D_σ con volatilidades x1.5, contagio sistémico en correlaciones R_estrés = 0.6·R + 0.4·J (SPD garantizada) y reducción no uniforme de retornos esperados (-30% en AAPL/MSFT y -50% en GOOGL/AMZN).",
+      "condicion_kappa": 26.4076,
       "A": [
-        [0.113906, 0.086751, 0.089505, 0.095733],
-        [0.086751, 0.127449, 0.099045, 0.109564],
-        [0.089505, 0.099045, 0.166464, 0.121421],
-        [0.095733, 0.109564, 0.121421, 0.216225]
+        [
+          0.113906,
+          0.100246,
+          0.108783,
+          0.120215
+        ],
+        [
+          0.100246,
+          0.127449,
+          0.117689,
+          0.13214
+        ],
+        [
+          0.108783,
+          0.117689,
+          0.166464,
+          0.148741
+        ],
+        [
+          0.120215,
+          0.13214,
+          0.148741,
+          0.216225
+        ]
       ],
       "b": [
-        0.1225,
-        0.1105,
+        0.1715,
+        0.1547,
         0.134,
         0.1075
       ]
@@ -49,10 +89,30 @@
       "descripcion": "Escenario de mal condicionamiento numérico mediante transformación D·A·D (reescalado del activo GOOGL por factor 20). Preserva simetría y definición positiva (SPD), pero eleva el número de condición κ(A) para evaluar el precondicionador Jacobi.",
       "condicion_kappa": 2000.977,
       "A": [
-        [0.050625, 0.038556, 0.7956, 0.042548],
-        [0.038556, 0.056644, 0.8804, 0.048695],
-        [0.7956, 0.8804, 29.5936, 1.0793],
-        [0.042548, 0.048695, 1.0793, 0.0961]
+        [
+          0.050625,
+          0.038556,
+          0.7956,
+          0.042548
+        ],
+        [
+          0.038556,
+          0.056644,
+          0.8804,
+          0.048695
+        ],
+        [
+          0.7956,
+          0.8804,
+          29.5936,
+          1.0793
+        ],
+        [
+          0.042548,
+          0.048695,
+          1.0793,
+          0.0961
+        ]
       ],
       "b": [
         0.245,
@@ -63,4 +123,3 @@
     }
   ]
 }
-

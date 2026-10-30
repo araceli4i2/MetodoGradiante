@@ -2,10 +2,10 @@
 
 > **DAT-242 Métodos Numéricos**  
 > **Carrera de Informática · Universidad Mayor de San Andrés (UMSA)**  
-> **Estudiante:** Raquel Serrano  
+> **Estudiante:** Serrano Mamani Raquel Araceli  
 > **Mención:** Inteligencia Artificial y Ciencia de Datos  
-> **Repositorio:** [https://github.com/araceli4i2/MetodoGradiante](https://github.com/araceli4i2/MetodoGradiante)  
-> **Sitio Web Desplegado:** [https://araceli4i2.github.io/MetodoGradiante/](https://araceli4i2.github.io/MetodoGradiante/)
+> **Demo en Vivo / Web Pública:** [https://araceli4i2.github.io/MetodoGradiante/](https://araceli4i2.github.io/MetodoGradiante/)  
+> **Repositorio:** [https://github.com/araceli4i2/MetodoGradiante](https://github.com/araceli4i2/MetodoGradiante)
 
 ---
 
@@ -90,10 +90,10 @@ python python/data_preparation.py
 
 ### ¿Qué realiza `data_preparation.py`?
 1. Descarga cotizaciones ajustadas vía `yfinance` para AAPL, MSFT, GOOGL y AMZN.
-2. Calcula la matriz de covarianzas anualizada muestral $A$ y los retornos medios anualizados $b$.
+2. Calcula los retornos diarios simples porcentuales ($r_{i,t} = \frac{P_{i,t} - P_{i,t-1}}{P_{i,t-1}}$ vía `pct_change().dropna()`), la matriz de covarianzas anualizada muestral $A = \operatorname{Cov}(r) \times 252$ y el vector de retornos medios anualizados $b = \mathbb{E}[r] \times 252$.
 3. Construye los tres escenarios:
-   - **Escenario 1 (Ideal):** Datos reales directos de mercado.
-   - **Escenario 2 (Bajo estrés):** Incremento de volatilidad del $+50\%$ ($A \times 2.25$) y caída de expectativas del $-50\%$ ($b \times 0.5$).
+   - **Escenario 1 (Ideal):** Datos reales directos de mercado ($\kappa(A) \approx 13.97$).
+   - **Escenario 2 (Bajo estrés):** Descomposición estructural $A = D_\sigma \cdot R \cdot D_\sigma$ con volatilidades $\times 1.5$ ($\sigma_{\text{estrés}} = 1.5 \cdot \sigma_{\text{base}}$), contagio en correlaciones $R_{\text{estrés}} = 0.6 \cdot R + 0.4 \cdot J$ ($J = \mathbf{1}\mathbf{1}^T$, estrictamente SPD) y reducción no uniforme de retornos esperados ($-30\%$ en AAPL y MSFT, $-50\%$ en GOOGL y AMZN), con $\kappa(A) \approx 26.41$ y $\kappa(M^{-1}A) \approx 20.76$.
    - **Escenario 3 (Mal condicionado):** Congruencia espectral $D \cdot A \cdot D$ con $D = \text{diag}(1, 1, 20, 1)$ inflando la escala de GOOGL para forzar $\kappa(A) > 2000$ preservando simetría y carácter SPD.
 4. Valida en cada caso la simetría $A = A^T$ y el carácter SPD mediante autovalores estrictamente positivos con `np.linalg.eigvalsh(A)`.
 5. Exporta el archivo estandarizado `data/escenarios.json`.
@@ -139,19 +139,19 @@ La plataforma web se encuentra desplegada de forma pública y gratuita a través
 
 | Métrica / Característica | 1. Escenario Ideal | 2. Escenario Bajo Estrés | 3. Escenario Mal Condicionado |
 |:---|:---:|:---:|:---:|
-| **Condición Espectral $\kappa(A)$** | $\approx 13.97$ (Bien condicionada) | $\approx 13.97$ (Bien condicionada) | $\approx 2000.98$ (Mal condicionada) |
-| **Condición Precondicionada $\kappa(M^{-1}A)$** | $\approx 10.97$ | $\approx 10.97$ | $\approx 10.97$ (Reducción de **$182\times$**) |
-| **Iteraciones GC / GCP** | 4 it / 4 it | 4 it / 4 it | 4 it / 4 it |
-| **Residuo Relativo Final GCP** | $7.74 \times 10^{-17}$ | $8.35 \times 10^{-17}$ | $7.88 \times 10^{-14}$ |
-| **Residuo Relativo Final GC** | $5.53 \times 10^{-17}$ | $5.67 \times 10^{-17}$ | $1.06 \times 10^{-8}$ |
-| **Ponderaciones Óptimas ($w_i$)** | AAPL: 63.97%<br>MSFT: 13.81%<br>GOOGL: 35.03%<br>AMZN: -12.81% | AAPL: 63.97%<br>MSFT: 13.81%<br>GOOGL: 35.03%<br>AMZN: -12.81% | AAPL: 63.97%<br>MSFT: 13.81%<br>GOOGL: 1.75%<br>AMZN: -12.81% |
-| **Efecto Macroeconómico y Financiero** | Cartera normal basada en 2 años de cotizaciones de Yahoo Finance. Fuerte inversión en AAPL y GOOGL; posición corta en AMZN como cobertura (*hedge*). | Shock bajista sistémico (+50% volatilidad, -50% retorno). La exposición bruta $x$ se reduce al 22.2% del nivel base ($77.8\%$ desapalancamiento), preservando pesos relativos por homotecia. | Desbalance de escala mediante congruencia $D \cdot A \cdot D$ (activo GOOGL $\times 20$). El precondicionador diagonal Jacobi neutraliza el desbalance y alcanza precisión de máquina ($10^{-14}$). |
+| **Condición Espectral $\kappa(A)$** | $\approx 13.97$ (Bien condicionada) | $\approx 26.41$ (Moderada) | $\approx 2000.98$ (Mal condicionada) |
+| **Condición Precondicionada $\kappa(M^{-1}A)$** | $\approx 10.97$ | $\approx 20.76$ | $\approx 10.97$ (Reducción de **$182\times$**) |
+| **Iteraciones GC / GCP (tol = 1e-6)** | 4 it / 4 it (Empate) | 4 it / 4 it (Empate) | 4 it / 4 it (Empate) |
+| **Residuo Relativo Final GCP** | $6.08 \times 10^{-14}$ | $7.81 \times 10^{-13}$ | $7.88 \times 10^{-14}$ |
+| **Residuo Relativo Final GC** | $8.00 \times 10^{-14}$ | $7.70 \times 10^{-13}$ | $1.06 \times 10^{-8}$ |
+| **Ponderaciones Óptimas ($w_i$)** | AAPL: 63.97%<br>MSFT: 13.81%<br>GOOGL: 35.03%<br>AMZN: -12.81% | AAPL: 120.66%<br>MSFT: 54.63%<br>GOOGL: -15.41%<br>AMZN: -59.87% | AAPL: 63.97%<br>MSFT: 13.81%<br>GOOGL: 1.75%<br>AMZN: -12.81% |
+| **Efecto Macroeconómico y Financiero** | Cartera normal basada en 2 años de cotizaciones de Yahoo Finance. Fuerte inversión en AAPL y GOOGL; posición corta en AMZN como cobertura (*hedge*). | Shock asimétrico y contagio: rotación hacia activos defensivos (AAPL al 120.7%) con GOOGL (-15.4%) y AMZN (-59.9%) en corto. | Desbalance de escala mediante congruencia $D \cdot A \cdot D$ (activo GOOGL $\times 20$). El precondicionador diagonal reduce $\kappa$ a 11, alcanzando precisión de máquina ($7.88 \times 10^{-14}$ vs $1.06 \times 10^{-8}$). |
 
 ---
 
 ## 7. Módulo QA y Pruebas Automatizadas en Vivo
 
-La **Sección 9** del aplicativo web incluye un módulo automatizado de Aseguramiento de Calidad Numérica (`js/qa.js`). Al presionar el botón **"⚡ EJECUTAR PRUEBAS"**, el sistema evalúa cuatro pruebas en tiempo real, midiendo tiempos en milisegundos y actualizando dinámicamente la tabla de resultados:
+La **Sección 9** del aplicativo web incluye un módulo automatizado de Aseguramiento de Calidad Numérica (`js/qa.js`). Al presionar el botón **"⚡ EJECUTAR PRUEBAS"**, el sistema evalúa cinco pruebas en tiempo real, midiendo tiempos en milisegundos y actualizando dinámicamente la tabla de resultados:
 
 1. **Prueba 1 (Carga de los 3 escenarios sin error):**  
    Verifica que los tres escenarios se carguen íntegros, con matrices simétricas $4 \times 4$, menores principales de Sylvester estrictamente positivos ($\Delta_k > 0$) y solución directa de Cholesky con residuo nulo ($\|Ax - b\|_2 < 10^{-10}$).
@@ -159,8 +159,10 @@ La **Sección 9** del aplicativo web incluye un módulo automatizado de Aseguram
    Induce perturbaciones críticas intencionales ($A_{12} = 0.999 \neq A_{21}$ y varianza diagonal negativa $A_{11} = -0.05 \le 0$). Comprueba que el sistema detecte preventivamente las anomalías, emita notificaciones toast retro y resalte celdas sin romper la ejecución.
 3. **Prueba 3 (Reactividad y recálculo numérico ante edición de coeficientes):**  
    Altera en vivo el retorno esperado de AAPL en $+10\%$ ($0.2450 \to 0.2695$). Comprueba que se recalculen instantáneamente la referencia de Cholesky, la asignación de pesos ($\Delta w_0 = +17.11\text{ pp}$), y la convergencia de GCP con error absoluto $\|E_a\|_2 < 10^{-6}$ y relativo $E_r < 10^{-5}$.
-4. **Prueba 4 (Aceleración de convergencia en el escenario mal condicionado):**  
-   Verifica que en el escenario con $\kappa(A) \approx 2000.98$, el precondicionador Jacobi reduzca el número de condición a $\kappa(M^{-1}A) \approx 10.97$, satisfaciendo estrictamente $\text{iter}_{\text{GCP}} \le \text{iter}_{\text{GC}}$ con un residuo $10^6$ veces más preciso en GCP ($7.88 \times 10^{-14}$ vs $1.06 \times 10^{-8}$).
+4. **Prueba 4 (Comparativa en el escenario mal condicionado):**  
+   Verifica que en el escenario con $\kappa(A) \approx 2000.98$, el precondicionador Jacobi reduzca el número de condición a $\kappa(M^{-1}A) \approx 10.97$, satisfaciendo estrictamente $\text{iter}_{\text{GCP}} \le \text{iter}_{\text{GC}}$ (empate en 4 iteraciones con la tolerancia oficial $10^{-6}$).
+5. **Prueba 5 (Precisión residual en $k = n$):**  
+   Verifica que en el escenario mal condicionado, el residuo relativo de GCP tras $k = n$ ($n = 4$) iteraciones sea significativamente menor que el de GC ($7.88 \times 10^{-14}$ vs $1.06 \times 10^{-8}$), atribuible a que el redondeo se amplifica con $\kappa(A) \approx 2001$, mientras que $\kappa(M^{-1}A) \approx 11$.
 
 ---
 

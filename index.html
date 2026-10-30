@@ -1,19 +1,21 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DAT-242 // Optimización de Cartera Markowitz</title>
-  
+
   <!-- Tailwind CSS por CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  
+
   <!-- Chart.js por CDN para visualización de convergencia -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  
+
   <!-- Estilos personalizados retro/arcade -->
   <link rel="stylesheet" href="css/retro.css">
 </head>
+
 <body class="scanlines text-cyan-100 flex flex-col min-h-screen">
 
   <!-- Encabezado Arcade / Terminal Superior -->
@@ -22,23 +24,49 @@
       <div>
         <div class="flex items-center space-x-2">
           <span class="inline-block w-3 h-3 bg-cyan-400 rounded-full animate-ping"></span>
-          <span class="text-xs uppercase tracking-widest text-cyan-400 font-bold">UMSA · DAT-242 · MÉTODOS NUMÉRICOS</span>
+          <span class="text-xs uppercase tracking-widest text-cyan-400 font-bold">UMSA · DAT-242 · MÉTODOS
+            NUMÉRICOS</span>
         </div>
         <h1 class="text-xl md:text-2xl font-bold tracking-tight text-white neon-glow">
           OPTIMIZACIÓN DE CARTERA MARKOWITZ
         </h1>
         <p class="text-xs text-cyan-300">
-          Estudiante: <span class="text-white">Raquel Serrano</span> | Mención: <span class="text-cyan-400">IA y Ciencia de Datos</span>
+          Estudiante: <span class="text-white">Serrano Mamani Raquel Araceli</span> | Mención: <span
+            class="text-cyan-400">IA y Ciencia de Datos</span>
         </p>
       </div>
 
-      <div class="flex items-center space-x-3">
-        <span class="hidden md:inline-flex items-center px-2.5 py-1 text-xs border border-cyan-500/50 bg-cyan-950/40 text-cyan-300 rounded">
+      <div class="flex items-center space-x-2 sm:space-x-3">
+        <!-- Enlace al Repositorio de GitHub (siempre visible en todas las secciones y móvil) -->
+        <a id="header-repo-link" href="https://github.com/araceli4i2/MetodoGradiante" target="_blank"
+          rel="noopener noreferrer" aria-label="Abrir el repositorio de GitHub en una pestaña nueva"
+          class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono border border-cyan-500/60 bg-cyan-950/40 hover:bg-cyan-900/60 text-cyan-200 hover:text-cyan-100 rounded transition-all shadow-[0_0_8px_rgba(6,182,212,0.2)] hover:shadow-[0_0_12px_rgba(6,182,212,0.5)] focus:outline-none focus:ring-1 focus:ring-cyan-300">
+          <svg class="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24" aria-hidden="true">
+            <path fill-rule="evenodd" clip-rule="evenodd"
+              d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+          </svg>
+          <span class="hidden sm:inline font-bold tracking-wider">REPOSITORIO</span>
+        </a>
+
+        <!-- Enlace a la Web Pública Desplegada (siempre visible en todas las secciones y móvil) -->
+        <a id="header-site-link" href="https://araceli4i2.github.io/MetodoGradiante/" target="_blank"
+          rel="noopener noreferrer" aria-label="Abrir la web pública en una pestaña nueva"
+          class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono border border-cyan-500/60 bg-cyan-950/40 hover:bg-cyan-900/60 text-cyan-200 hover:text-cyan-100 rounded transition-all shadow-[0_0_8px_rgba(6,182,212,0.2)] hover:shadow-[0_0_12px_rgba(6,182,212,0.5)] focus:outline-none focus:ring-1 focus:ring-cyan-300">
+          <svg class="w-4 h-4 fill-none stroke-current stroke-2 shrink-0" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+          </svg>
+          <span class="hidden sm:inline font-bold tracking-wider">WEB PÚBLICA</span>
+        </a>
+        <span
+          class="hidden md:inline-flex items-center px-2.5 py-1 text-xs border border-cyan-500/50 bg-cyan-950/40 text-cyan-300 rounded">
           <span class="w-2 h-2 bg-emerald-400 rounded-full mr-2"></span> TERMINAL LISTA
         </span>
-        
+
         <!-- Botón menú móvil -->
-        <button id="mobile-menu-btn" class="md:hidden border border-cyan-500 px-3 py-1 text-cyan-300 hover:bg-cyan-900/40 rounded text-sm flex items-center gap-1" aria-label="Abrir menú">
+        <button id="mobile-menu-btn"
+          class="md:hidden border border-cyan-500 px-3 py-1 text-cyan-300 hover:bg-cyan-900/40 rounded text-sm flex items-center gap-1"
+          aria-label="Abrir menú">
           <span>☰</span> MENÚ
         </button>
       </div>
@@ -47,16 +75,26 @@
     <!-- Menú Móvil Desplegable -->
     <nav id="mobile-nav" class="hidden md:hidden border-t border-cyan-800 bg-black/95 px-4 py-3">
       <div class="grid grid-cols-2 gap-2 text-xs">
-        <button class="nav-btn p-2 border border-cyan-700/60 text-left rounded" data-target="sec-inicio">1. Inicio</button>
-        <button class="nav-btn p-2 border border-cyan-700/60 text-left rounded" data-target="sec-caso-estudio">2. Caso de estudio</button>
-        <button class="nav-btn p-2 border border-cyan-700/60 text-left rounded" data-target="sec-formulacion">3. Formulación</button>
-        <button class="nav-btn p-2 border border-cyan-700/60 text-left rounded" data-target="sec-entrada-datos">4. Entrada de datos</button>
-        <button class="nav-btn p-2 border border-cyan-700/60 text-left rounded" data-target="sec-tres-escenarios">5. Tres escenarios</button>
-        <button class="nav-btn p-2 border border-cyan-700/60 text-left rounded" data-target="sec-solucion-referencia">6. Solución referencia</button>
-        <button class="nav-btn p-2 border border-cyan-700/60 text-left rounded" data-target="sec-gcp-vs-gc">7. GCP vs GC</button>
-        <button class="nav-btn p-2 border border-cyan-700/60 text-left rounded" data-target="sec-analisis-errores">8. Análisis errores</button>
-        <button class="nav-btn p-2 border border-cyan-700/60 text-left rounded" data-target="sec-modulo-qa">9. Módulo QA</button>
-        <button class="nav-btn p-2 border border-cyan-700/60 text-left rounded" data-target="sec-conclusiones-referencias">10. Conclusiones y Ref.</button>
+        <button class="nav-btn p-2 border border-cyan-700/60 text-left rounded" data-target="sec-inicio">1.
+          Inicio</button>
+        <button class="nav-btn p-2 border border-cyan-700/60 text-left rounded" data-target="sec-caso-estudio">2. Caso
+          de estudio</button>
+        <button class="nav-btn p-2 border border-cyan-700/60 text-left rounded" data-target="sec-formulacion">3.
+          Formulación</button>
+        <button class="nav-btn p-2 border border-cyan-700/60 text-left rounded" data-target="sec-entrada-datos">4.
+          Entrada de datos</button>
+        <button class="nav-btn p-2 border border-cyan-700/60 text-left rounded" data-target="sec-tres-escenarios">5.
+          Tres escenarios</button>
+        <button class="nav-btn p-2 border border-cyan-700/60 text-left rounded" data-target="sec-solucion-referencia">6.
+          Solución referencia</button>
+        <button class="nav-btn p-2 border border-cyan-700/60 text-left rounded" data-target="sec-gcp-vs-gc">7. GCP vs
+          GC</button>
+        <button class="nav-btn p-2 border border-cyan-700/60 text-left rounded" data-target="sec-analisis-errores">8.
+          Análisis errores</button>
+        <button class="nav-btn p-2 border border-cyan-700/60 text-left rounded" data-target="sec-modulo-qa">9. Módulo
+          QA</button>
+        <button class="nav-btn p-2 border border-cyan-700/60 text-left rounded"
+          data-target="sec-conclusiones-referencias">10. Conclusiones y Ref.</button>
       </div>
     </nav>
   </header>
@@ -65,34 +103,54 @@
   <nav class="hidden md:block bg-black/50 border-b border-cyan-900/80 sticky top-[73px] z-30 backdrop-blur-md">
     <div class="max-w-7xl mx-auto px-4 py-2">
       <div class="flex flex-wrap gap-1.5 justify-start text-xs">
-        <button class="nav-btn px-3 py-1.5 border border-cyan-800 rounded bg-cyan-950/20 hover:bg-cyan-900/40 text-cyan-200" data-target="sec-inicio">
+        <button
+          class="nav-btn px-3 py-1.5 border border-cyan-800 rounded bg-cyan-950/20 hover:bg-cyan-900/40 text-cyan-200"
+          data-target="sec-inicio">
           1. Inicio
         </button>
-        <button class="nav-btn px-3 py-1.5 border border-cyan-800 rounded bg-cyan-950/20 hover:bg-cyan-900/40 text-cyan-200" data-target="sec-caso-estudio">
+        <button
+          class="nav-btn px-3 py-1.5 border border-cyan-800 rounded bg-cyan-950/20 hover:bg-cyan-900/40 text-cyan-200"
+          data-target="sec-caso-estudio">
           2. Caso de estudio
         </button>
-        <button class="nav-btn px-3 py-1.5 border border-cyan-800 rounded bg-cyan-950/20 hover:bg-cyan-900/40 text-cyan-200" data-target="sec-formulacion">
+        <button
+          class="nav-btn px-3 py-1.5 border border-cyan-800 rounded bg-cyan-950/20 hover:bg-cyan-900/40 text-cyan-200"
+          data-target="sec-formulacion">
           3. Formulación
         </button>
-        <button class="nav-btn px-3 py-1.5 border border-cyan-800 rounded bg-cyan-950/20 hover:bg-cyan-900/40 text-cyan-200" data-target="sec-entrada-datos">
+        <button
+          class="nav-btn px-3 py-1.5 border border-cyan-800 rounded bg-cyan-950/20 hover:bg-cyan-900/40 text-cyan-200"
+          data-target="sec-entrada-datos">
           4. Entrada de datos
         </button>
-        <button class="nav-btn px-3 py-1.5 border border-cyan-800 rounded bg-cyan-950/20 hover:bg-cyan-900/40 text-cyan-200" data-target="sec-tres-escenarios">
+        <button
+          class="nav-btn px-3 py-1.5 border border-cyan-800 rounded bg-cyan-950/20 hover:bg-cyan-900/40 text-cyan-200"
+          data-target="sec-tres-escenarios">
           5. Tres escenarios
         </button>
-        <button class="nav-btn px-3 py-1.5 border border-cyan-800 rounded bg-cyan-950/20 hover:bg-cyan-900/40 text-cyan-200" data-target="sec-solucion-referencia">
+        <button
+          class="nav-btn px-3 py-1.5 border border-cyan-800 rounded bg-cyan-950/20 hover:bg-cyan-900/40 text-cyan-200"
+          data-target="sec-solucion-referencia">
           6. Solución de referencia
         </button>
-        <button class="nav-btn px-3 py-1.5 border border-cyan-800 rounded bg-cyan-950/20 hover:bg-cyan-900/40 text-cyan-200" data-target="sec-gcp-vs-gc">
+        <button
+          class="nav-btn px-3 py-1.5 border border-cyan-800 rounded bg-cyan-950/20 hover:bg-cyan-900/40 text-cyan-200"
+          data-target="sec-gcp-vs-gc">
           7. GCP vs GC
         </button>
-        <button class="nav-btn px-3 py-1.5 border border-cyan-800 rounded bg-cyan-950/20 hover:bg-cyan-900/40 text-cyan-200" data-target="sec-analisis-errores">
+        <button
+          class="nav-btn px-3 py-1.5 border border-cyan-800 rounded bg-cyan-950/20 hover:bg-cyan-900/40 text-cyan-200"
+          data-target="sec-analisis-errores">
           8. Análisis de errores
         </button>
-        <button class="nav-btn px-3 py-1.5 border border-cyan-800 rounded bg-cyan-950/20 hover:bg-cyan-900/40 text-cyan-200" data-target="sec-modulo-qa">
+        <button
+          class="nav-btn px-3 py-1.5 border border-cyan-800 rounded bg-cyan-950/20 hover:bg-cyan-900/40 text-cyan-200"
+          data-target="sec-modulo-qa">
           9. Módulo QA
         </button>
-        <button class="nav-btn px-3 py-1.5 border border-cyan-800 rounded bg-cyan-950/20 hover:bg-cyan-900/40 text-cyan-200" data-target="sec-conclusiones-referencias">
+        <button
+          class="nav-btn px-3 py-1.5 border border-cyan-800 rounded bg-cyan-950/20 hover:bg-cyan-900/40 text-cyan-200"
+          data-target="sec-conclusiones-referencias">
           10. Conclusiones y Referencias
         </button>
       </div>
@@ -109,11 +167,11 @@
           <span class="cursor-blink">></span>
           <span>TERMINAL DE CONTROL // DAT-242 MÉTODOS NUMÉRICOS</span>
         </div>
-        
+
         <h2 class="text-2xl md:text-3xl font-bold text-white neon-glow mb-2">
           1. Inicio
         </h2>
-        
+
         <div class="border-b border-cyan-800/80 pb-4 mb-4">
           <h3 class="text-lg md:text-xl text-cyan-300 font-semibold">
             Optimización de Cartera Markowitz mediante Gradientes Conjugados y Precondicionado
@@ -127,9 +185,12 @@
         </div>
 
         <div class="border-l-2 border-cyan-400 pl-4 py-1 text-sm md:text-base text-gray-200 leading-relaxed space-y-1">
-          <p>Aplicación interactiva para resolver el problema de optimización de carteras de Markowitz mediante el sistema lineal Σx = μ.</p>
-          <p>Contrasta la solución exacta por Cholesky frente a los métodos iterativos de Gradientes Conjugados (GC) y GC Precondicionado (GCP Jacobi).</p>
-          <p>Evalúa convergencia, estabilidad y precisión numérica bajo la tolerancia estricta ‖r‖/‖b‖ &lt; 10⁻⁶ en tres escenarios financieros.</p>
+          <p>Aplicación interactiva para resolver el problema de optimización de carteras de Markowitz mediante el
+            sistema lineal Σx = μ.</p>
+          <p>Contrasta la solución exacta por Cholesky frente a los métodos iterativos de Gradientes Conjugados (GC) y
+            GC Precondicionado (GCP Jacobi).</p>
+          <p>Evalúa convergencia, estabilidad y precisión numérica bajo la tolerancia estricta ‖r‖/‖b‖ < 10⁻⁶ en tres
+            escenarios financieros.</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
@@ -161,6 +222,76 @@
             </p>
           </div>
         </div>
+
+        <!-- Tarjeta de Recursos del Proyecto (Código Fuente y Sitio Web) -->
+        <div class="mt-6 p-4 rounded-lg border border-cyan-500/60 bg-cyan-950/20 space-y-4">
+          <!-- Fila 1: Código Fuente GitHub -->
+          <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-cyan-900/60 pb-3">
+            <div class="space-y-1">
+              <div class="flex items-center gap-2">
+                <span
+                  class="text-xs bg-cyan-900/80 text-cyan-300 px-2 py-0.5 rounded font-mono border border-cyan-600/50">CÓDIGO
+                  FUENTE</span>
+                <span class="text-xs text-gray-400 font-mono">Repositorio abierto DAT-242</span>
+              </div>
+              <p class="text-sm text-gray-200">
+                Accede al repositorio oficial con la implementación completa en Vanilla JS y Python, datos y suite de
+                pruebas:
+              </p>
+              <div class="text-xs font-mono text-cyan-300 break-all select-all">
+                <span id="inicio-repo-url-text">https://github.com/araceli4i2/MetodoGradiante</span>
+              </div>
+            </div>
+            <a id="inicio-repo-link" href="https://github.com/araceli4i2/MetodoGradiante" target="_blank"
+              rel="noopener noreferrer" aria-label="Abrir el repositorio de GitHub en una pestaña nueva"
+              class="shrink-0 inline-flex items-center gap-2 px-3.5 py-2 text-xs font-mono font-bold bg-cyan-950/60 hover:bg-cyan-900 border border-cyan-400 text-cyan-200 hover:text-white rounded transition-all shadow-[0_0_8px_rgba(6,182,212,0.25)] hover:shadow-[0_0_12px_rgba(6,182,212,0.5)] focus:outline-none focus:ring-1 focus:ring-cyan-300">
+              <svg class="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24" aria-hidden="true">
+                <path fill-rule="evenodd" clip-rule="evenodd"
+                  d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+              </svg>
+              <span>VER EN GITHUB</span>
+              <span>↗</span>
+            </a>
+          </div>
+
+          <!-- Fila 2: Sitio Web Desplegado (Público) -->
+          <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pt-1">
+            <div class="space-y-1">
+              <div class="flex items-center gap-2">
+                <span
+                  class="text-xs bg-emerald-950/80 text-emerald-300 px-2 py-0.5 rounded font-mono border border-emerald-600/50">SITIO
+                  WEB</span>
+                <span class="text-xs text-gray-400 font-mono">Despliegue público en GitHub Pages</span>
+              </div>
+              <p class="text-sm text-gray-200">
+                Aplicación web interactiva en producción accesible desde cualquier navegador:
+              </p>
+              <div class="text-xs font-mono text-emerald-300 break-all select-all">
+                <span id="inicio-site-url-text">https://araceli4i2.github.io/MetodoGradiante/</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <button id="btn-copiar-site-url" type="button" aria-label="Copiar enlace de la web publicada al portapapeles"
+                class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-mono font-bold bg-cyan-950/60 hover:bg-cyan-900 border border-cyan-500/60 text-cyan-200 hover:text-white rounded transition-all shadow-[0_0_8px_rgba(6,182,212,0.2)] focus:outline-none focus:ring-1 focus:ring-cyan-300 cursor-pointer">
+                <svg class="w-3.5 h-3.5 fill-none stroke-current stroke-2" viewBox="0 0 24 24" aria-hidden="true">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                </svg>
+                <span>COPIAR ENLACE</span>
+              </button>
+              <a id="inicio-site-link" href="https://araceli4i2.github.io/MetodoGradiante/" target="_blank"
+                rel="noopener noreferrer" aria-label="Abrir el sitio web publicado en una pestaña nueva"
+                class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-mono font-bold bg-emerald-950/60 hover:bg-emerald-900 border border-emerald-400 text-emerald-200 hover:text-white rounded transition-all shadow-[0_0_8px_rgba(16,185,129,0.25)] hover:shadow-[0_0_12px_rgba(16,185,129,0.5)] focus:outline-none focus:ring-1 focus:ring-emerald-300">
+                <svg class="w-4 h-4 fill-none stroke-current stroke-2 shrink-0" viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                </svg>
+                <span>ABRIR SITIO WEB</span>
+                <span>↗</span>
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -180,16 +311,19 @@
         <div class="space-y-3 text-sm md:text-base text-gray-300 leading-relaxed">
           <h3 class="text-lg text-cyan-300 font-bold">Contexto del Modelo de Markowitz</h3>
           <p>
-            La Teoría Moderna de Portafolios (Markowitz, 1952) establece que los inversores racionales buscan maximizar 
-            el retorno esperado de su cartera para un nivel de riesgo dado, o minimizar el riesgo (varianza) para un nivel 
-            de retorno objetivo. La interacción y correlación entre los activos permite diversificar el riesgo no sistemático 
+            La Teoría Moderna de Portafolios (Markowitz, 1952) establece que los inversores racionales buscan maximizar
+            el retorno esperado de su cartera para un nivel de riesgo dado, o minimizar el riesgo (varianza) para un
+            nivel
+            de retorno objetivo. La interacción y correlación entre los activos permite diversificar el riesgo no
+            sistemático
             del mercado.
           </p>
           <p>
-            En este proyecto se analiza una cartera conformada por cuatro activos tecnológicos clave del índice S&amp;P 500: 
-            <strong class="text-cyan-200">Apple Inc. (AAPL)</strong>, 
-            <strong class="text-cyan-200">Microsoft Corp. (MSFT)</strong>, 
-            <strong class="text-cyan-200">Alphabet Inc. (GOOGL)</strong> y 
+            En este proyecto se analiza una cartera conformada por cuatro activos tecnológicos clave del índice S&P
+            500:
+            <strong class="text-cyan-200">Apple Inc. (AAPL)</strong>,
+            <strong class="text-cyan-200">Microsoft Corp. (MSFT)</strong>,
+            <strong class="text-cyan-200">Alphabet Inc. (GOOGL)</strong> y
             <strong class="text-cyan-200">Amazon.com Inc. (AMZN)</strong>.
           </p>
         </div>
@@ -201,33 +335,43 @@
             <span class="px-2 py-0.5 bg-black/60 border border-cyan-500 rounded text-cyan-400 font-mono">Σx = μ</span>
           </h3>
           <p class="text-sm text-gray-300 leading-relaxed">
-            Al maximizar el índice de Sharpe de la cartera tangente (o en la formulación cuadrática media-varianza no restringida), 
-            las condiciones de primer orden conducen directamente al sistema lineal de ecuaciones <strong class="text-cyan-200">Σx = μ</strong> 
+            Al maximizar el índice de Sharpe de la cartera tangente (o en la formulación cuadrática media-varianza no
+            restringida),
+            las condiciones de primer orden conducen directamente al sistema lineal de ecuaciones <strong
+              class="text-cyan-200">Σx = μ</strong>
             (equivalente a <strong class="text-cyan-200">Ax = b</strong>), donde:
           </p>
           <ul class="list-disc list-inside space-y-1.5 text-xs md:text-sm text-gray-300 pl-2">
             <li>
-              <strong class="text-cyan-200 font-mono">Σ (A):</strong> Matriz simétrica y definida positiva ($4 \times 4$) de covarianzas anualizadas de los retornos de los activos.
+              <strong class="text-cyan-200 font-mono">Σ (A):</strong> Matriz simétrica y definida positiva ($4 \times
+              4$) de covarianzas anualizadas de los retornos de los activos.
             </li>
             <li>
-              <strong class="text-cyan-200 font-mono">μ (b):</strong> Vector ($4 \times 1$) de retornos esperados anualizados de cada activo.
+              <strong class="text-cyan-200 font-mono">μ (b):</strong> Vector ($4 \times 1$) de retornos esperados
+              anualizados de cada activo.
             </li>
             <li>
-              <strong class="text-cyan-200 font-mono">x:</strong> Vector de ponderaciones o pesos no normalizados de la cartera óptima.
+              <strong class="text-cyan-200 font-mono">x:</strong> Vector de ponderaciones o pesos no normalizados de la
+              cartera óptima.
             </li>
           </ul>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
             <div class="bg-black/50 p-3 rounded border border-cyan-900/80">
               <span class="text-cyan-400 font-semibold text-xs block mb-1">PESOS PROPORCIONALES Y NORMALIZACIÓN:</span>
               <p class="text-xs text-gray-300">
-                Los componentes de <span class="text-cyan-200 font-mono">x</span> son proporcionales a las asignaciones óptimas. 
-                Posteriormente se normalizan dividiendo cada elemento por la suma total (<span class="text-cyan-200 font-mono">wᵢ = xᵢ / Σ xⱼ</span>), asegurando que la inversión sume el 100% de la cartera.
+                Los componentes de <span class="text-cyan-200 font-mono">x</span> son proporcionales a las asignaciones
+                óptimas.
+                Posteriormente se normalizan dividiendo cada elemento por la suma total (<span
+                  class="text-cyan-200 font-mono">wᵢ = xᵢ / Σ xⱼ</span>), asegurando que la inversión sume el 100% de la
+                cartera.
               </p>
             </div>
             <div class="bg-black/50 p-3 rounded border border-cyan-900/80">
               <span class="text-cyan-400 font-semibold text-xs block mb-1">INTERPRETACIÓN DE PESOS NEGATIVOS:</span>
               <p class="text-xs text-gray-300">
-                La presencia de pesos negativos (<span class="text-cyan-200 font-mono">xᵢ &lt; 0</span>) modela legal y financieramente <strong class="text-cyan-200">posiciones cortas (short selling)</strong>, permitiendo vender activos prestados para financiar compras en posiciones largas.
+                La presencia de pesos negativos (<span class="text-cyan-200 font-mono">xᵢ < 0</span>) modela legal y
+                financieramente <strong class="text-cyan-200">posiciones cortas (short selling)</strong>, permitiendo
+                vender activos prestados para financiar compras en posiciones largas.
               </p>
             </div>
           </div>
@@ -239,24 +383,19 @@
             <div>
               <h3 class="text-base md:text-lg text-cyan-300 font-bold">Procedencia y Extracción de Datos</h3>
               <p class="text-xs text-gray-300 mt-1">
-                Datos históricos de precios de cierre ajustados recopilados desde <strong class="text-cyan-200">Yahoo Finance</strong> 
-                mediante el paquete de Python <code class="text-cyan-300 bg-cyan-950 px-1 py-0.5 rounded border border-cyan-800">yfinance</code>, 
-                cubriendo un horizonte muestral de <strong class="text-cyan-200">2 años</strong>.
+                Datos históricos de precios de cierre ajustados recopilados desde <strong class="text-cyan-200">Yahoo Finance</strong>
+                mediante el paquete de Python <code class="text-cyan-300 bg-cyan-950 px-1 py-0.5 rounded border border-cyan-800">yfinance</code>,
+                cubriendo un horizonte muestral de <strong class="text-cyan-200">2 años</strong>. El script <code class="text-cyan-300 bg-cyan-950 px-1 py-0.5 rounded border border-cyan-800">python/data_preparation.py</code> calcula los <strong class="text-cyan-200">retornos diarios simples porcentuales</strong> (<span class="font-mono text-cyan-300">rₜ = (Pₜ - Pₜ₋₁) / Pₜ₋₁</span>) con <code class="text-cyan-300 font-mono">pct_change().dropna()</code> y anualiza considerando <strong class="text-cyan-200">252 ruedas bursátiles</strong>: <span class="font-mono text-cyan-300">bᵢ = E[rᵢ] × 252</span> y <span class="font-mono text-cyan-300">Aᵢⱼ = Cov(rᵢ, rⱼ) × 252</span>.
               </p>
             </div>
-            
+
             <!-- Campo Editable: Fecha de extracción -->
             <div class="flex-shrink-0 bg-cyan-950/40 p-3 rounded border border-cyan-500/50">
               <label for="fecha-extraccion" class="block text-xs uppercase text-cyan-300 font-bold mb-1">
                 📅 Fecha de extracción:
               </label>
-              <input 
-                type="date" 
-                id="fecha-extraccion" 
-                name="fecha-extraccion" 
-                value="2026-10-28" 
-                class="bg-black text-cyan-200 border border-cyan-400 rounded px-3 py-1.5 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-cyan-300 cursor-pointer shadow-inner"
-              >
+              <input type="date" id="fecha-extraccion" name="fecha-extraccion" value="2026-10-28"
+                class="bg-black text-cyan-200 border border-cyan-400 rounded px-3 py-1.5 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-cyan-300 cursor-pointer shadow-inner">
               <span class="block text-[10px] text-gray-400 mt-1">* Campo editable de control temporal</span>
             </div>
           </div>
@@ -303,90 +442,109 @@
         <!-- Definición de Variables -->
         <div class="space-y-4 text-sm md:text-base text-gray-300 leading-relaxed">
           <p>
-            El problema de optimización cuadrática de Markowitz busca determinar las proporciones óptimas de capital 
-            asignadas a los activos financieros. En su forma resolutiva sin tasa libre de riesgo, el sistema se reduce 
+            El problema de optimización cuadrática de Markowitz busca determinar las proporciones óptimas de capital
+            asignadas a los activos financieros. En su forma resolutiva sin tasa libre de riesgo, el sistema se reduce
             a resolver la ecuación matricial lineal:
           </p>
           <div class="text-center py-2">
-            <span class="inline-block bg-black/80 px-4 py-2 border border-cyan-500 rounded text-cyan-300 font-mono text-base md:text-lg neon-glow">
-              Ax = b &nbsp;&Longleftrightarrow&nbsp; &Sigma;x = &mu;
+            <span
+              class="inline-block bg-black/80 px-4 py-2 border border-cyan-500 rounded text-cyan-300 font-mono text-base md:text-lg neon-glow">
+              Ax = b  ⟺  Σx = μ
             </span>
           </div>
 
           <h3 class="text-lg text-cyan-300 font-bold mt-4">Definición de las 4 Variables de Decisión</h3>
           <p>
-            El vector incógnita <span class="font-mono text-cyan-200">x = [x₁, x₂, x₃, x₄]ᵀ</span> representa las 
+            El vector incógnita <span class="font-mono text-cyan-200">x = [x₁, x₂, x₃, x₄]ᵀ</span> representa las
             <strong class="text-white">ponderaciones o pesos no normalizados</strong> de cada activo en la cartera:
           </p>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
             <div class="border border-cyan-900 bg-cyan-950/20 p-3 rounded">
-              <span class="font-mono text-cyan-300 font-bold block text-sm">x₁ &mdash; Apple Inc. (AAPL)</span>
+              <span class="font-mono text-cyan-300 font-bold block text-sm">x₁ — Apple Inc. (AAPL)</span>
               <p class="text-xs text-gray-400 mt-1">Peso no normalizado asignado al activo 1.</p>
             </div>
             <div class="border border-cyan-900 bg-cyan-950/20 p-3 rounded">
-              <span class="font-mono text-cyan-300 font-bold block text-sm">x₂ &mdash; Microsoft Corp. (MSFT)</span>
+              <span class="font-mono text-cyan-300 font-bold block text-sm">x₂ — Microsoft Corp. (MSFT)</span>
               <p class="text-xs text-gray-400 mt-1">Peso no normalizado asignado al activo 2.</p>
             </div>
             <div class="border border-cyan-900 bg-cyan-950/20 p-3 rounded">
-              <span class="font-mono text-cyan-300 font-bold block text-sm">x₃ &mdash; Alphabet Inc. (GOOGL)</span>
+              <span class="font-mono text-cyan-300 font-bold block text-sm">x₃ — Alphabet Inc. (GOOGL)</span>
               <p class="text-xs text-gray-400 mt-1">Peso no normalizado asignado al activo 3.</p>
             </div>
             <div class="border border-cyan-900 bg-cyan-950/20 p-3 rounded">
-              <span class="font-mono text-cyan-300 font-bold block text-sm">x₄ &mdash; Amazon.com Inc. (AMZN)</span>
+              <span class="font-mono text-cyan-300 font-bold block text-sm">x₄ — Amazon.com Inc. (AMZN)</span>
               <p class="text-xs text-gray-400 mt-1">Peso no normalizado asignado al activo 4.</p>
             </div>
           </div>
 
           <div class="bg-black/40 border border-cyan-800 p-3.5 rounded text-xs text-gray-300">
             <strong class="text-cyan-400 block mb-1">NORMALIZACIÓN DE LA CARTERA:</strong>
-            Una vez obtenido el vector solución <span class="text-cyan-200 font-mono">x</span>, los pesos reales de asignación porcentual de la cartera <span class="text-cyan-200 font-mono">wᵢ</span> se calculan normalizando respecto a la suma total:
+            Una vez obtenido el vector solución <span class="text-cyan-200 font-mono">x</span>, los pesos reales de
+            asignación porcentual de la cartera <span class="text-cyan-200 font-mono">wᵢ</span> se calculan normalizando
+            respecto a la suma total:
             <div class="text-center font-mono text-cyan-300 py-1.5 text-sm">
-              wᵢ = xᵢ / (&sum;ⱼ₌₁⁴ xⱼ) &nbsp;&implies;&nbsp; &sum;ᵢ₌₁⁴ wᵢ = 1 (100%)
+              wᵢ = xᵢ / (∑ⱼ₌₁⁴ xⱼ)  ⟹  ∑ᵢ₌₁⁴ wᵢ = 1 (100%)
             </div>
-            Los pesos con valor negativo (<span class="text-cyan-200 font-mono">wᵢ &lt; 0</span>) representan ventas al descubierto o posiciones cortas (<em>short positions</em>).
+            Los pesos con valor negativo (<span class="text-cyan-200 font-mono">wᵢ < 0</span>) representan ventas al
+            descubierto o posiciones cortas (<em>short positions</em>).
           </div>
         </div>
 
         <!-- Interpretación de a_ii, a_ij y b_i -->
         <div class="mt-6 space-y-4">
           <h3 class="text-lg text-cyan-300 font-bold">Interpretación de los Coeficientes Matriciales y Vectoriales</h3>
-          
+
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <!-- a_ii -->
             <div class="border border-cyan-700/70 bg-black/50 p-4 rounded-lg">
               <div class="flex items-center gap-2 mb-2">
-                <span class="px-2 py-0.5 bg-cyan-950 border border-cyan-500 rounded font-mono text-cyan-300 text-sm font-bold">aᵢᵢ</span>
+                <span
+                  class="px-2 py-0.5 bg-cyan-950 border border-cyan-500 rounded font-mono text-cyan-300 text-sm font-bold">aᵢᵢ</span>
                 <span class="text-white font-bold text-sm">Varianza Anualizada</span>
               </div>
               <p class="text-xs text-gray-300 leading-relaxed">
-                Elementos de la diagonal principal de <span class="text-cyan-200 font-mono">A</span> (<span class="text-cyan-200 font-mono">a₁₁, a₂₂, a₃₃, a₄₄</span>). 
-                Representan la <strong>varianza individual anualizada</strong> (<span class="text-cyan-200 font-mono">&sigma;ᵢ²</span>) del rendimiento del activo <span class="text-cyan-200 font-mono">i</span>. 
-                Cuantifica el riesgo o volatilidad propia no diversificable del activo individual. Al ser una matriz definida positiva (SPD), todos los términos diagonales son estrictamente positivos (<span class="text-cyan-200 font-mono">aᵢᵢ &gt; 0</span>).
+                Elementos de la diagonal principal de <span class="text-cyan-200 font-mono">A</span> (<span
+                  class="text-cyan-200 font-mono">a₁₁, a₂₂, a₃₃, a₄₄</span>).
+                Representan la <strong>varianza individual anualizada</strong> (<span
+                  class="text-cyan-200 font-mono">σᵢ²</span>) del rendimiento del activo <span
+                  class="text-cyan-200 font-mono">i</span>.
+                Cuantifica el riesgo o volatilidad propia no diversificable del activo individual. Al ser una matriz
+                definida positiva (SPD), todos los términos diagonales son estrictamente positivos (<span
+                  class="text-cyan-200 font-mono">aᵢᵢ > 0</span>).
               </p>
             </div>
 
             <!-- a_ij -->
             <div class="border border-cyan-700/70 bg-black/50 p-4 rounded-lg">
               <div class="flex items-center gap-2 mb-2">
-                <span class="px-2 py-0.5 bg-cyan-950 border border-cyan-500 rounded font-mono text-cyan-300 text-sm font-bold">aᵢⱼ (i ≠ j)</span>
+                <span
+                  class="px-2 py-0.5 bg-cyan-950 border border-cyan-500 rounded font-mono text-cyan-300 text-sm font-bold">aᵢⱼ
+                  (i ≠ j)</span>
                 <span class="text-white font-bold text-sm">Covarianza Cruzada</span>
               </div>
               <p class="text-xs text-gray-300 leading-relaxed">
-                Elementos fuera de la diagonal principal. Representan la <strong>covarianza anualizada</strong> (<span class="text-cyan-200 font-mono">Cov(rᵢ, rⱼ) = &rho;ᵢⱼ &sigma;ᵢ &sigma;ⱼ</span>) entre los rendimientos de los activos <span class="text-cyan-200 font-mono">i</span> y <span class="text-cyan-200 font-mono">j</span>.
-                Mide el comovimiento de precios. Por definición probabilística, la matriz es simétrica (<span class="text-cyan-200 font-mono">aᵢⱼ = aⱼᵢ</span>). Si <span class="text-cyan-200 font-mono">aᵢⱼ &gt; 0</span> se mueven conjuntamente; si es baja o negativa favorece la diversificación del portafolio.
+                Elementos fuera de la diagonal principal. Representan la <strong>covarianza anualizada</strong> (<span
+                  class="text-cyan-200 font-mono">Cov(rᵢ, rⱼ) = ρᵢⱼ σᵢ σⱼ</span>) entre los rendimientos
+                de los activos <span class="text-cyan-200 font-mono">i</span> y <span
+                  class="text-cyan-200 font-mono">j</span>.
+                Mide el comovimiento de precios. Por definición probabilística, la matriz es simétrica (<span
+                  class="text-cyan-200 font-mono">aᵢⱼ = aⱼᵢ</span>). Si <span class="text-cyan-200 font-mono">aᵢⱼ >
+                  0</span> se mueven conjuntamente; si es baja o negativa favorece la diversificación del portafolio.
               </p>
             </div>
 
             <!-- b_i -->
             <div class="border border-cyan-700/70 bg-black/50 p-4 rounded-lg">
               <div class="flex items-center gap-2 mb-2">
-                <span class="px-2 py-0.5 bg-cyan-950 border border-cyan-500 rounded font-mono text-cyan-300 text-sm font-bold">bᵢ</span>
+                <span
+                  class="px-2 py-0.5 bg-cyan-950 border border-cyan-500 rounded font-mono text-cyan-300 text-sm font-bold">bᵢ</span>
                 <span class="text-white font-bold text-sm">Retorno Esperado</span>
               </div>
               <p class="text-xs text-gray-300 leading-relaxed">
-                Componentes del vector del término independiente <span class="text-cyan-200 font-mono">b = [b₁, b₂, b₃, b₄]ᵀ</span>. 
-                Representan el <strong>retorno esperado anualizado</strong> (<span class="text-cyan-200 font-mono">&mu;ᵢ = E[rᵢ] &times; 252</span>) de cada activo. 
+                Componentes del vector del término independiente <span class="text-cyan-200 font-mono">b = [b₁, b₂, b₃, b₄]ᵀ</span>.
+                Representan el <strong>retorno esperado anualizado</strong> (<span class="text-cyan-200 font-mono">μᵢ = E[rᵢ] × 252</span>) de cada activo,
+                calculado a partir de los <strong>retornos diarios simples porcentuales</strong> (<span class="text-cyan-200 font-mono">rₜ = (Pₜ - Pₜ₋₁) / Pₜ₋₁</span>) obtenidos vía <code class="text-cyan-300 font-mono">pct_change()</code> y anualizados por las 252 ruedas del año bursátil.
                 Es el rendimiento medio proyectado que impulsa la selección de activos con mayor potencial de ganancia en relación a su riesgo.
               </p>
             </div>
@@ -395,33 +553,38 @@
 
         <!-- Diagnóstico Numérico del Escenario Cargado -->
         <div class="mt-6 border border-cyan-800/80 bg-black/60 rounded-lg p-5 space-y-4">
-          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-cyan-900 pb-3">
+          <div
+            class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-cyan-900 pb-3">
             <div>
               <h3 class="text-base font-bold text-cyan-300 flex items-center gap-2">
                 <span>DIAGNÓSTICO NUMÉRICO DEL ESCENARIO CARGADO</span>
-                <span id="diag-escenario-badge" class="text-xs bg-cyan-950 border border-cyan-500 text-cyan-300 px-2 py-0.5 rounded font-mono">1. IDEAL</span>
+                <span id="diag-escenario-badge"
+                  class="text-xs bg-cyan-950 border border-cyan-500 text-cyan-300 px-2 py-0.5 rounded font-mono">1.
+                  IDEAL</span>
               </h3>
               <p class="text-xs text-gray-400 mt-0.5">
                 Evaluación con Álgebra Lineal pura (Sylvester y Jacobi cíclico) sobre la matriz A activa.
               </p>
             </div>
-            <button id="btn-recalcular-diag" type="button" class="text-xs px-3 py-1 bg-cyan-950/80 border border-cyan-700 hover:border-cyan-400 text-cyan-300 rounded font-mono cursor-pointer transition-all">
+            <button id="btn-recalcular-diag" type="button"
+              class="text-xs px-3 py-1 bg-cyan-950/80 border border-cyan-700 hover:border-cyan-400 text-cyan-300 rounded font-mono cursor-pointer transition-all">
               🔄 Actualizar Diagnóstico
             </button>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            
+
             <!-- 1. Simetría -->
             <div class="border border-cyan-900 bg-cyan-950/30 p-3.5 rounded flex flex-col justify-between">
               <div>
                 <span class="text-xs text-gray-400 uppercase tracking-wider block mb-1">1. Simetría (A = Aᵀ)</span>
-                <div id="diag-simetria-status" class="text-sm font-bold text-emerald-400 flex items-center gap-1.5 font-mono">
+                <div id="diag-simetria-status"
+                  class="text-sm font-bold text-emerald-400 flex items-center gap-1.5 font-mono">
                   <span>●</span> <span>SÍ (Simétrica)</span>
                 </div>
               </div>
               <p id="diag-simetria-desc" class="text-[11px] text-gray-300 font-mono mt-2 pt-2 border-t border-cyan-950">
-                ‖A - Aᵀ‖ &lt; 1e-8
+                ‖A - Aᵀ‖ < 1e-8
               </p>
             </div>
 
@@ -429,27 +592,32 @@
             <div class="border border-cyan-900 bg-cyan-950/30 p-3.5 rounded flex flex-col justify-between">
               <div>
                 <span class="text-xs text-gray-400 uppercase tracking-wider block mb-1">2. Menores Principales</span>
-                <div id="diag-sylvester-status" class="text-sm font-bold text-emerald-400 flex items-center gap-1.5 font-mono">
+                <div id="diag-sylvester-status"
+                  class="text-sm font-bold text-emerald-400 flex items-center gap-1.5 font-mono">
                   <span>●</span> <span>Sylvester: SPD Válida</span>
                 </div>
               </div>
-              <div id="diag-menores-vals" class="text-[11px] text-cyan-300 font-mono mt-2 pt-2 border-t border-cyan-950 space-y-0.5">
-                <div>Δ₁ = 0.050625 (&gt; 0)</div>
-                <div>Δ₂ = 0.001381 (&gt; 0)</div>
-                <div>Δ₃ = 4.95e-5 (&gt; 0)</div>
-                <div>Δ₄ = 2.29e-6 (&gt; 0)</div>
+              <div id="diag-menores-vals"
+                class="text-[11px] text-cyan-300 font-mono mt-2 pt-2 border-t border-cyan-950 space-y-0.5">
+                <div>Δ₁ = 0.050625 (> 0)</div>
+                <div>Δ₂ = 0.001381 (> 0)</div>
+                <div>Δ₃ = 4.95e-5 (> 0)</div>
+                <div>Δ₄ = 2.29e-6 (> 0)</div>
               </div>
             </div>
 
             <!-- 3. Autovalores (Jacobi Cíclico) -->
             <div class="border border-cyan-900 bg-cyan-950/30 p-3.5 rounded flex flex-col justify-between">
               <div>
-                <span class="text-xs text-gray-400 uppercase tracking-wider block mb-1">3. Autovalores λᵢ (Jacobi)</span>
-                <div id="diag-autovalores-status" class="text-sm font-bold text-cyan-300 flex items-center gap-1.5 font-mono">
-                  <span>●</span> <span>λₘᵢₙ &gt; 0 (SPD)</span>
+                <span class="text-xs text-gray-400 uppercase tracking-wider block mb-1">3. Autovalores λᵢ
+                  (Jacobi)</span>
+                <div id="diag-autovalores-status"
+                  class="text-sm font-bold text-cyan-300 flex items-center gap-1.5 font-mono">
+                  <span>●</span> <span>λₘᵢₙ > 0 (SPD)</span>
                 </div>
               </div>
-              <div id="diag-autovalores-vals" class="text-[11px] text-cyan-300 font-mono mt-2 pt-2 border-t border-cyan-950 space-y-0.5">
+              <div id="diag-autovalores-vals"
+                class="text-[11px] text-cyan-300 font-mono mt-2 pt-2 border-t border-cyan-950 space-y-0.5">
                 <div>λ₁ = 0.014827</div>
                 <div>λ₂ = 0.023078</div>
                 <div>λ₃ = 0.032371</div>
@@ -472,6 +640,40 @@
 
           </div>
         </div>
+
+        <!-- Tabla Comparativa de Verificación Numérica Simultánea (Los 3 Escenarios) -->
+        <div class="mt-6 border border-cyan-800/80 bg-black/60 rounded-lg p-5 space-y-4">
+          <div class="border-b border-cyan-900 pb-3 flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
+            <div>
+              <h3 class="text-base font-bold text-cyan-300 flex items-center gap-2">
+                <span>VERIFICACIÓN NUMÉRICA COMPARATIVA DE LOS TRES ESCENARIOS (SIMULTÁNEA)</span>
+                <span class="text-xs bg-cyan-950 border border-cyan-500 text-cyan-300 px-2 py-0.5 rounded font-mono">EN VIVO // LinAlg.js</span>
+              </h3>
+              <p class="text-xs text-gray-400 mt-0.5">
+                Evaluación algebraica simultánea calculada en vivo desde los datos de cada escenario (independiente del escenario activo): simetría ‖A − Aᵀ‖, menores de Sylvester (Δ₁…Δ₄), espectro de autovalores λᵢ y conclusión SPD.
+              </p>
+            </div>
+            <span class="text-xs font-mono text-emerald-400 bg-emerald-950/40 border border-emerald-500/50 px-2.5 py-1 rounded">
+              ✓ DATOS EN VIVO // TRES ESCENARIOS
+            </span>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-xs text-left border-collapse font-mono">
+              <thead>
+                <tr class="text-cyan-400 border-b border-cyan-900/80 bg-cyan-950/30">
+                  <th class="p-2.5">Propiedad / Parámetro Numérico</th>
+                  <th class="p-2.5 text-center text-cyan-300">1. Ideal</th>
+                  <th class="p-2.5 text-center text-amber-300 border-l border-cyan-900/60">2. Bajo estrés</th>
+                  <th class="p-2.5 text-center text-rose-300 border-l border-cyan-900/60">3. Mal condicionado</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-comparativa-sec3" class="divide-y divide-cyan-950 text-gray-200">
+                <!-- Se inyecta dinámicamente con LinAlg.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -488,18 +690,21 @@
         </h2>
 
         <p class="text-sm text-gray-300 mb-6">
-          Configure los coeficientes de la matriz de covarianzas anualizadas <span class="text-cyan-300 font-mono">A</span>, 
-          el vector de retornos esperados <span class="text-cyan-300 font-mono">b</span>, y los hiperparámetros numéricos del algoritmo de gradientes conjugados.
+          Configure los coeficientes de la matriz de covarianzas anualizadas <span
+            class="text-cyan-300 font-mono">A</span>,
+          el vector de retornos esperados <span class="text-cyan-300 font-mono">b</span>, y los hiperparámetros
+          numéricos del algoritmo de gradientes conjugados.
         </p>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          
+
           <!-- Cuadrícula 4x4 para Matriz A -->
           <div class="lg:col-span-8 border border-cyan-800 bg-black/60 p-4 md:p-5 rounded-lg">
             <div class="flex justify-between items-center mb-3">
               <h3 class="text-sm md:text-base font-bold text-cyan-300 flex items-center gap-2">
                 <span>MATRIZ DE COVARIANZAS A (4×4)</span>
-                <span class="text-[10px] bg-cyan-950 border border-cyan-700 text-cyan-400 px-2 py-0.5 rounded">Simétrica &middot; SPD</span>
+                <span class="text-[10px] bg-cyan-950 border border-cyan-700 text-cyan-400 px-2 py-0.5 rounded">Simétrica
+                  · SPD</span>
               </h3>
               <span class="text-xs text-gray-400">[aᵢⱼ] anualizadas</span>
             </div>
@@ -520,43 +725,77 @@
                   <!-- Fila 0: AAPL -->
                   <tr>
                     <td class="p-2 text-left text-cyan-300 font-bold">1. AAPL</td>
-                    <td class="p-1"><input type="number" step="any" id="mat-a-0-0" class="input-matrix w-full bg-black/90 border border-cyan-800 focus:border-cyan-400 text-cyan-200 text-center py-1.5 px-1 rounded text-xs" value="0.050625"></td>
-                    <td class="p-1"><input type="number" step="any" id="mat-a-0-1" class="input-matrix w-full bg-black/90 border border-cyan-800 focus:border-cyan-400 text-cyan-200 text-center py-1.5 px-1 rounded text-xs" value="0.038556"></td>
-                    <td class="p-1"><input type="number" step="any" id="mat-a-0-2" class="input-matrix w-full bg-black/90 border border-cyan-800 focus:border-cyan-400 text-cyan-200 text-center py-1.5 px-1 rounded text-xs" value="0.039780"></td>
-                    <td class="p-1"><input type="number" step="any" id="mat-a-0-3" class="input-matrix w-full bg-black/90 border border-cyan-800 focus:border-cyan-400 text-cyan-200 text-center py-1.5 px-1 rounded text-xs" value="0.042548"></td>
+                    <td class="p-1"><input type="number" step="any" id="mat-a-0-0"
+                        class="input-matrix w-full bg-black/90 border border-cyan-800 focus:border-cyan-400 text-cyan-200 text-center py-1.5 px-1 rounded text-xs"
+                        value="0.050625"></td>
+                    <td class="p-1"><input type="number" step="any" id="mat-a-0-1"
+                        class="input-matrix w-full bg-black/90 border border-cyan-800 focus:border-cyan-400 text-cyan-200 text-center py-1.5 px-1 rounded text-xs"
+                        value="0.038556"></td>
+                    <td class="p-1"><input type="number" step="any" id="mat-a-0-2"
+                        class="input-matrix w-full bg-black/90 border border-cyan-800 focus:border-cyan-400 text-cyan-200 text-center py-1.5 px-1 rounded text-xs"
+                        value="0.039780"></td>
+                    <td class="p-1"><input type="number" step="any" id="mat-a-0-3"
+                        class="input-matrix w-full bg-black/90 border border-cyan-800 focus:border-cyan-400 text-cyan-200 text-center py-1.5 px-1 rounded text-xs"
+                        value="0.042548"></td>
                   </tr>
                   <!-- Fila 1: MSFT -->
                   <tr>
                     <td class="p-2 text-left text-cyan-300 font-bold">2. MSFT</td>
-                    <td class="p-1"><input type="number" step="any" id="mat-a-1-0" class="input-matrix w-full bg-black/90 border border-cyan-800 focus:border-cyan-400 text-cyan-200 text-center py-1.5 px-1 rounded text-xs" value="0.038556"></td>
-                    <td class="p-1"><input type="number" step="any" id="mat-a-1-1" class="input-matrix w-full bg-black/90 border border-cyan-800 focus:border-cyan-400 text-cyan-200 text-center py-1.5 px-1 rounded text-xs" value="0.056644"></td>
-                    <td class="p-1"><input type="number" step="any" id="mat-a-1-2" class="input-matrix w-full bg-black/90 border border-cyan-800 focus:border-cyan-400 text-cyan-200 text-center py-1.5 px-1 rounded text-xs" value="0.044020"></td>
-                    <td class="p-1"><input type="number" step="any" id="mat-a-1-3" class="input-matrix w-full bg-black/90 border border-cyan-800 focus:border-cyan-400 text-cyan-200 text-center py-1.5 px-1 rounded text-xs" value="0.048695"></td>
+                    <td class="p-1"><input type="number" step="any" id="mat-a-1-0"
+                        class="input-matrix w-full bg-black/90 border border-cyan-800 focus:border-cyan-400 text-cyan-200 text-center py-1.5 px-1 rounded text-xs"
+                        value="0.038556"></td>
+                    <td class="p-1"><input type="number" step="any" id="mat-a-1-1"
+                        class="input-matrix w-full bg-black/90 border border-cyan-800 focus:border-cyan-400 text-cyan-200 text-center py-1.5 px-1 rounded text-xs"
+                        value="0.056644"></td>
+                    <td class="p-1"><input type="number" step="any" id="mat-a-1-2"
+                        class="input-matrix w-full bg-black/90 border border-cyan-800 focus:border-cyan-400 text-cyan-200 text-center py-1.5 px-1 rounded text-xs"
+                        value="0.044020"></td>
+                    <td class="p-1"><input type="number" step="any" id="mat-a-1-3"
+                        class="input-matrix w-full bg-black/90 border border-cyan-800 focus:border-cyan-400 text-cyan-200 text-center py-1.5 px-1 rounded text-xs"
+                        value="0.048695"></td>
                   </tr>
                   <!-- Fila 2: GOOGL -->
                   <tr>
                     <td class="p-2 text-left text-cyan-300 font-bold">3. GOOGL</td>
-                    <td class="p-1"><input type="number" step="any" id="mat-a-2-0" class="input-matrix w-full bg-black/90 border border-cyan-800 focus:border-cyan-400 text-cyan-200 text-center py-1.5 px-1 rounded text-xs" value="0.039780"></td>
-                    <td class="p-1"><input type="number" step="any" id="mat-a-2-1" class="input-matrix w-full bg-black/90 border border-cyan-800 focus:border-cyan-400 text-cyan-200 text-center py-1.5 px-1 rounded text-xs" value="0.044020"></td>
-                    <td class="p-1"><input type="number" step="any" id="mat-a-2-2" class="input-matrix w-full bg-black/90 border border-cyan-800 focus:border-cyan-400 text-cyan-200 text-center py-1.5 px-1 rounded text-xs" value="0.073984"></td>
-                    <td class="p-1"><input type="number" step="any" id="mat-a-2-3" class="input-matrix w-full bg-black/90 border border-cyan-800 focus:border-cyan-400 text-cyan-200 text-center py-1.5 px-1 rounded text-xs" value="0.053965"></td>
+                    <td class="p-1"><input type="number" step="any" id="mat-a-2-0"
+                        class="input-matrix w-full bg-black/90 border border-cyan-800 focus:border-cyan-400 text-cyan-200 text-center py-1.5 px-1 rounded text-xs"
+                        value="0.039780"></td>
+                    <td class="p-1"><input type="number" step="any" id="mat-a-2-1"
+                        class="input-matrix w-full bg-black/90 border border-cyan-800 focus:border-cyan-400 text-cyan-200 text-center py-1.5 px-1 rounded text-xs"
+                        value="0.044020"></td>
+                    <td class="p-1"><input type="number" step="any" id="mat-a-2-2"
+                        class="input-matrix w-full bg-black/90 border border-cyan-800 focus:border-cyan-400 text-cyan-200 text-center py-1.5 px-1 rounded text-xs"
+                        value="0.073984"></td>
+                    <td class="p-1"><input type="number" step="any" id="mat-a-2-3"
+                        class="input-matrix w-full bg-black/90 border border-cyan-800 focus:border-cyan-400 text-cyan-200 text-center py-1.5 px-1 rounded text-xs"
+                        value="0.053965"></td>
                   </tr>
                   <!-- Fila 3: AMZN -->
                   <tr>
                     <td class="p-2 text-left text-cyan-300 font-bold">4. AMZN</td>
-                    <td class="p-1"><input type="number" step="any" id="mat-a-3-0" class="input-matrix w-full bg-black/90 border border-cyan-800 focus:border-cyan-400 text-cyan-200 text-center py-1.5 px-1 rounded text-xs" value="0.042548"></td>
-                    <td class="p-1"><input type="number" step="any" id="mat-a-3-1" class="input-matrix w-full bg-black/90 border border-cyan-800 focus:border-cyan-400 text-cyan-200 text-center py-1.5 px-1 rounded text-xs" value="0.048695"></td>
-                    <td class="p-1"><input type="number" step="any" id="mat-a-3-2" class="input-matrix w-full bg-black/90 border border-cyan-800 focus:border-cyan-400 text-cyan-200 text-center py-1.5 px-1 rounded text-xs" value="0.053965"></td>
-                    <td class="p-1"><input type="number" step="any" id="mat-a-3-3" class="input-matrix w-full bg-black/90 border border-cyan-800 focus:border-cyan-400 text-cyan-200 text-center py-1.5 px-1 rounded text-xs" value="0.096100"></td>
+                    <td class="p-1"><input type="number" step="any" id="mat-a-3-0"
+                        class="input-matrix w-full bg-black/90 border border-cyan-800 focus:border-cyan-400 text-cyan-200 text-center py-1.5 px-1 rounded text-xs"
+                        value="0.042548"></td>
+                    <td class="p-1"><input type="number" step="any" id="mat-a-3-1"
+                        class="input-matrix w-full bg-black/90 border border-cyan-800 focus:border-cyan-400 text-cyan-200 text-center py-1.5 px-1 rounded text-xs"
+                        value="0.048695"></td>
+                    <td class="p-1"><input type="number" step="any" id="mat-a-3-2"
+                        class="input-matrix w-full bg-black/90 border border-cyan-800 focus:border-cyan-400 text-cyan-200 text-center py-1.5 px-1 rounded text-xs"
+                        value="0.053965"></td>
+                    <td class="p-1"><input type="number" step="any" id="mat-a-3-3"
+                        class="input-matrix w-full bg-black/90 border border-cyan-800 focus:border-cyan-400 text-cyan-200 text-center py-1.5 px-1 rounded text-xs"
+                        value="0.096100"></td>
                   </tr>
                 </tbody>
               </table>
             </div>
-            <p class="text-[11px] text-gray-400 mt-2">* Diagonal principal = varianzas (aᵢᵢ). Fuera de diagonal = covarianzas simétricas (aᵢⱼ = aⱼᵢ).</p>
+            <p class="text-[11px] text-gray-400 mt-2">* Diagonal principal = varianzas (aᵢᵢ). Fuera de diagonal =
+              covarianzas simétricas (aᵢⱼ = aⱼᵢ).</p>
           </div>
 
           <!-- 4 inputs para Vector b -->
-          <div class="lg:col-span-4 border border-cyan-800 bg-black/60 p-4 md:p-5 rounded-lg flex flex-col justify-between">
+          <div
+            class="lg:col-span-4 border border-cyan-800 bg-black/60 p-4 md:p-5 rounded-lg flex flex-col justify-between">
             <div>
               <div class="flex justify-between items-center mb-3">
                 <h3 class="text-sm md:text-base font-bold text-cyan-300">
@@ -564,23 +803,31 @@
                 </h3>
                 <span class="text-xs text-gray-400">μ anual</span>
               </div>
-              
+
               <div class="space-y-2.5 font-mono text-xs">
                 <div>
                   <label for="vec-b-0" class="block text-gray-300 mb-0.5">b₁ (AAPL):</label>
-                  <input type="number" step="any" id="vec-b-0" class="input-vector w-full bg-black/90 border border-cyan-800 focus:border-cyan-400 text-cyan-200 py-1.5 px-2.5 rounded" value="0.2450">
+                  <input type="number" step="any" id="vec-b-0"
+                    class="input-vector w-full bg-black/90 border border-cyan-800 focus:border-cyan-400 text-cyan-200 py-1.5 px-2.5 rounded"
+                    value="0.2450">
                 </div>
                 <div>
                   <label for="vec-b-1" class="block text-gray-300 mb-0.5">b₂ (MSFT):</label>
-                  <input type="number" step="any" id="vec-b-1" class="input-vector w-full bg-black/90 border border-cyan-800 focus:border-cyan-400 text-cyan-200 py-1.5 px-2.5 rounded" value="0.2210">
+                  <input type="number" step="any" id="vec-b-1"
+                    class="input-vector w-full bg-black/90 border border-cyan-800 focus:border-cyan-400 text-cyan-200 py-1.5 px-2.5 rounded"
+                    value="0.2210">
                 </div>
                 <div>
                   <label for="vec-b-2" class="block text-gray-300 mb-0.5">b₃ (GOOGL):</label>
-                  <input type="number" step="any" id="vec-b-2" class="input-vector w-full bg-black/90 border border-cyan-800 focus:border-cyan-400 text-cyan-200 py-1.5 px-2.5 rounded" value="0.2680">
+                  <input type="number" step="any" id="vec-b-2"
+                    class="input-vector w-full bg-black/90 border border-cyan-800 focus:border-cyan-400 text-cyan-200 py-1.5 px-2.5 rounded"
+                    value="0.2680">
                 </div>
                 <div>
                   <label for="vec-b-3" class="block text-gray-300 mb-0.5">b₄ (AMZN):</label>
-                  <input type="number" step="any" id="vec-b-3" class="input-vector w-full bg-black/90 border border-cyan-800 focus:border-cyan-400 text-cyan-200 py-1.5 px-2.5 rounded" value="0.2150">
+                  <input type="number" step="any" id="vec-b-3"
+                    class="input-vector w-full bg-black/90 border border-cyan-800 focus:border-cyan-400 text-cyan-200 py-1.5 px-2.5 rounded"
+                    value="0.2150">
                 </div>
               </div>
             </div>
@@ -600,7 +847,8 @@
               <label for="select-x0" class="block text-gray-300 mb-1 font-sans font-bold">
                 Vector inicial (x₀):
               </label>
-              <select id="select-x0" class="w-full bg-black border border-cyan-700 text-cyan-200 py-2 px-2 rounded focus:outline-none focus:border-cyan-400">
+              <select id="select-x0"
+                class="w-full bg-black border border-cyan-700 text-cyan-200 py-2 px-2 rounded focus:outline-none focus:border-cyan-400">
                 <option value="zeros" selected>Vector Cero [0, 0, 0, 0]</option>
                 <option value="ones">Equiponderado [0.25, 0.25, 0.25, 0.25]</option>
                 <option value="unit">Unidades [1, 1, 1, 1]</option>
@@ -611,9 +859,10 @@
             <!-- Tolerancia -->
             <div>
               <label for="input-tol" class="block text-gray-300 mb-1 font-sans font-bold">
-                Tolerancia (‖r‖/‖b‖ &lt; ε):
+                Tolerancia (‖r‖/‖b‖ < ε):
               </label>
-              <input type="text" id="input-tol" value="1e-6" class="w-full bg-black border border-cyan-700 text-cyan-200 py-2 px-2 rounded focus:outline-none focus:border-cyan-400 font-mono">
+              <input type="text" id="input-tol" value="1e-6"
+                class="w-full bg-black border border-cyan-700 text-cyan-200 py-2 px-2 rounded focus:outline-none focus:border-cyan-400 font-mono">
             </div>
 
             <!-- Iteraciones Máximas Nmáx -->
@@ -621,7 +870,8 @@
               <label for="input-max-iter" class="block text-gray-300 mb-1 font-sans font-bold">
                 Iteraciones Máximas (Nmáx):
               </label>
-              <input type="number" id="input-max-iter" min="1" max="10000" value="100" class="w-full bg-black border border-cyan-700 text-cyan-200 py-2 px-2 rounded focus:outline-none focus:border-cyan-400 font-mono">
+              <input type="number" id="input-max-iter" min="1" max="10000" value="100"
+                class="w-full bg-black border border-cyan-700 text-cyan-200 py-2 px-2 rounded focus:outline-none focus:border-cyan-400 font-mono">
             </div>
 
             <!-- Selector Precondicionador -->
@@ -629,7 +879,8 @@
               <label for="select-precond" class="block text-gray-300 mb-1 font-sans font-bold">
                 Precondicionador (M):
               </label>
-              <select id="select-precond" class="w-full bg-black border border-cyan-700 text-cyan-200 py-2 px-2 rounded focus:outline-none focus:border-cyan-400">
+              <select id="select-precond"
+                class="w-full bg-black border border-cyan-700 text-cyan-200 py-2 px-2 rounded focus:outline-none focus:border-cyan-400">
                 <option value="jacobi" selected>GCP (Jacobi / Diagonal)</option>
                 <option value="none">GC Clásico (Sin precondicionador)</option>
               </select>
@@ -640,10 +891,14 @@
           <div id="contenedor-x0-custom" class="hidden mt-4 pt-3 border-t border-cyan-900/60">
             <span class="text-xs text-cyan-300 block mb-2 font-mono">Valores de x₀ personalizado:</span>
             <div class="grid grid-cols-4 gap-2 text-xs font-mono">
-              <input type="number" step="any" id="x0-custom-0" placeholder="x₀,₁" value="0" class="bg-black border border-cyan-800 text-cyan-200 p-1.5 rounded text-center">
-              <input type="number" step="any" id="x0-custom-1" placeholder="x₀,₂" value="0" class="bg-black border border-cyan-800 text-cyan-200 p-1.5 rounded text-center">
-              <input type="number" step="any" id="x0-custom-2" placeholder="x₀,₃" value="0" class="bg-black border border-cyan-800 text-cyan-200 p-1.5 rounded text-center">
-              <input type="number" step="any" id="x0-custom-3" placeholder="x₀,₄" value="0" class="bg-black border border-cyan-800 text-cyan-200 p-1.5 rounded text-center">
+              <input type="number" step="any" id="x0-custom-0" placeholder="x₀,₁" value="0"
+                class="bg-black border border-cyan-800 text-cyan-200 p-1.5 rounded text-center">
+              <input type="number" step="any" id="x0-custom-1" placeholder="x₀,₂" value="0"
+                class="bg-black border border-cyan-800 text-cyan-200 p-1.5 rounded text-center">
+              <input type="number" step="any" id="x0-custom-2" placeholder="x₀,₃" value="0"
+                class="bg-black border border-cyan-800 text-cyan-200 p-1.5 rounded text-center">
+              <input type="number" step="any" id="x0-custom-3" placeholder="x₀,₄" value="0"
+                class="bg-black border border-cyan-800 text-cyan-200 p-1.5 rounded text-center">
             </div>
           </div>
         </div>
@@ -652,10 +907,12 @@
         <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4">
           <div class="flex items-center space-x-2 text-xs text-gray-400">
             <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-            <span id="calc-status-msg" class="font-mono text-cyan-300">Entradas listas. Presione CALCULAR para ejecutar los solvers.</span>
+            <span id="calc-status-msg" class="font-mono text-cyan-300">Entradas listas. Presione CALCULAR para ejecutar
+              los solvers.</span>
           </div>
 
-          <button id="btn-calcular" type="button" class="w-full sm:w-auto px-6 py-3 bg-cyan-950/60 border-2 border-cyan-400 hover:bg-cyan-500 hover:text-black text-cyan-300 font-bold tracking-wider uppercase rounded transition-all duration-200 shadow-[0_0_15px_rgba(0,240,255,0.4)] cursor-pointer text-sm">
+          <button id="btn-calcular" type="button"
+            class="w-full sm:w-auto px-6 py-3 bg-cyan-950/60 border-2 border-cyan-400 hover:bg-cyan-500 hover:text-black text-cyan-300 font-bold tracking-wider uppercase rounded transition-all duration-200 shadow-[0_0_15px_rgba(0,240,255,0.4)] cursor-pointer text-sm">
             ⚡ CALCULAR
           </button>
         </div>
@@ -677,7 +934,8 @@
               5. Tres escenarios
             </h2>
             <p class="text-xs text-cyan-300 mt-1">
-              Haga clic en cualquiera de los escenarios para cargar automáticamente sus matrices <span class="font-mono">A</span> y vectores <span class="font-mono">b</span> en la Sección 4.
+              Haga clic en cualquiera de los escenarios para cargar automáticamente sus matrices <span
+                class="font-mono">A</span> y vectores <span class="font-mono">b</span> en la Sección 4.
             </p>
           </div>
 
@@ -691,49 +949,56 @@
 
         <!-- Tarjetas interactivas con los 3 botones y justificación financiera -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
-          
+
           <!-- TARJETA 1: IDEAL -->
-          <div class="border border-cyan-800/80 bg-black/60 rounded-lg p-5 flex flex-col justify-between hover:border-cyan-400 transition-all shadow-[0_0_10px_rgba(0,240,255,0.1)]">
+          <div
+            class="border border-cyan-800/80 bg-black/60 rounded-lg p-5 flex flex-col justify-between hover:border-cyan-400 transition-all shadow-[0_0_10px_rgba(0,240,255,0.1)]">
             <div>
               <div class="flex justify-between items-start mb-2">
-                <span class="px-2 py-0.5 text-[11px] bg-cyan-950 border border-cyan-500 text-cyan-300 font-mono rounded">
+                <span
+                  class="px-2 py-0.5 text-[11px] bg-cyan-950 border border-cyan-500 text-cyan-300 font-mono rounded">
                   ESCENARIO 01
                 </span>
-                <span class="text-xs font-mono text-emerald-400 font-bold">
+                <span id="card-ideal-kappa-badge" class="text-xs font-mono text-emerald-400 font-bold">
                   κ(A) ≈ 13.97
                 </span>
               </div>
               <h3 class="text-lg font-bold text-white neon-glow mb-2">
                 Ideal (Datos Reales)
               </h3>
-              
+
               <div class="bg-cyan-950/20 border-l-2 border-cyan-400 p-2.5 my-3 text-xs text-gray-300 leading-relaxed">
                 <strong class="text-cyan-300 block mb-1">JUSTIFICACIÓN FINANCIERA:</strong>
-                Representa el régimen normal de mercado obtenido a partir de cotizaciones históricas de 2 años (Yahoo Finance). 
-                Refleja rentabilidades anualizadas reales (~21% a 27%) y covarianzas moderadas. Sirve como estándar de referencia sin perturbaciones extremas.
+                Representa el régimen normal de mercado obtenido a partir de cotizaciones históricas de 2 años (Yahoo
+                Finance).
+                Refleja rentabilidades anualizadas reales (~21% a 27%) y covarianzas moderadas. Sirve como estándar de
+                referencia sin perturbaciones extremas.
               </div>
 
-              <div class="text-[11px] font-mono text-gray-400 space-y-1 mb-4">
+              <div id="card-ideal-metricas" class="text-[11px] font-mono text-gray-400 space-y-1 mb-4">
                 <div>• Autovalores: [0.0148, 0.2071]</div>
                 <div>• Condición: Matriz SPD bien condicionada</div>
-                <div>• Activos: AAPL, MSFT, GOOGL, AMZN</div>
+                <div id="card-ideal-condicion">• Condición: κ(A) ≈ 13.97 | κ(M⁻¹A) ≈ 10.97</div>
               </div>
             </div>
 
-            <button id="btn-cargar-ideal" type="button" class="w-full py-2.5 px-4 bg-cyan-950 border border-cyan-500 hover:bg-cyan-500 hover:text-black text-cyan-200 font-bold text-xs uppercase tracking-wider rounded transition-all flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_10px_rgba(0,240,255,0.2)]">
+            <button id="btn-cargar-ideal" type="button"
+              class="w-full py-2.5 px-4 bg-cyan-950 border border-cyan-500 hover:bg-cyan-500 hover:text-black text-cyan-200 font-bold text-xs uppercase tracking-wider rounded transition-all flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_10px_rgba(0,240,255,0.2)]">
               <span>📂</span> CARGAR ESCENARIO IDEAL
             </button>
           </div>
 
           <!-- TARJETA 2: BAJO ESTRÉS -->
-          <div class="border border-cyan-800/80 bg-black/60 rounded-lg p-5 flex flex-col justify-between hover:border-cyan-400 transition-all shadow-[0_0_10px_rgba(0,240,255,0.1)]">
+          <div
+            class="border border-cyan-800/80 bg-black/60 rounded-lg p-5 flex flex-col justify-between hover:border-cyan-400 transition-all shadow-[0_0_10px_rgba(0,240,255,0.1)]">
             <div>
               <div class="flex justify-between items-start mb-2">
-                <span class="px-2 py-0.5 text-[11px] bg-cyan-950 border border-amber-500 text-amber-300 font-mono rounded">
+                <span
+                  class="px-2 py-0.5 text-[11px] bg-cyan-950 border border-amber-500 text-amber-300 font-mono rounded">
                   ESCENARIO 02
                 </span>
-                <span class="text-xs font-mono text-amber-400 font-bold">
-                  κ(A) ≈ 13.97
+                <span id="card-estres-kappa-badge" class="text-xs font-mono text-amber-400 font-bold">
+                  κ(A) ≈ 26.41
                 </span>
               </div>
               <h3 class="text-lg font-bold text-white neon-glow mb-2">
@@ -742,30 +1007,33 @@
 
               <div class="bg-amber-950/20 border-l-2 border-amber-400 p-2.5 my-3 text-xs text-gray-300 leading-relaxed">
                 <strong class="text-amber-300 block mb-1">JUSTIFICACIÓN FINANCIERA:</strong>
-                Modela un shock severo de mercado con aversión al riesgo: las volatilidades aumentan 50% (&sigma; &times; 1.5 &rArr; Cov &times; 2.25) 
-                y los retornos esperados caen a la mitad (b &times; 0.5). Aunque la matriz preserva simetría y carácter SPD, el riesgo financiero se intensifica drásticamente.
+                Modela un shock severo de mercado: volatilidades × 1.5 (descomposición A = D_σ·R·D_σ); correlaciones bajo contagio sistémico R_estrés = 0.6·R + 0.4·J (J = matriz de unos, garantizada SPD por combinación convexa); y retornos esperados reducidos de forma asimétrica (-30 % en AAPL y MSFT, -50 % en GOOGL y AMZN) justificado por contracción diferencial de ingresos y compresión de múltiplos.
               </div>
 
-              <div class="text-[11px] font-mono text-gray-400 space-y-1 mb-4">
-                <div>• Escalamiento de riesgo: Covarianzas &times; 2.25</div>
-                <div>• Caída de expectativas: Retornos &times; 0.50</div>
-                <div>• Condición: Preserva espectro SPD homotético</div>
+              <div id="card-estres-metricas" class="text-[11px] font-mono text-gray-400 space-y-1 mb-4">
+                <div>• Volatilidades: σ_estrés = 1.5 · σ_base</div>
+                <div>• Correlaciones: R_estrés = 0.6·R + 0.4·J (SPD)</div>
+                <div>• Retornos b: -30% AAPL/MSFT, -50% GOOGL/AMZN</div>
+                <div id="card-estres-condicion">• Condición: κ(A) ≈ 26.41 | κ(M⁻¹A) ≈ 20.76</div>
               </div>
             </div>
 
-            <button id="btn-cargar-estres" type="button" class="w-full py-2.5 px-4 bg-amber-950/60 border border-amber-500 hover:bg-amber-500 hover:text-black text-amber-200 font-bold text-xs uppercase tracking-wider rounded transition-all flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_10px_rgba(245,158,11,0.2)]">
+            <button id="btn-cargar-estres" type="button"
+              class="w-full py-2.5 px-4 bg-amber-950/60 border border-amber-500 hover:bg-amber-500 hover:text-black text-amber-200 font-bold text-xs uppercase tracking-wider rounded transition-all flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_10px_rgba(245,158,11,0.2)]">
               <span>📂</span> CARGAR ESCENARIO BAJO ESTRÉS
             </button>
           </div>
 
           <!-- TARJETA 3: MAL CONDICIONADO -->
-          <div class="border border-cyan-800/80 bg-black/60 rounded-lg p-5 flex flex-col justify-between hover:border-cyan-400 transition-all shadow-[0_0_10px_rgba(0,240,255,0.1)]">
+          <div
+            class="border border-cyan-800/80 bg-black/60 rounded-lg p-5 flex flex-col justify-between hover:border-cyan-400 transition-all shadow-[0_0_10px_rgba(0,240,255,0.1)]">
             <div>
               <div class="flex justify-between items-start mb-2">
-                <span class="px-2 py-0.5 text-[11px] bg-cyan-950 border border-rose-500 text-rose-300 font-mono rounded">
+                <span
+                  class="px-2 py-0.5 text-[11px] bg-cyan-950 border border-rose-500 text-rose-300 font-mono rounded">
                   ESCENARIO 03
                 </span>
-                <span class="text-xs font-mono text-rose-400 font-bold">
+                <span id="card-mal-kappa-badge" class="text-xs font-mono text-rose-400 font-bold">
                   κ(A) ≈ 2000.98
                 </span>
               </div>
@@ -775,19 +1043,22 @@
 
               <div class="bg-rose-950/20 border-l-2 border-rose-400 p-2.5 my-3 text-xs text-gray-300 leading-relaxed">
                 <strong class="text-rose-300 block mb-1">JUSTIFICACIÓN FINANCIERA Y NUMÉRICA:</strong>
-                Desbalance extremo de escala mediante congruencia D&middot;A&middot;D (activo GOOGL reescalado &times; 20). 
-                Por la Ley de Inercia de Sylvester, la matriz se mantiene 100% simétrica y definida positiva (SPD), 
-                pero eleva &kappa;(A) a ~2001, provocando estancamiento en GC simple y evidenciando el poder del precondicionador Jacobi.
+                Desbalance extremo de escala mediante congruencia D·A·D (activo GOOGL reescalado ×
+                20).
+                Por la Ley de Inercia de Sylvester, la matriz se mantiene 100% simétrica y definida positiva (SPD),
+                pero eleva κ(A) a ~2001, provocando estancamiento en GC simple y evidenciando el poder del
+                precondicionador Jacobi.
               </div>
 
-              <div class="text-[11px] font-mono text-gray-400 space-y-1 mb-4">
-                <div>• Transformación: Congruencia D&middot;A&middot;D (SPD)</div>
-                <div>• Número de condición: κ(A) &gt; 2000</div>
-                <div>• Objetivo: Demostrar la aceleración de GCP</div>
+              <div id="card-mal-metricas" class="text-[11px] font-mono text-gray-400 space-y-1 mb-4">
+                <div>• Transformación: Congruencia D·A·D (SPD)</div>
+                <div>• Número de condición: κ(A) > 2000</div>
+                <div id="card-mal-condicion">• Condición: κ(A) ≈ 2000.98 | κ(M⁻¹A) ≈ 10.97</div>
               </div>
             </div>
 
-            <button id="btn-cargar-mal" type="button" class="w-full py-2.5 px-4 bg-rose-950/60 border border-rose-500 hover:bg-rose-500 hover:text-black text-rose-200 font-bold text-xs uppercase tracking-wider rounded transition-all flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_10px_rgba(244,63,94,0.2)]">
+            <button id="btn-cargar-mal" type="button"
+              class="w-full py-2.5 px-4 bg-rose-950/60 border border-rose-500 hover:bg-rose-500 hover:text-black text-rose-200 font-bold text-xs uppercase tracking-wider rounded transition-all flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_10px_rgba(244,63,94,0.2)]">
               <span>📂</span> CARGAR MAL CONDICIONADO
             </button>
           </div>
@@ -796,7 +1067,8 @@
 
         <!-- Visor de Matriz y Vector del Escenario Seleccionado -->
         <div class="border border-cyan-800/80 bg-black/50 p-4 rounded-lg mt-4">
-          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-cyan-900 pb-2 mb-3">
+          <div
+            class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-cyan-900 pb-2 mb-3">
             <span class="text-xs font-bold text-cyan-300 uppercase tracking-wider">
               Detalle de Datos del Escenario Seleccionado
             </span>
@@ -808,11 +1080,13 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
             <div>
               <span class="text-gray-400 block mb-1">Matriz A (4×4):</span>
-              <pre id="pre-detalle-a" class="bg-black/90 p-3 rounded border border-cyan-900 text-cyan-200 overflow-x-auto text-[11px] leading-relaxed"></pre>
+              <pre id="pre-detalle-a"
+                class="bg-black/90 p-3 rounded border border-cyan-900 text-cyan-200 overflow-x-auto text-[11px] leading-relaxed"></pre>
             </div>
             <div>
               <span class="text-gray-400 block mb-1">Vector b (4×1):</span>
-              <pre id="pre-detalle-b" class="bg-black/90 p-3 rounded border border-cyan-900 text-cyan-200 overflow-x-auto text-[11px] leading-relaxed"></pre>
+              <pre id="pre-detalle-b"
+                class="bg-black/90 p-3 rounded border border-cyan-900 text-cyan-200 overflow-x-auto text-[11px] leading-relaxed"></pre>
             </div>
           </div>
         </div>
@@ -834,7 +1108,8 @@
               6. Solución de referencia
             </h2>
             <p class="text-xs text-cyan-300 mt-1">
-              Método directo: Factorización de Cholesky <span class="font-mono text-white">A = L·Lᵀ</span> (sustitución hacia adelante <span class="font-mono">L·y = b</span> y atrás <span class="font-mono">Lᵀ·x = y</span>).
+              Método directo: Factorización de Cholesky <span class="font-mono text-white">A = L·Lᵀ</span> (sustitución
+              hacia adelante <span class="font-mono">L·y = b</span> y atrás <span class="font-mono">Lᵀ·x = y</span>).
             </p>
           </div>
 
@@ -884,9 +1159,10 @@
             <span class="text-xs font-bold text-cyan-300 uppercase tracking-wider">
               Factor Triangular Inferior L (A = L·Lᵀ)
             </span>
-            <span class="text-[11px] text-gray-400 font-mono">Lᵢᵢ &gt; 0</span>
+            <span class="text-[11px] text-gray-400 font-mono">Lᵢᵢ > 0</span>
           </div>
-          <pre id="pre-cholesky-l" class="bg-black/90 p-3 rounded border border-cyan-900 text-cyan-200 overflow-x-auto text-[11px] font-mono leading-relaxed"></pre>
+          <pre id="pre-cholesky-l"
+            class="bg-black/90 p-3 rounded border border-cyan-900 text-cyan-200 overflow-x-auto text-[11px] font-mono leading-relaxed"></pre>
         </div>
 
       </div>
@@ -906,18 +1182,20 @@
               7. GCP vs GC
             </h2>
             <p class="text-xs text-cyan-300 mt-1">
-              Contraste de velocidad de convergencia, número de iteraciones y evolución de la norma residual relativa ‖r‖₂ / ‖b‖₂.
+              Contraste de velocidad de convergencia, número de iteraciones y evolución de la norma residual relativa
+              ‖r‖₂ / ‖b‖₂.
             </p>
           </div>
 
-          <div id="badge-comparativa-resumen" class="bg-black/80 border border-cyan-500/60 px-3 py-1.5 rounded text-xs font-mono text-cyan-200">
+          <div id="badge-comparativa-resumen"
+            class="bg-black/80 border border-cyan-500/60 px-3 py-1.5 rounded text-xs font-mono text-cyan-200">
             <!-- Resumen dinámico -->
           </div>
         </div>
 
         <!-- Tarjetas comparativas GC vs GCP -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-          
+
           <!-- Columna GC Clásico -->
           <div class="border border-cyan-800 bg-black/60 rounded-lg p-4 flex flex-col justify-between">
             <div>
@@ -928,7 +1206,8 @@
                 <span id="gc-badge-convergio" class="text-[10px] px-2 py-0.5 rounded font-mono font-bold"></span>
               </div>
 
-              <div class="grid grid-cols-2 gap-2 text-xs font-mono my-3 bg-cyan-950/20 p-2.5 rounded border border-cyan-900/60">
+              <div
+                class="grid grid-cols-2 gap-2 text-xs font-mono my-3 bg-cyan-950/20 p-2.5 rounded border border-cyan-900/60">
                 <div>
                   <span class="text-gray-400 block text-[10px]">Iteraciones:</span>
                   <span id="gc-iteraciones-val" class="text-base text-cyan-300 font-bold">0</span>
@@ -941,7 +1220,8 @@
 
               <div class="text-xs font-mono">
                 <span class="text-gray-400 block mb-1">Vector solución x_GC:</span>
-                <pre id="gc-vector-x" class="bg-black/90 p-2 rounded border border-cyan-900 text-cyan-200 text-[11px]"></pre>
+                <pre id="gc-vector-x"
+                  class="bg-black/90 p-2 rounded border border-cyan-900 text-cyan-200 text-[11px]"></pre>
               </div>
             </div>
             <div class="text-[10px] text-gray-400 mt-3 pt-2 border-t border-cyan-950">
@@ -959,7 +1239,8 @@
                 <span id="gcp-badge-convergio" class="text-[10px] px-2 py-0.5 rounded font-mono font-bold"></span>
               </div>
 
-              <div class="grid grid-cols-2 gap-2 text-xs font-mono my-3 bg-emerald-950/20 p-2.5 rounded border border-emerald-900/60">
+              <div
+                class="grid grid-cols-2 gap-2 text-xs font-mono my-3 bg-emerald-950/20 p-2.5 rounded border border-emerald-900/60">
                 <div>
                   <span class="text-gray-400 block text-[10px]">Iteraciones:</span>
                   <span id="gcp-iteraciones-val" class="text-base text-emerald-300 font-bold">0</span>
@@ -972,7 +1253,8 @@
 
               <div class="text-xs font-mono">
                 <span class="text-gray-400 block mb-1">Vector solución x_GCP:</span>
-                <pre id="gcp-vector-x" class="bg-black/90 p-2 rounded border border-emerald-900 text-emerald-200 text-[11px]"></pre>
+                <pre id="gcp-vector-x"
+                  class="bg-black/90 p-2 rounded border border-emerald-900 text-emerald-200 text-[11px]"></pre>
               </div>
             </div>
             <div class="text-[10px] text-gray-400 mt-3 pt-2 border-t border-emerald-950">
@@ -1018,7 +1300,8 @@
               8. Análisis de errores
             </h2>
             <p class="text-xs text-cyan-300 mt-1">
-              Evaluación del error absoluto (Ea), error relativo (Er), error porcentual (Ep) y comparación integral entre escenarios.
+              Evaluación del error absoluto (Ea), error relativo (Er), error porcentual (Ep) y comparación integral
+              entre escenarios.
             </p>
           </div>
 
@@ -1034,7 +1317,8 @@
         <div class="border border-cyan-800 bg-black/60 rounded-lg p-4 overflow-x-auto">
           <h3 class="text-sm font-bold text-cyan-300 mb-3 uppercase tracking-wider flex items-center justify-between">
             <span>1. Errores por Variable (GCP vs Referencia Cholesky)</span>
-            <span class="text-[11px] text-gray-400 font-normal">Ea = |xref - xGCP| &nbsp;|&nbsp; Er = Ea / |xref| &nbsp;|&nbsp; Ep = Er &times; 100%</span>
+            <span class="text-[11px] text-gray-400 font-normal">Ea = |xref - xGCP|  |  Er = Ea / |xref|
+               |  Ep = Er × 100%</span>
           </h3>
 
           <table class="w-full text-xs text-left border-collapse font-mono">
@@ -1061,13 +1345,15 @@
             </tfoot>
           </table>
           <p class="text-[11px] text-gray-400 mt-2 font-mono">
-            * Si x_ref = 0, el error relativo y porcentual se indica como "no definido" para evitar indeterminación numérica.
+            * Si x_ref = 0, el error relativo y porcentual se indica como "no definido" para evitar indeterminación
+            numérica.
           </p>
         </div>
 
         <!-- SUBPARTE 2: TABLA COMPARATIVA DE 3 COLUMNAS (IDEAL, BAJO ESTRÉS, MAL CONDICIONADO) -->
         <div class="border border-cyan-800 bg-black/60 rounded-lg p-4 overflow-x-auto mt-6">
-          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-cyan-900 pb-3 mb-3">
+          <div
+            class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-cyan-900 pb-3 mb-3">
             <div>
               <h3 class="text-sm font-bold text-cyan-300 uppercase tracking-wider">
                 2. Tabla Comparativa Multiescenario (Ejecución Automática de los 3 Escenarios)
@@ -1086,8 +1372,10 @@
               <tr class="text-cyan-400 border-b border-cyan-800 bg-cyan-950/40">
                 <th class="p-2.5 w-1/4">Métrica / Característica</th>
                 <th class="p-2.5 w-1/4 text-center border-l border-cyan-900 text-cyan-300 font-bold">1. Ideal</th>
-                <th class="p-2.5 w-1/4 text-center border-l border-cyan-900 text-amber-300 font-bold">2. Bajo estrés</th>
-                <th class="p-2.5 w-1/4 text-center border-l border-cyan-900 text-rose-300 font-bold">3. Mal condicionado</th>
+                <th class="p-2.5 w-1/4 text-center border-l border-cyan-900 text-amber-300 font-bold">2. Bajo estrés
+                </th>
+                <th class="p-2.5 w-1/4 text-center border-l border-cyan-900 text-rose-300 font-bold">3. Mal condicionado
+                </th>
               </tr>
             </thead>
             <tbody id="tbody-comparativa-escenarios" class="divide-y divide-cyan-950 text-gray-200">
@@ -1098,32 +1386,37 @@
 
         <!-- SUBPARTE 3: PANEL DE SENSIBILIDAD (PERTURBACIÓN DE b EN ±5% Y ±10%) -->
         <div class="border border-cyan-800 bg-black/60 rounded-lg p-4 md:p-5 mt-6">
-          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-cyan-900 pb-3 mb-4">
+          <div
+            class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-cyan-900 pb-3 mb-4">
             <div>
               <h3 class="text-sm font-bold text-cyan-300 uppercase tracking-wider flex items-center gap-2">
                 <span>3. Panel de Sensibilidad Financiera (Perturbación de b en ±5% y ±10%)</span>
               </h3>
               <p class="text-xs text-gray-400 mt-0.5">
-                Evalúa el impacto de la incertidumbre en los retornos esperados (b) sobre la asignación de pesos normalizados (w = x / ∑x).
+                Evalúa el impacto de la incertidumbre en los retornos esperados (b) sobre la asignación de pesos
+                normalizados (w = x / ∑x).
               </p>
             </div>
             <div class="flex items-center gap-2">
               <span class="text-[11px] text-gray-400 font-mono">Perturbación activa:</span>
-              <span id="badge-sensibilidad-actual" class="px-2 py-0.5 text-xs font-mono font-bold rounded bg-cyan-950 border border-cyan-500 text-cyan-300">
+              <span id="badge-sensibilidad-actual"
+                class="px-2 py-0.5 text-xs font-mono font-bold rounded bg-cyan-950 border border-cyan-500 text-cyan-300">
                 0% (Base)
               </span>
             </div>
           </div>
 
           <!-- Controles de Sensibilidad -->
-          <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center bg-cyan-950/20 p-3.5 rounded border border-cyan-900/60 mb-4">
-            
+          <div
+            class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center bg-cyan-950/20 p-3.5 rounded border border-cyan-900/60 mb-4">
+
             <!-- Selector de activo / alcance -->
             <div class="md:col-span-5 flex flex-col gap-1">
               <label for="select-sensibilidad-activo" class="text-xs text-cyan-300 font-bold uppercase tracking-wider">
                 Activo / Vector a perturbar:
               </label>
-              <select id="select-sensibilidad-activo" class="bg-black border border-cyan-700 text-cyan-200 text-xs rounded px-2.5 py-1.5 focus:border-cyan-400 focus:outline-none font-mono">
+              <select id="select-sensibilidad-activo"
+                class="bg-black border border-cyan-700 text-cyan-200 text-xs rounded px-2.5 py-1.5 focus:border-cyan-400 focus:outline-none font-mono">
                 <option value="0" selected>AAPL (Activo 1) - Mayor retorno relativo</option>
                 <option value="1">MSFT (Activo 2) - Retorno moderado</option>
                 <option value="2">GOOGL (Activo 3) - Alta ponderación</option>
@@ -1135,19 +1428,24 @@
             <!-- Botones de perturbación rápida -->
             <div class="md:col-span-7 flex flex-wrap items-center justify-end gap-1.5">
               <span class="text-xs text-gray-400 font-mono mr-1">Rango rápido:</span>
-              <button id="btn-pert-m10" type="button" class="btn-sens-quick px-2.5 py-1 text-xs font-mono rounded bg-black/80 border border-rose-600/70 hover:border-rose-400 text-rose-300 transition-all cursor-pointer">
+              <button id="btn-pert-m10" type="button"
+                class="btn-sens-quick px-2.5 py-1 text-xs font-mono rounded bg-black/80 border border-rose-600/70 hover:border-rose-400 text-rose-300 transition-all cursor-pointer">
                 -10%
               </button>
-              <button id="btn-pert-m5" type="button" class="btn-sens-quick px-2.5 py-1 text-xs font-mono rounded bg-black/80 border border-amber-600/70 hover:border-amber-400 text-amber-300 transition-all cursor-pointer">
+              <button id="btn-pert-m5" type="button"
+                class="btn-sens-quick px-2.5 py-1 text-xs font-mono rounded bg-black/80 border border-amber-600/70 hover:border-amber-400 text-amber-300 transition-all cursor-pointer">
                 -5%
               </button>
-              <button id="btn-pert-0" type="button" class="btn-sens-quick px-2.5 py-1 text-xs font-mono rounded bg-cyan-950 border border-cyan-400 text-cyan-200 font-bold transition-all cursor-pointer shadow-[0_0_8px_rgba(0,240,255,0.3)]">
+              <button id="btn-pert-0" type="button"
+                class="btn-sens-quick px-2.5 py-1 text-xs font-mono rounded bg-cyan-950 border border-cyan-400 text-cyan-200 font-bold transition-all cursor-pointer shadow-[0_0_8px_rgba(0,240,255,0.3)]">
                 0% Base
               </button>
-              <button id="btn-pert-p5" type="button" class="btn-sens-quick px-2.5 py-1 text-xs font-mono rounded bg-black/80 border border-emerald-600/70 hover:border-emerald-400 text-emerald-300 transition-all cursor-pointer">
+              <button id="btn-pert-p5" type="button"
+                class="btn-sens-quick px-2.5 py-1 text-xs font-mono rounded bg-black/80 border border-emerald-600/70 hover:border-emerald-400 text-emerald-300 transition-all cursor-pointer">
                 +5%
               </button>
-              <button id="btn-pert-p10" type="button" class="btn-sens-quick px-2.5 py-1 text-xs font-mono rounded bg-black/80 border border-cyan-600/70 hover:border-cyan-400 text-cyan-300 transition-all cursor-pointer">
+              <button id="btn-pert-p10" type="button"
+                class="btn-sens-quick px-2.5 py-1 text-xs font-mono rounded bg-black/80 border border-cyan-600/70 hover:border-cyan-400 text-cyan-300 transition-all cursor-pointer">
                 +10%
               </button>
             </div>
@@ -1186,7 +1484,8 @@
           </div>
 
           <!-- Nota interpretativa de sensibilidad -->
-          <div id="sensibilidad-interpretacion" class="mt-4 bg-cyan-950/20 border-l-2 border-cyan-400 p-3 text-xs text-gray-300 leading-relaxed font-mono">
+          <div id="sensibilidad-interpretacion"
+            class="mt-4 bg-cyan-950/20 border-l-2 border-cyan-400 p-3 text-xs text-gray-300 leading-relaxed font-mono">
             <!-- Texto dinámico -->
           </div>
 
@@ -1194,13 +1493,16 @@
 
         <!-- SUBPARTE 4: MAPA DE CALOR DE CORRELACIÓN (DERIVADA DE A) -->
         <div class="border border-cyan-800 bg-black/60 rounded-lg p-4 md:p-5 mt-6">
-          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-cyan-900 pb-3 mb-4">
+          <div
+            class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-cyan-900 pb-3 mb-4">
             <div>
               <h3 class="text-sm font-bold text-cyan-300 uppercase tracking-wider flex items-center gap-2">
                 <span>4. Mapa de Calor (Heatmap) de la Matriz de Correlación R</span>
               </h3>
               <p class="text-xs text-gray-400 mt-0.5">
-                Normalización estandarizada de la covarianza: <span class="text-cyan-200 font-mono">Rᵢⱼ = aᵢⱼ / √(aᵢᵢ · aⱼⱼ)</span>. Refleja el grado de co-movimiento entre activos independientemente de su escala de volatilidad.
+                Normalización estandarizada de la covarianza: <span class="text-cyan-200 font-mono">Rᵢⱼ = aᵢⱼ / √(aᵢᵢ ·
+                  aⱼⱼ)</span>. Refleja el grado de co-movimiento entre activos independientemente de su escala de
+                volatilidad.
               </p>
             </div>
             <div class="text-[11px] text-cyan-400 font-mono bg-cyan-950 border border-cyan-700 px-2 py-0.5 rounded">
@@ -1209,20 +1511,22 @@
           </div>
 
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            
+
             <!-- Heatmap 4x4 Table -->
             <div class="lg:col-span-7 overflow-x-auto">
-              <table id="table-heatmap-correlacion" class="w-full text-xs text-center border-collapse font-mono border border-cyan-900">
+              <table id="table-heatmap-correlacion"
+                class="w-full text-xs text-center border-collapse font-mono border border-cyan-900">
                 <!-- Se inyecta dinámicamente -->
               </table>
 
               <!-- Leyenda de colores del Heatmap -->
-              <div class="flex flex-wrap items-center justify-between gap-2 mt-3 pt-3 border-t border-cyan-950 text-[10px] font-mono text-gray-400">
+              <div
+                class="flex flex-wrap items-center justify-between gap-2 mt-3 pt-3 border-t border-cyan-950 text-[10px] font-mono text-gray-400">
                 <span class="text-cyan-300 font-bold">Escala de Intensidad:</span>
                 <div class="flex items-center gap-3">
                   <div class="flex items-center gap-1">
                     <span class="w-3 h-3 rounded bg-cyan-950 border border-cyan-800 inline-block"></span>
-                    <span>Baja (&lt; 0.50)</span>
+                    <span>Baja (< 0.50)</span>
                   </div>
                   <div class="flex items-center gap-1">
                     <span class="w-3 h-3 rounded bg-cyan-900/60 border border-cyan-600 inline-block"></span>
@@ -1230,7 +1534,7 @@
                   </div>
                   <div class="flex items-center gap-1">
                     <span class="w-3 h-3 rounded bg-cyan-500/30 border border-cyan-400 inline-block"></span>
-                    <span>Alta (&gt; 0.70)</span>
+                    <span>Alta (> 0.70)</span>
                   </div>
                   <div class="flex items-center gap-1">
                     <span class="w-3 h-3 rounded bg-cyan-400/80 border border-cyan-200 inline-block"></span>
@@ -1261,7 +1565,8 @@
                 </div>
               </div>
 
-              <div id="heatmap-insight" class="text-[11px] text-gray-300 leading-relaxed border-t border-cyan-900/80 pt-2 font-mono">
+              <div id="heatmap-insight"
+                class="text-[11px] text-gray-300 leading-relaxed border-t border-cyan-900/80 pt-2 font-mono">
                 <!-- Se llena dinámicamente con interpretación financiera -->
               </div>
             </div>
@@ -1286,16 +1591,19 @@
               9. Módulo QA
             </h2>
             <p class="text-xs text-cyan-300 mt-1">
-              Batería de pruebas automatizadas en tiempo real: validación de escenarios, captura preventiva de errores, reactividad y verificación de convergencia precondicionada.
+              Batería de pruebas automatizadas en tiempo real: validación de escenarios, captura preventiva de errores,
+              reactividad y verificación de convergencia precondicionada.
             </p>
           </div>
 
           <!-- Botón de ejecución y resumen -->
           <div class="flex flex-wrap items-center gap-3">
-            <div id="badge-qa-resumen" class="px-3 py-1.5 rounded text-xs font-mono font-bold bg-cyan-950 border border-cyan-500 text-cyan-300 shadow-[0_0_10px_rgba(0,240,255,0.2)]">
+            <div id="badge-qa-resumen"
+              class="px-3 py-1.5 rounded text-xs font-mono font-bold bg-cyan-950 border border-cyan-500 text-cyan-300 shadow-[0_0_10px_rgba(0,240,255,0.2)]">
               ESTADO: PENDIENTE DE EJECUCIÓN
             </div>
-            <button id="btn-ejecutar-qa" type="button" class="py-2 px-4 bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-xs uppercase tracking-wider rounded font-mono transition-all flex items-center gap-2 cursor-pointer shadow-[0_0_15px_rgba(0,240,255,0.4)]">
+            <button id="btn-ejecutar-qa" type="button"
+              class="py-2 px-4 bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-xs uppercase tracking-wider rounded font-mono transition-all flex items-center gap-2 cursor-pointer shadow-[0_0_15px_rgba(0,240,255,0.4)]">
               <span>⚡</span> EJECUTAR PRUEBAS
             </button>
           </div>
@@ -1312,13 +1620,13 @@
           <div class="border border-cyan-900 bg-black/60 p-3.5 rounded flex flex-col justify-between">
             <span class="text-[11px] text-gray-400 uppercase font-mono">2. Manejo de Excepciones</span>
             <div id="qa-stat-excepciones" class="text-sm font-bold text-gray-400 font-mono mt-1">--</div>
-            <span class="text-[10px] text-gray-500 font-mono mt-1">Asimetría &amp; No-SPD</span>
+            <span class="text-[10px] text-gray-500 font-mono mt-1">Asimetría & No-SPD</span>
           </div>
 
           <div class="border border-cyan-900 bg-black/60 p-3.5 rounded flex flex-col justify-between">
-            <span class="text-[11px] text-gray-400 uppercase font-mono">3. Reactividad &amp; Recálculo</span>
+            <span class="text-[11px] text-gray-400 uppercase font-mono">3. Reactividad & Recálculo</span>
             <div id="qa-stat-reactividad" class="text-sm font-bold text-gray-400 font-mono mt-1">--</div>
-            <span class="text-[10px] text-gray-500 font-mono mt-1">Cholesky, GCP &amp; Errores</span>
+            <span class="text-[10px] text-gray-500 font-mono mt-1">Cholesky, GCP & Errores</span>
           </div>
 
           <div class="border border-cyan-900 bg-black/60 p-3.5 rounded flex flex-col justify-between">
@@ -1330,7 +1638,8 @@
 
         <!-- Tabla QA: Entrada, Resultado Esperado, Resultado Obtenido, Conclusión -->
         <div class="border border-cyan-800 bg-black/60 rounded-lg p-4 overflow-x-auto">
-          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-cyan-900 pb-3 mb-3">
+          <div
+            class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-cyan-900 pb-3 mb-3">
             <h3 class="text-sm font-bold text-cyan-300 uppercase tracking-wider flex items-center gap-2 font-mono">
               <span>BATERÍA DE PRUEBAS UNITARIAS Y DE INTEGRACIÓN (DAT-242)</span>
             </h3>
@@ -1384,9 +1693,10 @@
         <h2 class="text-2xl md:text-3xl font-bold text-white neon-glow mb-2">
           10. Conclusiones y Referencias
         </h2>
-        
+
         <p class="text-xs text-cyan-300 mb-6">
-          Análisis integrador de los resultados empíricos obtenidos en los tres escenarios de la cartera de Markowitz, evaluación del precondicionador diagonal de Suñagua (2020) y referencias académicas en formato APA.
+          Análisis integrador de los resultados empíricos obtenidos en los tres escenarios de la cartera de Markowitz,
+          evaluación del precondicionador diagonal de Suñagua (2020) y referencias académicas en formato APA.
         </p>
 
         <!-- SUBPARTE 1: CONCLUSIONES TÉCNICAS Y NUMÉRICAS -->
@@ -1396,27 +1706,36 @@
           </h3>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-            
+
             <!-- Tarjeta 1: Relación kappa(A) e iteraciones -->
             <div class="border border-cyan-800 bg-black/60 p-4 rounded-lg flex flex-col justify-between">
               <div>
                 <div class="flex items-center gap-2 mb-2">
-                  <span class="px-2 py-0.5 bg-cyan-950 border border-cyan-500 text-cyan-300 text-xs font-mono font-bold rounded">κ(A)</span>
+                  <span
+                    class="px-2 py-0.5 bg-cyan-950 border border-cyan-500 text-cyan-300 text-xs font-mono font-bold rounded">κ(A)</span>
                   <h4 class="text-sm font-bold text-white">Condicionamiento Espectral y Convergencia</h4>
                 </div>
                 <p class="text-xs text-gray-300 leading-relaxed mb-3">
-                  La cota teórica de convergencia de Gradientes Conjugados en normas de energía establece que el factor de contracción por iteración satisface:
+                  La cota teórica de convergencia de Gradientes Conjugados en normas de energía establece que el factor
+                  de contracción por iteración satisface:
                 </p>
-                <div class="bg-black/90 p-2.5 rounded border border-cyan-900 text-center text-xs font-mono text-cyan-300 mb-3">
+                <div
+                  class="bg-black/90 p-2.5 rounded border border-cyan-900 text-center text-xs font-mono text-cyan-300 mb-3">
                   ‖eₖ‖_A / ‖e₀‖_A ≤ 2 · [ (√κ - 1) / (√κ + 1) ]ᵏ
                 </div>
                 <p class="text-xs text-gray-300 leading-relaxed">
-                  En el <strong>Escenario Ideal</strong> (κ ≈ 13.97), el factor de contracción es estrecho (~0.577), garantizando una rápida reducción del error. 
-                  En el <strong>Escenario Mal Condicionado</strong> (κ ≈ 2000.98), el factor teórico sube a ~0.956. Aunque en dimensión finita (n = 4) el subespacio de Krylov abarca el espacio euclídeo en 4 pasos, la acumulación de errores de redondeo degrada el residuo de GC sin precondicionar a 1.06e-8, mientras que con Jacobi alcanza 7.88e-14.
+                  En el <strong>Escenario Ideal</strong> (con los datos precargados κ ≈ 13.97), el factor de contracción
+                  teórico es ~0.577.
+                  En el <strong>Escenario Mal Condicionado</strong> (con los datos precargados), el factor teórico para
+                  GC con κ(A) ≈ 2000.98 es de ~0.956, mientras que para GCP con precondicionador Jacobi κ(M⁻¹A) ≈ 10.97
+                  se reduce a ~0.536, indicando una cota de convergencia más favorable (cota teórica de peor caso; con n
+                  = 4 el método termina en a lo sumo 4 iteraciones, por lo que esta cota no predice el número de
+                  iteraciones observado). Con los datos precargados, la acumulación de errores de redondeo sitúa el
+                  residuo final de GC en 1.06e-8, mientras que con Jacobi alcanza 7.88e-14.
                 </p>
               </div>
               <div class="mt-3 pt-2 border-t border-cyan-950 text-[11px] text-cyan-400 font-mono">
-                * Conforme a Golub &amp; Van Loan (2013) y Saad (2003).
+                * Conforme a Golub & Van Loan (2013) y Saad (2003).
               </div>
             </div>
 
@@ -1424,18 +1743,26 @@
             <div class="border border-emerald-800 bg-black/60 p-4 rounded-lg flex flex-col justify-between">
               <div>
                 <div class="flex items-center gap-2 mb-2">
-                  <span class="px-2 py-0.5 bg-emerald-950 border border-emerald-500 text-emerald-300 text-xs font-mono font-bold rounded">M = diag(A)</span>
+                  <span
+                    class="px-2 py-0.5 bg-emerald-950 border border-emerald-500 text-emerald-300 text-xs font-mono font-bold rounded">M
+                    = diag(A)</span>
                   <h4 class="text-sm font-bold text-white">Eficacia del Precondicionador de Suñagua</h4>
                 </div>
                 <p class="text-xs text-gray-300 leading-relaxed mb-3">
-                  El precondicionador diagonal de Jacobi implementado bajo el esquema de <strong>Suñagua (2020)</strong> actúa como un escalamiento simétrico implícito:
+                  El precondicionador diagonal de Jacobi implementado bajo el esquema de <strong>Suñagua (2020)</strong>
+                  actúa como un escalamiento simétrico implícito:
                 </p>
-                <div class="bg-black/90 p-2.5 rounded border border-emerald-900 text-center text-xs font-mono text-emerald-300 mb-3">
+                <div
+                  class="bg-black/90 p-2.5 rounded border border-emerald-900 text-center text-xs font-mono text-emerald-300 mb-3">
                   Ã = M⁻¹/² · A · M⁻¹/²
                 </div>
                 <p class="text-xs text-gray-300 leading-relaxed">
-                  En el escenario mal condicionado, el desbalance extremo de escalas introducido en el activo GOOGL (varianza inflada x400) es neutralizado con costo <span class="font-mono text-emerald-300">O(n)</span> por iteración (división por la diagonal). 
-                  El número de condición espectral cae de <strong>κ(A) ≈ 2000.98</strong> a <strong>κ(M⁻¹A) ≈ 10.97</strong> (reducción de más de <strong>182 veces</strong>), alcanzando precisión de máquina sin ningún paso de factorización costoso.
+                  En el escenario mal condicionado, el desbalance extremo de escalas introducido en el activo GOOGL
+                  (varianza inflada x400) es neutralizado con costo <span class="font-mono text-emerald-300">O(n)</span>
+                  por iteración (división por la diagonal).
+                  El número de condición espectral cae de <strong>κ(A) ≈ 2000.98</strong> a <strong>κ(M⁻¹A) ≈
+                    10.97</strong> (reducción de más de <strong>182 veces</strong>), alcanzando precisión de máquina sin
+                  ningún paso de factorización costoso.
                 </p>
               </div>
               <div class="mt-3 pt-2 border-t border-emerald-950 text-[11px] text-emerald-400 font-mono">
@@ -1447,23 +1774,31 @@
             <div class="border border-cyan-800 bg-black/60 p-4 rounded-lg flex flex-col justify-between">
               <div>
                 <div class="flex items-center gap-2 mb-2">
-                  <span class="px-2 py-0.5 bg-cyan-950 border border-cyan-500 text-cyan-300 text-xs font-mono font-bold rounded">A = L·Lᵀ</span>
+                  <span
+                    class="px-2 py-0.5 bg-cyan-950 border border-cyan-500 text-cyan-300 text-xs font-mono font-bold rounded">A
+                    = L·Lᵀ</span>
                   <h4 class="text-sm font-bold text-white">Método Directo vs Métodos Iterativos</h4>
                 </div>
                 <p class="text-xs text-gray-300 leading-relaxed mb-3">
-                  La factorización directa de Cholesky proveyó la solución exacta de referencia (residuo ‖Ax - b‖₂ &lt; 1e-16).
+                  La factorización directa de Cholesky proveyó la solución exacta de referencia (residuo ‖Ax - b‖₂ <
+                  1e-16).
                 </p>
                 <ul class="text-xs text-gray-300 space-y-2 mb-3">
                   <li>
-                    <strong class="text-cyan-200">• Precisión Absoluta:</strong> En sistemas pequeños (n = 4), Cholesky es insuperable en costo y exactitud. El error absoluto de GCP respecto a Cholesky fue <span class="font-mono text-emerald-400">‖Ea‖₂ &lt; 1e-13</span>.
+                    <strong class="text-cyan-200">• Precisión Absoluta:</strong> En sistemas pequeños (n = 4), Cholesky
+                    es insuperable en costo y exactitud. El error absoluto de GCP respecto a Cholesky fue <span
+                      class="font-mono text-emerald-400">‖Ea‖₂ < 1e-13</span>.
                   </li>
                   <li>
-                    <strong class="text-cyan-200">• Escalabilidad en Gran Dimensión:</strong> Para carteras con miles de activos o matrices dispersas, Cholesky requiere O(n³) operaciones y memoria densa, mientras que GCP Jacobi requiere solo productos matriz-vector O(n² o n no nulos), posicionándose como el método de elección en Big Data financiero.
+                    <strong class="text-cyan-200">• Escalabilidad en Gran Dimensión:</strong> Para carteras con miles de
+                    activos o matrices dispersas, Cholesky requiere O(n³) operaciones y memoria densa, mientras que GCP
+                    Jacobi requiere solo productos matriz-vector O(n² o n no nulos), posicionándose como el método de
+                    elección en Big Data financiero.
                   </li>
                 </ul>
               </div>
               <div class="mt-3 pt-2 border-t border-cyan-950 text-[11px] text-cyan-400 font-mono">
-                * Error relativo de GCP vs Cholesky: Er &lt; 1e-14.
+                * Error relativo de GCP vs Cholesky: Er < 1e-14.
               </div>
             </div>
 
@@ -1477,23 +1812,27 @@
           </h3>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-            
+
             <!-- Tarjeta 1: Efecto del estrés en A y b -->
             <div class="border border-amber-800/80 bg-black/60 p-4 rounded-lg flex flex-col justify-between">
               <div>
                 <div class="flex items-center gap-2 mb-2">
-                  <span class="px-2 py-0.5 bg-amber-950 border border-amber-500 text-amber-300 text-xs font-mono font-bold rounded">ESTRÉS</span>
+                  <span
+                    class="px-2 py-0.5 bg-amber-950 border border-amber-500 text-amber-300 text-xs font-mono font-bold rounded">ESTRÉS</span>
                   <h4 class="text-sm font-bold text-white">Impacto del Shock Macroeconómico</h4>
                 </div>
                 <p class="text-xs text-gray-300 leading-relaxed mb-3">
-                  En el <strong>Escenario Bajo Estrés</strong>, modelar un shock bajista (+50% volatilidad ⇒ Covarianzas x2.25; -50% retornos esperados ⇒ b x0.5) produjo una contracción del vector no normalizado x por un factor exacto:
+                  En el <strong>Escenario Bajo Estrés</strong> (con los datos precargados), modelar un shock bajista con
+                  contagio correlacional y recorte asimétrico de retornos produjo un ajuste cuantitativo significativo:
                 </p>
-                <div class="bg-black/90 p-2.5 rounded border border-amber-900 text-center text-xs font-mono text-amber-300 mb-3">
-                  x_estrés = (0.50 / 2.25) · x_ideal ≈ 0.2222 · x_ideal
+                <div
+                  class="bg-black/90 p-2.5 rounded border border-amber-900 text-center text-xs font-mono text-amber-300 mb-3">
+                  b_estrés: -30% AAPL/MSFT, -50% GOOGL/AMZN  |  R_estrés = 0.6·R + 0.4·J
                 </div>
                 <p class="text-xs text-gray-300 leading-relaxed">
-                  Financieramente, esto significa que el capital apalancado óptimo o exposición bruta se reduce en un <strong>77.8%</strong> para mitigar el riesgo sistémico. 
-                  Sin embargo, al ser una transformación homotética uniforme, los pesos normalizados (w = x / ∑x) se conservan exactamente iguales, demostrando que shocks simétricos no alteran las preferencias relativas entre activos.
+                  Con los datos precargados del escenario de estrés, el modelo concentra la cartera en los activos con
+                  menor recorte de retorno esperado (AAPL y MSFT, -30%) y toma posiciones cortas en los de mayor recorte
+                  (GOOGL y AMZN, -50%); es consecuencia de los supuestos del escenario, no una predicción de mercado.
                 </p>
               </div>
               <div class="mt-3 pt-2 border-t border-amber-950 text-[11px] text-amber-400 font-mono">
@@ -1505,19 +1844,26 @@
             <div class="border border-rose-800/80 bg-black/60 p-4 rounded-lg flex flex-col justify-between">
               <div>
                 <div class="flex items-center gap-2 mb-2">
-                  <span class="px-2 py-0.5 bg-rose-950 border border-rose-500 text-rose-300 text-xs font-mono font-bold rounded">SENSIBILIDAD</span>
+                  <span
+                    class="px-2 py-0.5 bg-rose-950 border border-rose-500 text-rose-300 text-xs font-mono font-bold rounded">SENSIBILIDAD</span>
                   <h4 class="text-sm font-bold text-white">Ruido en Estimaciones e Hiper-sensibilidad</h4>
                 </div>
                 <p class="text-xs text-gray-300 leading-relaxed mb-3">
-                  El panel de sensibilidad de la Sección 8 demostró la vulnerabilidad intrínseca del optimizador de media-varianza como <em>"maximizador de errores"</em> (Michaud, 1989; Best &amp; Grauer, 1991):
+                  El panel de sensibilidad de la Sección 8 demostró la vulnerabilidad intrínseca del optimizador de
+                  media-varianza como <em>"maximizador de errores"</em> (Michaud, 1989; Best & Grauer, 1991):
                 </p>
                 <ul class="text-xs text-gray-300 space-y-1.5 mb-3">
-                  <li>• Un error de estimación de solo <strong>+5% en b(AAPL)</strong> incrementó su peso en la cartera en <strong>+8.79 puntos porcentuales</strong> (de 63.97% a 72.76%).</li>
-                  <li>• Un shock asimétrico de <strong>+10%</strong> elevó su ponderación en <strong>+17.11 pp</strong> (a 81.08%).</li>
-                  <li>• Una reducción de <strong>-10%</strong> desplomó su peso a <strong>44.83%</strong> (-19.14 pp).</li>
+                  <li>• Un error de estimación de solo <strong>+5% en b(AAPL)</strong> incrementó su peso en la cartera
+                    en <strong>+8.79 puntos porcentuales</strong> (de 63.97% a 72.76%).</li>
+                  <li>• Un shock asimétrico de <strong>+10%</strong> elevó su ponderación en <strong>+17.11 pp</strong>
+                    (a 81.08%).</li>
+                  <li>• Una reducción de <strong>-10%</strong> desplomó su peso a <strong>44.83%</strong> (-19.14 pp).
+                  </li>
                 </ul>
                 <p class="text-xs text-gray-300 leading-relaxed">
-                  Esto comprueba que la precisión del solver numérico es necesaria pero no suficiente: debe complementarse con modelos de estimación robusta (Black-Litterman o contracción bayesiana) para evitar reasignaciones espurias en producción.
+                  Esto comprueba que la precisión del solver numérico es necesaria pero no suficiente: debe
+                  complementarse con modelos de estimación robusta (Black-Litterman o contracción bayesiana) para evitar
+                  reasignaciones espurias en producción.
                 </p>
               </div>
               <div class="mt-3 pt-2 border-t border-rose-950 text-[11px] text-rose-400 font-mono">
@@ -1529,18 +1875,25 @@
             <div class="border border-cyan-800 bg-black/60 p-4 rounded-lg flex flex-col justify-between">
               <div>
                 <div class="flex items-center gap-2 mb-2">
-                  <span class="px-2 py-0.5 bg-cyan-950 border border-cyan-500 text-cyan-300 text-xs font-mono font-bold rounded">COBERTURA</span>
+                  <span
+                    class="px-2 py-0.5 bg-cyan-950 border border-cyan-500 text-cyan-300 text-xs font-mono font-bold rounded">COBERTURA</span>
                   <h4 class="text-sm font-bold text-white">Estructura de Correlación y Diversificación</h4>
                 </div>
                 <p class="text-xs text-gray-300 leading-relaxed mb-3">
-                  El mapa de calor de correlación reveló coeficientes positivos moderados entre los gigantes tecnológicos:
+                  El mapa de calor de correlación reveló coeficientes positivos moderados entre los gigantes
+                  tecnológicos:
                 </p>
-                <div class="bg-black/90 p-2.5 rounded border border-cyan-900 text-center text-xs font-mono text-cyan-300 mb-3">
-                  R̄ ≈ +0.66 &nbsp;|&nbsp; R_máx(AAPL/MSFT) = 0.72 &nbsp;|&nbsp; R_mín(AAPL/AMZN) = 0.61
+                <div
+                  class="bg-black/90 p-2.5 rounded border border-cyan-900 text-center text-xs font-mono text-cyan-300 mb-3">
+                  R̄ ≈ +0.66  |  R_máx(AAPL/MSFT) = 0.72  |  R_mín(AAPL/AMZN) = 0.61
                 </div>
                 <p class="text-xs text-gray-300 leading-relaxed">
-                  Al ser todas las correlaciones estrictamente menores a la unidad (Rᵢⱼ &lt; 1), la teoría de Markowitz comprueba que la varianza global de la cartera es inferior a la combinación lineal de riesgos individuales. 
-                  La solución óptima arrojó una posición corta en <strong>AMZN (-12.81%)</strong>, la cual actúa como cobertura (hedge) para maximizar el ratio de Sharpe ante las altas ponderaciones de AAPL (63.97%) y GOOGL (35.03%).
+                  Al ser todas las correlaciones estrictamente menores a la unidad (Rᵢⱼ < 1), la teoría de Markowitz
+                  comprueba que la varianza global de la cartera es inferior a la combinación lineal de riesgos
+                  individuales.
+                  La solución óptima arrojó una posición corta en <strong>AMZN (-12.81%)</strong>, la cual actúa como
+                  cobertura (hedge) para maximizar el ratio de Sharpe ante las altas ponderaciones de AAPL (63.97%) y
+                  GOOGL (35.03%).
                 </p>
               </div>
               <div class="mt-3 pt-2 border-t border-cyan-950 text-[11px] text-cyan-400 font-mono">
@@ -1553,7 +1906,8 @@
 
         <!-- SUBPARTE 3: CUADRO COMPARATIVO CONSOLIDADO DE ESCENARIOS -->
         <div class="border border-cyan-800 bg-black/60 rounded-lg p-4 overflow-x-auto mb-8">
-          <h3 class="text-sm font-bold text-cyan-300 uppercase tracking-wider mb-3 flex items-center justify-between font-mono">
+          <h3
+            class="text-sm font-bold text-cyan-300 uppercase tracking-wider mb-3 flex items-center justify-between font-mono">
             <span>10.3 Cuadro Resumen Comparativo de Escenarios Reales</span>
             <span class="text-xs text-gray-400 font-normal">Datos consolidados del sistema</span>
           </h3>
@@ -1577,17 +1931,19 @@
                 <td class="p-2.5 text-center text-emerald-400">10.97</td>
                 <td class="p-2.5 text-center">4 / 4</td>
                 <td class="p-2.5 text-center font-mono">7.74e-17</td>
-                <td class="p-2.5 text-gray-300">Régimen normal: alta ponderación en AAPL y GOOGL, AMZN en cobertura.</td>
+                <td class="p-2.5 text-gray-300">Régimen normal: alta ponderación en AAPL y GOOGL, AMZN en cobertura.
+                </td>
                 <td class="p-2.5 text-center text-emerald-400 font-bold">Bien condicionada (SPD)</td>
               </tr>
               <tr class="hover:bg-cyan-950/20">
                 <td class="p-2.5 font-bold text-amber-300">2. Bajo estrés</td>
-                <td class="p-2.5 text-center">13.97</td>
+                <td class="p-2.5 text-center">26.41</td>
                 <td class="p-2.5 text-center text-emerald-400">10.97</td>
                 <td class="p-2.5 text-center">4 / 4</td>
-                <td class="p-2.5 text-center font-mono">8.35e-17</td>
-                <td class="p-2.5 text-gray-300">Shock bajista: contracción de exposición al 22.2% con pesos relativos invariantes.</td>
-                <td class="p-2.5 text-center text-amber-400 font-bold">Escalamiento homotético</td>
+                <td class="p-2.5 text-center font-mono">1.12e-16</td>
+                <td class="p-2.5 text-gray-300">Contracción de retornos asimétrica (-30% AAPL/MSFT, -50% GOOGL/AMZN) y
+                  contagio en correlación.</td>
+                <td class="p-2.5 text-center text-amber-400 font-bold">SPD bajo estrés</td>
               </tr>
               <tr class="hover:bg-cyan-950/20">
                 <td class="p-2.5 font-bold text-rose-300">3. Mal condicionado</td>
@@ -1595,7 +1951,8 @@
                 <td class="p-2.5 text-center text-emerald-400 font-bold">10.97</td>
                 <td class="p-2.5 text-center text-emerald-400 font-bold">4 / 4</td>
                 <td class="p-2.5 text-center font-mono text-emerald-300">7.88e-14</td>
-                <td class="p-2.5 text-gray-300">Desbalance de escala en GOOGL. Jacobi recupera precisión de máquina (182x mejora).</td>
+                <td class="p-2.5 text-gray-300">Desbalance de escala en GOOGL. Jacobi recupera precisión de máquina
+                  (182x mejora).</td>
                 <td class="p-2.5 text-center text-rose-400 font-bold">Aceleración GCP crítica</td>
               </tr>
             </tbody>
@@ -1609,75 +1966,175 @@
           </h3>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
-            
+
             <!-- Referencia 1: Suñagua -->
-            <div class="border border-cyan-900 bg-black/70 p-4 rounded-lg flex flex-col justify-between hover:border-cyan-500 transition-all">
+            <div
+              class="border border-cyan-900 bg-black/70 p-4 rounded-lg flex flex-col justify-between hover:border-cyan-500 transition-all">
               <div class="space-y-2">
                 <div class="flex items-center justify-between">
-                  <span class="text-cyan-400 font-bold text-[11px] uppercase tracking-wider">[ARTÍCULO CIENTÍFICO]</span>
-                  <span class="text-[10px] bg-cyan-950 border border-cyan-800 text-gray-400 px-1.5 py-0.5 rounded">UMSA · 2020</span>
+                  <span class="text-cyan-400 font-bold text-[11px] uppercase tracking-wider">[ARTÍCULO
+                    CIENTÍFICO]</span>
+                  <span class="text-[10px] bg-cyan-950 border border-cyan-800 text-gray-400 px-1.5 py-0.5 rounded">UMSA
+                    · 2020</span>
                 </div>
                 <p class="text-gray-200 leading-relaxed">
-                  Suñagua S., P. (2020). Resolución de sistemas de ecuaciones lineales mediante el método del gradiente conjugado precondicionado. 
+                  Suñagua S., P. (2020). Resolución de sistemas de ecuaciones lineales mediante el método del gradiente
+                  conjugado precondicionado.
                   <em>Revista Boliviana de Matemática – UMSA</em>, <em>04</em>, 2–7.
                 </p>
                 <p class="text-gray-400 text-[11px] leading-relaxed">
-                  <strong>Aporte al proyecto:</strong> Base matemática y formulación algorítmica para la deducción del método de Gradientes Conjugados Precondicionado (GCP) con precondicionador diagonal de Jacobi M = diag(A) y cálculo espectral de κ(M⁻¹A).
+                  <strong>Aporte al proyecto:</strong> Base matemática y formulación algorítmica para la deducción del
+                  método de Gradientes Conjugados Precondicionado (GCP) con precondicionador diagonal de Jacobi M =
+                  diag(A) y cálculo espectral de κ(M⁻¹A).
                 </p>
               </div>
             </div>
 
             <!-- Referencia 2: Golub & Van Loan -->
-            <div class="border border-cyan-900 bg-black/70 p-4 rounded-lg flex flex-col justify-between hover:border-cyan-500 transition-all">
+            <div
+              class="border border-cyan-900 bg-black/70 p-4 rounded-lg flex flex-col justify-between hover:border-cyan-500 transition-all">
               <div class="space-y-2">
                 <div class="flex items-center justify-between">
-                  <span class="text-cyan-400 font-bold text-[11px] uppercase tracking-wider">[LIBRO DE TEXTO CLÁSICO]</span>
-                  <span class="text-[10px] bg-cyan-950 border border-cyan-800 text-gray-400 px-1.5 py-0.5 rounded">4.ª EDICIÓN</span>
+                  <span class="text-cyan-400 font-bold text-[11px] uppercase tracking-wider">[LIBRO DE TEXTO
+                    CLÁSICO]</span>
+                  <span class="text-[10px] bg-cyan-950 border border-cyan-800 text-gray-400 px-1.5 py-0.5 rounded">4.ª
+                    EDICIÓN</span>
                 </div>
                 <p class="text-gray-200 leading-relaxed">
-                  Golub, G. H., &amp; Van Loan, C. F. (2013). <em>Matrix Computations</em> (4th ed.). Johns Hopkins University Press.
+                  Golub, G. H., & Van Loan, C. F. (2013). <em>Matrix Computations</em> (4th ed.). Johns Hopkins
+                  University Press.
                 </p>
                 <p class="text-gray-400 text-[11px] leading-relaxed">
-                  <strong>Aporte al proyecto:</strong> Tratamiento riguroso de la factorización directa de Cholesky (Cap. 4), análisis de sensibilidad y número de condición espectral κ(A), y propiedades de convergencia de métodos de Krylov en matrices simétricas definidas positivas.
+                  <strong>Aporte al proyecto:</strong> Tratamiento riguroso de la factorización directa de Cholesky
+                  (Cap. 4), análisis de sensibilidad y número de condición espectral κ(A), y propiedades de convergencia
+                  de métodos de Krylov en matrices simétricas definidas positivas.
                 </p>
               </div>
             </div>
 
             <!-- Referencia 3: Saad -->
-            <div class="border border-cyan-900 bg-black/70 p-4 rounded-lg flex flex-col justify-between hover:border-cyan-500 transition-all">
+            <div
+              class="border border-cyan-900 bg-black/70 p-4 rounded-lg flex flex-col justify-between hover:border-cyan-500 transition-all">
               <div class="space-y-2">
                 <div class="flex items-center justify-between">
                   <span class="text-cyan-400 font-bold text-[11px] uppercase tracking-wider">[TRATADO NUMÉRICO]</span>
-                  <span class="text-[10px] bg-cyan-950 border border-cyan-800 text-gray-400 px-1.5 py-0.5 rounded">SIAM · 2.ª EDICIÓN</span>
+                  <span class="text-[10px] bg-cyan-950 border border-cyan-800 text-gray-400 px-1.5 py-0.5 rounded">SIAM
+                    · 2.ª EDICIÓN</span>
                 </div>
                 <p class="text-gray-200 leading-relaxed">
-                  Saad, Y. (2003). <em>Iterative Methods for Sparse Linear Systems</em> (2nd ed.). Society for Industrial and Applied Mathematics (SIAM). https://doi.org/10.1137/1.9780898718003
+                  Saad, Y. (2003). <em>Iterative Methods for Sparse Linear Systems</em> (2nd ed.). Society for
+                  Industrial and Applied Mathematics (SIAM). https://doi.org/10.1137/1.9780898718003
                 </p>
                 <p class="text-gray-400 text-[11px] leading-relaxed">
-                  <strong>Aporte al proyecto:</strong> Teoría de subespacios de Krylov, gradientes conjugados con precondicionamiento por bloques y diagonales, y análisis de distribución de autovalores para acelerar tasas de convergencia iterativas.
+                  <strong>Aporte al proyecto:</strong> Teoría de subespacios de Krylov, gradientes conjugados con
+                  precondicionamiento por bloques y diagonales, y análisis de distribución de autovalores para acelerar
+                  tasas de convergencia iterativas.
                 </p>
               </div>
             </div>
 
             <!-- Referencia 4: Markowitz y Yahoo Finance -->
-            <div class="border border-cyan-900 bg-black/70 p-4 rounded-lg flex flex-col justify-between hover:border-cyan-500 transition-all">
+            <div
+              class="border border-cyan-900 bg-black/70 p-4 rounded-lg flex flex-col justify-between hover:border-cyan-500 transition-all">
               <div class="space-y-2">
                 <div class="flex items-center justify-between">
-                  <span class="text-cyan-400 font-bold text-[11px] uppercase tracking-wider">[FINANZAS CUANTITATIVAS &amp; DATOS]</span>
-                  <span class="text-[10px] bg-cyan-950 border border-cyan-800 text-gray-400 px-1.5 py-0.5 rounded">HISTÓRICO 2 AÑOS</span>
+                  <span class="text-cyan-400 font-bold text-[11px] uppercase tracking-wider">[FINANZAS CUANTITATIVAS
+                    & DATOS]</span>
+                  <span
+                    class="text-[10px] bg-cyan-950 border border-cyan-800 text-gray-400 px-1.5 py-0.5 rounded">HISTÓRICO
+                    2 AÑOS</span>
                 </div>
                 <p class="text-gray-200 leading-relaxed">
-                  Markowitz, H. (1952). Portfolio Selection. <em>The Journal of Finance</em>, <em>7</em>(1), 77–91. https://doi.org/10.2307/2975974
+                  Markowitz, H. (1952). Portfolio Selection. <em>The Journal of Finance</em>, <em>7</em>(1), 77–91.
+                  https://doi.org/10.2307/2975974
                 </p>
                 <p class="text-gray-200 leading-relaxed">
-                  Yahoo Finance. (2024). <em>Historical Market Quotations for AAPL, MSFT, GOOGL, and AMZN</em> [Conjunto de datos extraído vía yfinance]. Yahoo Finance API. https://finance.yahoo.com/
+                  Yahoo Finance. (2024). <em>Historical Market Quotations for AAPL, MSFT, GOOGL, and AMZN</em> [Conjunto
+                  de datos extraído vía yfinance]. Yahoo Finance API. https://finance.yahoo.com/
                 </p>
                 <p class="text-gray-400 text-[11px] leading-relaxed">
-                  <strong>Aporte al proyecto:</strong> Modelo de selección óptima de cartera de media-varianza y series temporales de 252 días bursátiles de cotizaciones de cierre ajustadas para el cálculo de retornos anualizados (b) y matrices de covarianza (A).
+                  <strong>Aporte al proyecto:</strong> Modelo de selección óptima de cartera de media-varianza y series
+                  temporales de 252 días bursátiles de cotizaciones de cierre ajustadas para el cálculo de retornos
+                  anualizados (b) y matrices de covarianza (A).
                 </p>
               </div>
             </div>
 
+          </div>
+        </div>
+
+        <!-- SUBPARTE 5: RECURSOS DEL PROYECTO -->
+        <div class="space-y-4 mt-8 pt-6 border-t border-cyan-900">
+          <h3 class="text-lg font-bold text-cyan-300 flex items-center gap-2 border-b border-cyan-800 pb-2">
+            <span>10.5 Recursos del Proyecto y Despliegue</span>
+          </h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
+            <!-- Recurso 1: Repositorio GitHub -->
+            <div
+              class="border border-cyan-800 bg-black/70 p-4 rounded-lg flex flex-col justify-between hover:border-cyan-400 transition-all shadow-[0_0_8px_rgba(6,182,212,0.15)]">
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-cyan-400 font-bold text-[11px] uppercase tracking-wider flex items-center gap-1.5">
+                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24" aria-hidden="true">
+                      <path fill-rule="evenodd" clip-rule="evenodd"
+                        d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+                    </svg>
+                    [CÓDIGO FUENTE]
+                  </span>
+                  <span
+                    class="text-[10px] bg-cyan-950 border border-cyan-800 text-gray-400 px-1.5 py-0.5 rounded">GITHUB</span>
+                </div>
+                <h4 class="text-sm font-bold text-white mb-1">Repositorio Oficial en GitHub</h4>
+                <p class="text-gray-300 text-[11px] leading-relaxed mb-3">
+                  Código fuente completo, implementación en Vanilla JS y Python, suite de verificación cruzada con NumPy
+                  y documentación técnica.
+                </p>
+                <div
+                  class="text-[11px] text-cyan-200 break-all select-all font-mono mb-3 p-2 bg-black/60 rounded border border-cyan-950">
+                  <span id="sec10-repo-url-text">https://github.com/araceli4i2/MetodoGradiante</span>
+                </div>
+              </div>
+              <a id="sec10-repo-link" href="https://github.com/araceli4i2/MetodoGradiante" target="_blank"
+                rel="noopener noreferrer" aria-label="Abrir el repositorio de GitHub en una pestaña nueva"
+                class="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-cyan-950/80 hover:bg-cyan-800 border border-cyan-500/80 text-cyan-200 hover:text-white rounded font-bold transition-all shadow-[0_0_8px_rgba(6,182,212,0.2)] hover:shadow-[0_0_12px_rgba(6,182,212,0.4)] focus:outline-none focus:ring-1 focus:ring-cyan-300">
+                <span>ABRIR REPOSITORIO GITHUB</span>
+                <span>↗</span>
+              </a>
+            </div>
+
+            <!-- Recurso 2: Sitio Web Desplegado (GitHub Pages) -->
+            <div
+              class="border border-emerald-800 bg-black/70 p-4 rounded-lg flex flex-col justify-between hover:border-emerald-400 transition-all shadow-[0_0_8px_rgba(16,185,129,0.15)]">
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <span
+                    class="text-emerald-400 font-bold text-[11px] uppercase tracking-wider flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    [PRODUCCIÓN / LIVE]
+                  </span>
+                  <span
+                    class="text-[10px] bg-emerald-950 border border-emerald-800 text-gray-400 px-1.5 py-0.5 rounded">GITHUB
+                    PAGES</span>
+                </div>
+                <h4 class="text-sm font-bold text-white mb-1">Sitio Web Desplegado</h4>
+                <p class="text-gray-300 text-[11px] leading-relaxed mb-3">
+                  Aplicación interactiva desplegada en GitHub Pages para acceso público continuo con todos los módulos y
+                  pruebas QA.
+                </p>
+                <div
+                  class="text-[11px] text-emerald-200 break-all select-all font-mono mb-3 p-2 bg-black/60 rounded border border-emerald-950">
+                  <span id="sec10-deploy-url-text">https://araceli4i2.github.io/MetodoGradiante/</span>
+                </div>
+              </div>
+              <a id="sec10-deploy-link" href="https://araceli4i2.github.io/MetodoGradiante/" target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Abrir el sitio web desplegado en GitHub Pages en una pestaña nueva"
+                class="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-emerald-950/80 hover:bg-emerald-800 border border-emerald-500/80 text-emerald-200 hover:text-white rounded font-bold transition-all shadow-[0_0_8px_rgba(16,185,129,0.2)] hover:shadow-[0_0_12px_rgba(16,185,129,0.4)] focus:outline-none focus:ring-1 focus:ring-emerald-300">
+                <span>VISITAR WEB DESPLEGADA</span>
+                <span>↗</span>
+              </a>
+            </div>
           </div>
         </div>
 
@@ -1687,7 +2144,8 @@
   </main>
 
   <!-- Contenedor de Toasts Retro -->
-  <div id="retro-toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2.5 max-w-sm sm:max-w-md w-full pointer-events-none px-4"></div>
+  <div id="retro-toast-container"
+    class="fixed top-20 right-4 z-50 flex flex-col gap-2.5 max-w-sm sm:max-w-md w-full pointer-events-none px-4"></div>
 
   <!-- Pie de Página Arcade -->
   <footer class="border-t border-cyan-900/60 bg-black/80 py-4 text-center text-xs text-cyan-500">
@@ -1707,5 +2165,5 @@
   <script src="js/ui.js"></script>
   <script src="js/qa.js"></script>
 </body>
-</html>
 
+</html>
