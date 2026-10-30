@@ -86,6 +86,7 @@ function solveGC(A, b, x0, tol = 1e-6, maxIter = 100) {
   let normR = norm2(r);
   let residuoRelativo = normR / factorEscala;
   const historial = [residuoRelativo];
+  const traza = [];
 
   if (residuoRelativo < tol) {
     return {
@@ -93,7 +94,8 @@ function solveGC(A, b, x0, tol = 1e-6, maxIter = 100) {
       iteraciones: 0,
       residuoRelativo,
       convergio: true,
-      historial
+      historial,
+      traza
     };
   }
 
@@ -107,6 +109,11 @@ function solveGC(A, b, x0, tol = 1e-6, maxIter = 100) {
   // 4. Bucle principal de iteración de Gradientes Conjugados
   while (iter < maxIter) {
     iter++;
+
+    // Guardar copias defensivas al inicio del paso k
+    const rk = [...r];
+    const zk = [...r]; // Para GC estándar (M = I), z_k = r_k
+    const pk = [...p];
 
     // v = A · pₖ
     const v = matVec(A, p);
@@ -133,17 +140,36 @@ function solveGC(A, b, x0, tol = 1e-6, maxIter = 100) {
     residuoRelativo = normR / factorEscala;
     historial.push(residuoRelativo);
 
-    // Comprobación de parada
-    if (residuoRelativo < tol) {
-      convergio = true;
-      break;
-    }
-
     // Nuevo producto punto del residuo: ρₖ₊₁ = ⟨rₖ₊₁, rₖ₊₁⟩
     const rhoNext = dot(r, r);
 
     // Parámetro de ortogonalización (Fletcher-Reeves): βₖ = ⟨rₖ₊₁, rₖ₊₁⟩ / ⟨rₖ, rₖ⟩
     const beta = rhoNext / rho;
+
+    // Registrar traza de la iteración k
+    traza.push({
+      k: iter - 1,
+      iter: iter,
+      rk: rk,
+      zk: zk,
+      pk: pk,
+      alpha: alpha,
+      alphak: alpha,
+      beta: beta,
+      betak: beta,
+      xk1: [...x],
+      xNext: [...x],
+      'xk+1': [...x],
+      rk1: [...r],
+      residuoRelativo: residuoRelativo,
+      resRel: residuoRelativo
+    });
+
+    // Comprobación de parada
+    if (residuoRelativo < tol) {
+      convergio = true;
+      break;
+    }
 
     // Actualización de la dirección de descenso conjugada: pₖ₊₁ = rₖ₊₁ + βₖ·pₖ
     for (let i = 0; i < n; i++) {
@@ -158,7 +184,8 @@ function solveGC(A, b, x0, tol = 1e-6, maxIter = 100) {
     iteraciones: iter,
     residuoRelativo,
     convergio,
-    historial
+    historial,
+    traza
   };
 }
 
@@ -255,6 +282,7 @@ function solveGCP(A, b, x0, tol = 1e-6, maxIter = 100, M = null) {
   let normR = norm2(r);
   let residuoRelativo = normR / factorEscala;
   const historial = [residuoRelativo];
+  const traza = [];
 
   if (residuoRelativo < tol) {
     return {
@@ -262,7 +290,8 @@ function solveGCP(A, b, x0, tol = 1e-6, maxIter = 100, M = null) {
       iteraciones: 0,
       residuoRelativo,
       convergio: true,
-      historial
+      historial,
+      traza
     };
   }
 
@@ -281,6 +310,11 @@ function solveGCP(A, b, x0, tol = 1e-6, maxIter = 100, M = null) {
   // 4. Bucle iterativo de Suñagua (2020)
   while (iter < maxIter) {
     iter++;
+
+    // Guardar copias defensivas al inicio del paso k
+    const rk = [...r];
+    const zk = [...z];
+    const pk = [...p];
 
     // Apk = A · pₖ
     const Apk = matVec(A, p);
@@ -306,11 +340,6 @@ function solveGCP(A, b, x0, tol = 1e-6, maxIter = 100, M = null) {
     residuoRelativo = normR / factorEscala;
     historial.push(residuoRelativo);
 
-    if (residuoRelativo < tol) {
-      convergio = true;
-      break;
-    }
-
     // Resolver M·zₖ₊₁ = rₖ₊₁
     const zNext = resolverM(r);
 
@@ -319,6 +348,30 @@ function solveGCP(A, b, x0, tol = 1e-6, maxIter = 100, M = null) {
 
     // βₖ = (rₖ₊₁ᵀ·zₖ₊₁) / (rₖᵀ·zₖ)
     const beta = gammaNext / gamma;
+
+    // Registrar traza de la iteración k
+    traza.push({
+      k: iter - 1,
+      iter: iter,
+      rk: rk,
+      zk: zk,
+      pk: pk,
+      alpha: alpha,
+      alphak: alpha,
+      beta: beta,
+      betak: beta,
+      xk1: [...x],
+      xNext: [...x],
+      'xk+1': [...x],
+      rk1: [...r],
+      residuoRelativo: residuoRelativo,
+      resRel: residuoRelativo
+    });
+
+    if (residuoRelativo < tol) {
+      convergio = true;
+      break;
+    }
 
     // pₖ₊₁ = zₖ₊₁ + βₖ·pₖ
     for (let i = 0; i < n; i++) {
@@ -334,7 +387,8 @@ function solveGCP(A, b, x0, tol = 1e-6, maxIter = 100, M = null) {
     iteraciones: iter,
     residuoRelativo,
     convergio,
-    historial
+    historial,
+    traza
   };
 }
 

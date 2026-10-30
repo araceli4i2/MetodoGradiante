@@ -269,30 +269,18 @@ document.addEventListener('DOMContentLoaded', () => {
   inicializarEnlacesProyecto();
 
   // =========================================================================
-  // 1. NAVEGACIÓN ENTRE SECCIONES
+  // 1. NAVEGACIÓN CONTINUA CON SCROLL SUAVE E INTERSECTION OBSERVER
   // =========================================================================
   const navButtons = document.querySelectorAll('.nav-btn');
   const sections = document.querySelectorAll('.content-section');
   const mobileMenuBtn = document.getElementById('mobile-menu-btn');
   const mobileNav = document.getElementById('mobile-nav');
 
-  function navigateTo(targetId) {
-    let found = false;
+  const prefersReducedMotion = () => {
+    return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  };
 
-    sections.forEach(section => {
-      if (section.id === targetId) {
-        section.classList.remove('hidden');
-        found = true;
-      } else {
-        section.classList.add('hidden');
-      }
-    });
-
-    if (!found && sections.length > 0) {
-      sections[0].classList.remove('hidden');
-      targetId = sections[0].id;
-    }
-
+  function marcarNavActivo(targetId) {
     navButtons.forEach(btn => {
       if (btn.getAttribute('data-target') === targetId) {
         btn.classList.add('active');
@@ -300,12 +288,34 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.classList.remove('active');
       }
     });
+  }
+
+  function scrollToSection(targetId, updateHash = true) {
+    const targetEl = document.getElementById(targetId);
+    if (!targetEl) return;
+
+    targetEl.scrollIntoView({
+      behavior: prefersReducedMotion() ? 'auto' : 'smooth',
+      block: 'start'
+    });
+
+    marcarNavActivo(targetId);
+
+    if (updateHash && window.location.hash !== '#' + targetId) {
+      try {
+        history.replaceState(null, '', '#' + targetId);
+      } catch (e) {
+        window.location.hash = targetId;
+      }
+    }
 
     if (mobileNav && !mobileNav.classList.contains('hidden')) {
       mobileNav.classList.add('hidden');
     }
+  }
 
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  function navigateTo(targetId) {
+    scrollToSection(targetId, true);
   }
 
   navButtons.forEach(btn => {
@@ -313,8 +323,7 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       const target = btn.getAttribute('data-target');
       if (target) {
-        window.location.hash = target;
-        navigateTo(target);
+        scrollToSection(target, true);
       }
     });
   });
@@ -322,7 +331,7 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('hashchange', () => {
     const hash = (window.location.hash || '').replace('#', '');
     if (hash && document.getElementById(hash)) {
-      navigateTo(hash);
+      scrollToSection(hash, false);
     }
   });
 
@@ -330,6 +339,23 @@ document.addEventListener('DOMContentLoaded', () => {
     mobileMenuBtn.addEventListener('click', () => {
       mobileNav.classList.toggle('hidden');
     });
+  }
+
+  // IntersectionObserver para detectar la sección visible y resaltar el botón correspondiente
+  if ('IntersectionObserver' in window && sections.length > 0) {
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          marcarNavActivo(entry.target.id);
+        }
+      });
+    }, {
+      root: null,
+      rootMargin: '-15% 0px -70% 0px',
+      threshold: 0
+    });
+
+    sections.forEach(sec => sectionObserver.observe(sec));
   }
 
   // =========================================================================
@@ -1499,6 +1525,296 @@ document.addEventListener('DOMContentLoaded', () => {
     tbody.innerHTML = html;
   }
 
+  // =========================================================================
+  // TRAZA PASO A PASO DEL ALGORITMO (SECCIÓN 7)
+  // =========================================================================
+  const estadoTraza = {
+    metodo: 'GCP', // 'GCP' | 'GC'
+    paso: 0,
+    verTodo: true,
+    trazaGCP: [],
+    trazaGC: [],
+    nombreEscenario: 'Ideal'
+  };
+
+  /**
+   * Da formato tabular vertical a un vector de 4 dimensiones con ticker
+   */
+  function formatearVectorTraza(vec) {
+    if (!Array.isArray(vec)) return '<span class="text-gray-500">-</span>';
+    const tickers = ACTIVOS_INFO.map(a => a.ticker);
+    return `
+      <div class="font-mono text-[11px] leading-tight space-y-0.5">
+        ${vec.map((val, i) => {
+          const tick = tickers[i] || `x${i + 1}`;
+          const valStr = (Math.abs(val) < 1e-4 && val !== 0) || Math.abs(val) >= 1e5
+            ? val.toExponential(3)
+            : val.toFixed(5);
+          return `<div class="flex items-center justify-between gap-1.5">
+            <span class="text-cyan-400 font-bold text-[10px]">${tick}:</span>
+            <span class="text-gray-200 text-right">${valStr}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    `;
+  }
+
+  /**
+   * Renderiza la vista actual de la traza (filas, indicadores y estado de botones)
+   */
+  function renderizarVistaTraza() {
+    const tbody = document.getElementById('tbody-traza-gcp');
+    const indicadorPaso = document.getElementById('traza-indicador-paso');
+    const btnPrev = document.getElementById('btn-traza-prev');
+    const btnNext = document.getElementById('btn-traza-next');
+    const btnVerTodo = document.getElementById('btn-traza-ver-todo');
+    const pasosNav = document.getElementById('traza-pasos-nav');
+    const badgeMetodo = document.getElementById('traza-badge-metodo');
+    const btnMetodoGCP = document.getElementById('btn-traza-metodo-gcp');
+    const btnMetodoGC = document.getElementById('btn-traza-metodo-gc');
+    const thZk = document.getElementById('th-traza-zk');
+    const thBetak = document.getElementById('th-traza-betak');
+    const resumenEstado = document.getElementById('traza-resumen-estado');
+
+    if (!tbody) return;
+
+    const esGCP = estadoTraza.metodo === 'GCP';
+    const traza = esGCP ? estadoTraza.trazaGCP : estadoTraza.trazaGC;
+    const totalPasos = Array.isArray(traza) ? traza.length : 0;
+
+    // Actualizar estilos de conmutadores de método
+    if (badgeMetodo) {
+      badgeMetodo.textContent = esGCP ? 'GCP (Jacobi)' : 'GC Clásico';
+      badgeMetodo.className = esGCP
+        ? 'text-xs px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-500 font-mono'
+        : 'text-xs px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-500 font-mono';
+    }
+    if (btnMetodoGCP) {
+      btnMetodoGCP.className = esGCP
+        ? 'px-2.5 py-1 rounded bg-emerald-900/70 text-emerald-200 border border-emerald-500 font-bold transition-colors'
+        : 'px-2.5 py-1 rounded text-gray-400 hover:text-cyan-200 transition-colors';
+    }
+    if (btnMetodoGC) {
+      btnMetodoGC.className = !esGCP
+        ? 'px-2.5 py-1 rounded bg-cyan-900/70 text-cyan-200 border border-cyan-500 font-bold transition-colors'
+        : 'px-2.5 py-1 rounded text-gray-400 hover:text-cyan-200 transition-colors';
+    }
+
+    // Actualizar fórmulas de cabecera según el método
+    if (thZk) {
+      thZk.innerHTML = esGCP
+        ? `<span class="text-white font-bold block text-sm">zₖ</span><span class="text-[10px] text-gray-300 font-normal block font-sans">M·zₖ = rₖ (rₖ,ᵢ / Aᵢᵢ)</span>`
+        : `<span class="text-white font-bold block text-sm">zₖ</span><span class="text-[10px] text-gray-300 font-normal block font-sans">M = I ⇒ zₖ = rₖ</span>`;
+    }
+    if (thBetak) {
+      thBetak.innerHTML = esGCP
+        ? `<span class="text-white font-bold block text-sm">βₖ</span><span class="text-[10px] text-gray-300 font-normal block font-sans">(rₖ₊₁ᵀ zₖ₊₁) / (rₖᵀ zₖ)</span>`
+        : `<span class="text-white font-bold block text-sm">βₖ</span><span class="text-[10px] text-gray-300 font-normal block font-sans">(rₖ₊₁ᵀ rₖ₊₁) / (rₖᵀ rₖ)</span>`;
+    }
+
+    if (totalPasos === 0) {
+      tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-gray-400 font-mono">No hay datos de traza disponibles para este cálculo.</td></tr>`;
+      if (indicadorPaso) indicadorPaso.textContent = '-';
+      return;
+    }
+
+    // Validar rango del paso actual
+    if (estadoTraza.paso >= totalPasos) estadoTraza.paso = totalPasos - 1;
+    if (estadoTraza.paso < 0) estadoTraza.paso = 0;
+
+    // Actualizar botones de navegación
+    if (btnPrev) {
+      btnPrev.disabled = estadoTraza.verTodo ? false : (estadoTraza.paso <= 0);
+    }
+    if (btnNext) {
+      btnNext.disabled = estadoTraza.verTodo ? false : (estadoTraza.paso >= totalPasos - 1);
+    }
+    if (indicadorPaso) {
+      indicadorPaso.textContent = estadoTraza.verTodo
+        ? `Todas (${totalPasos}/${totalPasos})`
+        : `k = ${estadoTraza.paso} (${estadoTraza.paso + 1}/${totalPasos})`;
+    }
+    if (btnVerTodo) {
+      btnVerTodo.textContent = estadoTraza.verTodo ? '👁 Paso a paso' : '👁 Ver todo';
+      btnVerTodo.className = estadoTraza.verTodo
+        ? 'px-3 py-1.5 rounded bg-emerald-900/50 hover:bg-emerald-800/60 border border-emerald-400 text-emerald-200 text-xs font-mono font-bold transition-all shadow-[0_0_8px_rgba(16,185,129,0.3)]'
+        : 'px-3 py-1.5 rounded bg-cyan-900/40 hover:bg-cyan-800/60 border border-cyan-500 text-cyan-100 text-xs font-mono font-bold transition-all shadow-[0_0_8px_rgba(6,182,212,0.2)]';
+    }
+
+    // Selector rápido de iteraciones (pills)
+    if (pasosNav) {
+      pasosNav.innerHTML = `<span class="text-gray-400 text-[11px] mr-1">Ir a iteración:</span>` +
+        traza.map((p, idx) => {
+          const isActive = (!estadoTraza.verTodo && estadoTraza.paso === idx) ||
+                           (estadoTraza.verTodo && estadoTraza.paso === idx);
+          const btnClass = isActive
+            ? 'px-2 py-0.5 rounded bg-cyan-500 text-black font-bold border border-cyan-300 cursor-pointer shadow-[0_0_6px_rgba(6,182,212,0.8)]'
+            : 'px-2 py-0.5 rounded bg-cyan-950/60 text-cyan-300 border border-cyan-800 hover:bg-cyan-900/60 cursor-pointer';
+          return `<button type="button" class="${btnClass}" data-step="${idx}">k = ${idx}</button>`;
+        }).join('') +
+        `<button type="button" class="px-2 py-0.5 rounded ${estadoTraza.verTodo ? 'bg-emerald-500 text-black font-bold border border-emerald-300' : 'bg-black text-gray-400 border border-cyan-900 hover:text-cyan-200'}" data-action="all">Todos</button>`;
+
+      pasosNav.querySelectorAll('button[data-step]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          estadoTraza.verTodo = false;
+          estadoTraza.paso = parseInt(btn.getAttribute('data-step'), 10);
+          renderizarVistaTraza();
+        });
+      });
+      const btnAll = pasosNav.querySelector('button[data-action="all"]');
+      if (btnAll) {
+        btnAll.addEventListener('click', (e) => {
+          e.preventDefault();
+          estadoTraza.verTodo = true;
+          renderizarVistaTraza();
+        });
+      }
+    }
+
+    // Filtrar pasos a mostrar
+    const pasosAMostrar = estadoTraza.verTodo
+      ? traza
+      : [traza[estadoTraza.paso]];
+
+    let html = '';
+    pasosAMostrar.forEach((p) => {
+      const isCurrent = p.k === estadoTraza.paso;
+      const rowHighlight = (!estadoTraza.verTodo || isCurrent)
+        ? 'bg-cyan-950/30 border-l-2 border-l-cyan-400'
+        : 'hover:bg-cyan-950/20';
+
+      const alphaStr = (Math.abs(p.alpha) < 1e-4 && p.alpha !== 0) || Math.abs(p.alpha) >= 1e5
+        ? p.alpha.toExponential(4)
+        : p.alpha.toFixed(6);
+
+      const betaStr = (p.beta !== null && p.beta !== undefined)
+        ? ((Math.abs(p.beta) < 1e-4 && p.beta !== 0) || Math.abs(p.beta) >= 1e5 ? p.beta.toExponential(4) : p.beta.toFixed(6))
+        : '<span class="text-gray-500">-</span>';
+
+      const resRelVal = p.residuoRelativo !== undefined ? p.residuoRelativo : (p.resRel || 0);
+      const resRelStr = resRelVal.toExponential(4);
+      const resRelBadge = resRelVal < 1e-6
+        ? `<div class="text-emerald-400 font-bold font-mono">${resRelStr}</div><span class="inline-block px-1.5 py-0.2 rounded text-[9px] bg-emerald-950 border border-emerald-500 text-emerald-300 font-bold mt-0.5">✓ Parada</span>`
+        : `<div class="text-cyan-300 font-mono">${resRelStr}</div>`;
+
+      html += `
+        <tr class="${rowHighlight} transition-colors border-b border-cyan-950/60">
+          <td class="p-2.5 text-center align-top border-r border-cyan-900/80">
+            <span class="text-white font-bold text-sm block">k = ${p.k}</span>
+            <span class="text-[10px] text-cyan-400 font-mono block">Iter ${p.iter}</span>
+          </td>
+          <td class="p-2.5 align-top border-r border-cyan-900/80">
+            ${formatearVectorTraza(p.rk)}
+          </td>
+          <td class="p-2.5 align-top border-r border-cyan-900/80">
+            ${formatearVectorTraza(p.zk)}
+          </td>
+          <td class="p-2.5 align-top border-r border-cyan-900/80">
+            ${formatearVectorTraza(p.pk)}
+          </td>
+          <td class="p-2.5 align-top text-right border-r border-cyan-900/80 font-mono">
+            <span class="text-amber-300 font-bold text-xs">${alphaStr}</span>
+          </td>
+          <td class="p-2.5 align-top border-r border-cyan-900/80">
+            ${formatearVectorTraza(p.xk1 || p.xNext)}
+          </td>
+          <td class="p-2.5 align-top text-right border-r border-cyan-900/80 font-mono">
+            ${resRelBadge}
+          </td>
+          <td class="p-2.5 align-top text-right font-mono">
+            <span class="text-purple-300 text-xs">${betaStr}</span>
+          </td>
+        </tr>
+      `;
+    });
+
+    tbody.innerHTML = html;
+
+    if (resumenEstado) {
+      const ultimoPaso = traza[traza.length - 1];
+      const residuoFinal = ultimoPaso ? ultimoPaso.residuoRelativo : 0;
+      if (residuoFinal < 1e-6) {
+        resumenEstado.innerHTML = `<span class="text-emerald-400">✓ Tolerancia alcanzada en k = ${totalPasos - 1} (${totalPasos} it): ‖rₙ‖/‖b‖ = ${residuoFinal.toExponential(4)} &lt; 1e-6</span>`;
+      } else {
+        resumenEstado.innerHTML = `<span class="text-amber-400">Iteración ${totalPasos}: ‖r‖/‖b‖ = ${residuoFinal.toExponential(4)}</span>`;
+      }
+    }
+  }
+
+  /**
+   * Actualiza el conjunto de datos de la traza para el escenario activo
+   */
+  function actualizarTablaTraza(trazaGCP, trazaGC, nombreEscenario) {
+    estadoTraza.trazaGCP = Array.isArray(trazaGCP) ? trazaGCP : [];
+    estadoTraza.trazaGC = Array.isArray(trazaGC) ? trazaGC : [];
+    estadoTraza.nombreEscenario = nombreEscenario || 'Ideal';
+    renderizarVistaTraza();
+  }
+
+  /**
+   * Registra los manejadores de eventos para los controles de la traza
+   */
+  function inicializarControlesTraza() {
+    const btnPrev = document.getElementById('btn-traza-prev');
+    const btnNext = document.getElementById('btn-traza-next');
+    const btnVerTodo = document.getElementById('btn-traza-ver-todo');
+    const btnMetodoGCP = document.getElementById('btn-traza-metodo-gcp');
+    const btnMetodoGC = document.getElementById('btn-traza-metodo-gc');
+
+    if (btnPrev) {
+      btnPrev.addEventListener('click', (e) => {
+        e.preventDefault();
+        const traza = estadoTraza.metodo === 'GCP' ? estadoTraza.trazaGCP : estadoTraza.trazaGC;
+        if (!traza || traza.length === 0) return;
+        if (estadoTraza.verTodo) {
+          estadoTraza.verTodo = false;
+        } else if (estadoTraza.paso > 0) {
+          estadoTraza.paso--;
+        }
+        renderizarVistaTraza();
+      });
+    }
+
+    if (btnNext) {
+      btnNext.addEventListener('click', (e) => {
+        e.preventDefault();
+        const traza = estadoTraza.metodo === 'GCP' ? estadoTraza.trazaGCP : estadoTraza.trazaGC;
+        if (!traza || traza.length === 0) return;
+        if (estadoTraza.verTodo) {
+          estadoTraza.verTodo = false;
+        } else if (estadoTraza.paso < traza.length - 1) {
+          estadoTraza.paso++;
+        }
+        renderizarVistaTraza();
+      });
+    }
+
+    if (btnVerTodo) {
+      btnVerTodo.addEventListener('click', (e) => {
+        e.preventDefault();
+        estadoTraza.verTodo = !estadoTraza.verTodo;
+        renderizarVistaTraza();
+      });
+    }
+
+    if (btnMetodoGCP) {
+      btnMetodoGCP.addEventListener('click', (e) => {
+        e.preventDefault();
+        estadoTraza.metodo = 'GCP';
+        renderizarVistaTraza();
+      });
+    }
+
+    if (btnMetodoGC) {
+      btnMetodoGC.addEventListener('click', (e) => {
+        e.preventDefault();
+        estadoTraza.metodo = 'GC';
+        renderizarVistaTraza();
+      });
+    }
+  }
+
   /**
    * Ejecuta la demostración opcional con tolerancia estricta (1e-6, 1e-10, 1e-12) en Sección 7.
    * La tolerancia oficial del desafío es 1e-6.
@@ -1572,6 +1888,184 @@ document.addEventListener('DOMContentLoaded', () => {
   let estadoSensibilidad = { deltaPct: 0, target: '0' };
   let ultimoCalculo = null;
 
+    // =========================================================================
+  // GESTIÓN DE ESTADO DE CÁLCULO, PANEL STICKY HUD Y ANIMACIÓN DE RECALCULO
+  // =========================================================================
+  const PESOS_IDEAL_BASE = [0.639698, 0.138067, 0.350308, -0.128072];
+
+  function obtenerPesosEscenarioIdeal() {
+    if (cacheEscenariosData && cacheEscenariosData.length > 0) {
+      const escIdeal = cacheEscenariosData.find(e => e.id === 'ideal');
+      if (escIdeal && window.LinAlg && window.LinAlg.resolverCholesky) {
+        try {
+          const res = window.LinAlg.resolverCholesky(escIdeal.A, escIdeal.b);
+          const sumX = res.x.reduce((a, b) => a + b, 0);
+          if (sumX !== 0) return res.x.map(v => v / sumX);
+        } catch (e) {
+          // Fallback a pesos base
+        }
+      }
+    }
+    return PESOS_IDEAL_BASE;
+  }
+
+  function actualizarEstadoCalculo(actualizado, mensaje) {
+    const badgeSticky = document.getElementById('sticky-status-badge');
+    const textSticky = document.getElementById('sticky-status-text');
+    const badgeStickyM = document.getElementById('sticky-status-badge-m');
+    const textStickyM = document.getElementById('sticky-status-text-m');
+
+    if (actualizado) {
+      if (badgeSticky) {
+        badgeSticky.className = 'px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 bg-emerald-950 border border-emerald-500 text-emerald-300 shadow-[0_0_6px_rgba(16,185,129,0.3)]';
+      }
+      if (textSticky) textSticky.textContent = 'ACTUALIZADO';
+      if (badgeStickyM) {
+        badgeStickyM.className = 'px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-emerald-950 border border-emerald-500 text-emerald-300';
+      }
+      if (textStickyM) textStickyM.textContent = 'ACTUAL';
+      if (calcStatusMsg) {
+        calcStatusMsg.innerHTML = mensaje || `<span class="text-emerald-400">✓ Cálculo completado:</span> Solución y comparativas actualizadas con los datos vigentes.`;
+      }
+    } else {
+      if (badgeSticky) {
+        badgeSticky.className = 'px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 bg-amber-950 border border-amber-500 text-amber-300 shadow-[0_0_8px_rgba(245,158,11,0.4)] animate-pulse';
+      }
+      if (textSticky) textSticky.textContent = 'RESULTADOS DESACTUALIZADOS';
+      if (badgeStickyM) {
+        badgeStickyM.className = 'px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-amber-950 border border-amber-500 text-amber-300';
+      }
+      if (textStickyM) textStickyM.textContent = 'DESACTUALIZADO';
+      if (calcStatusMsg) {
+        calcStatusMsg.innerHTML = `<span class="text-amber-400 font-bold">▲ Edición en curso:</span> Resultados desactualizados. Presione <strong>CALCULAR</strong> para recalcular la cartera.`;
+      }
+    }
+  }
+
+  function actualizarPanelSticky(metricas) {
+    if (!metricas) return;
+    const { escenario, esSPD, condA, condMA, iterGC, iterGCP, resGCP, convergioGCP } = metricas;
+
+    // Desktop
+    const elEsc = document.getElementById('sticky-escenario-nombre');
+    if (elEsc) elEsc.textContent = (escenario || 'Ideal').toUpperCase();
+
+    const elSpd = document.getElementById('sticky-spd-status');
+    if (elSpd) {
+      elSpd.textContent = esSPD ? 'SÍ' : 'NO';
+      elSpd.className = esSPD ? 'font-bold text-emerald-400' : 'font-bold text-rose-400';
+    }
+
+    const elCondA = document.getElementById('sticky-cond-a');
+    if (elCondA) {
+      elCondA.textContent = typeof condA === 'number' ? condA.toFixed(2) : (condA || '--');
+    }
+
+    const elCondMA = document.getElementById('sticky-cond-ma');
+    if (elCondMA) {
+      elCondMA.textContent = typeof condMA === 'number' ? condMA.toFixed(2) : (condMA || '--');
+    }
+
+    const elIterGC = document.getElementById('sticky-iter-gc');
+    if (elIterGC) elIterGC.textContent = iterGC !== undefined ? `${iterGC} it` : '--';
+
+    const elIterGCP = document.getElementById('sticky-iter-gcp');
+    if (elIterGCP) elIterGCP.textContent = iterGCP !== undefined ? `${iterGCP} it` : '--';
+
+    const elResGCP = document.getElementById('sticky-res-gcp');
+    if (elResGCP) {
+      elResGCP.textContent = typeof resGCP === 'number' ? resGCP.toExponential(2) : (resGCP || '--');
+    }
+
+    const elBadge = document.getElementById('sticky-convergencia-badge');
+    if (elBadge) {
+      if (convergioGCP) {
+        elBadge.className = 'px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-950 border border-emerald-500 text-emerald-300';
+        elBadge.textContent = '✓ CONVERGIÓ';
+      } else {
+        elBadge.className = 'px-1.5 py-0.5 rounded text-[10px] font-bold bg-rose-950 border border-rose-500 text-rose-300';
+        elBadge.textContent = '▲ NO CONVERGIÓ';
+      }
+    }
+
+    // Mobile
+    const elEscM = document.getElementById('sticky-escenario-nombre-m');
+    if (elEscM) elEscM.textContent = (escenario || 'Ideal').toUpperCase();
+
+    const elSpdM = document.getElementById('sticky-spd-status-m');
+    if (elSpdM) {
+      elSpdM.textContent = esSPD ? 'SÍ' : 'NO';
+      elSpdM.className = esSPD ? 'text-emerald-400' : 'text-rose-400';
+    }
+
+    const elCondAM = document.getElementById('sticky-cond-a-m');
+    if (elCondAM) {
+      elCondAM.textContent = typeof condA === 'number' ? condA.toFixed(1) : (condA || '--');
+    }
+
+    const elCondMAM = document.getElementById('sticky-cond-ma-m');
+    if (elCondMAM) {
+      elCondMAM.textContent = typeof condMA === 'number' ? condMA.toFixed(1) : (condMA || '--');
+    }
+
+    const elIterGCM = document.getElementById('sticky-iter-gc-m');
+    if (elIterGCM) elIterGCM.textContent = iterGC !== undefined ? `${iterGC}` : '--';
+
+    const elIterGCPM = document.getElementById('sticky-iter-gcp-m');
+    if (elIterGCPM) elIterGCPM.textContent = iterGCP !== undefined ? `${iterGCP}` : '--';
+
+    const elResGCPM = document.getElementById('sticky-res-gcp-m');
+    if (elResGCPM) {
+      elResGCPM.textContent = typeof resGCP === 'number' ? resGCP.toExponential(1) : (resGCP || '--');
+    }
+
+    const elBadgeM = document.getElementById('sticky-convergencia-badge-m');
+    if (elBadgeM) {
+      if (convergioGCP) {
+        elBadgeM.className = 'px-1 py-0.5 rounded text-[9px] font-bold bg-emerald-950 border border-emerald-500 text-emerald-300';
+        elBadgeM.textContent = '✓';
+      } else {
+        elBadgeM.className = 'px-1 py-0.5 rounded text-[9px] font-bold bg-rose-950 border border-rose-500 text-rose-300';
+        elBadgeM.textContent = '▲';
+      }
+    }
+  }
+
+  function animarCeldasRecalculadas() {
+    const elements = [
+      ...document.querySelectorAll('#tbody-referencia td'),
+      document.getElementById('ref-residuo-norma'),
+      document.getElementById('gc-iteraciones-val'),
+      document.getElementById('gc-residuo-val'),
+      document.getElementById('gcp-iteraciones-val'),
+      document.getElementById('gcp-residuo-val'),
+      document.getElementById('gc-vector-x'),
+      document.getElementById('gcp-vector-x'),
+      document.getElementById('err-residuo-global-gcp'),
+      document.getElementById('err-error-relativo-gcp'),
+      document.getElementById('sticky-cond-a'),
+      document.getElementById('sticky-cond-ma'),
+      document.getElementById('sticky-iter-gc'),
+      document.getElementById('sticky-iter-gcp'),
+      document.getElementById('sticky-res-gcp'),
+      document.getElementById('sticky-cond-a-m'),
+      document.getElementById('sticky-cond-ma-m'),
+      document.getElementById('sticky-iter-gc-m'),
+      document.getElementById('sticky-iter-gcp-m'),
+      document.getElementById('sticky-res-gcp-m')
+    ].filter(Boolean);
+
+    elements.forEach(el => {
+      el.classList.remove('celda-actualizada');
+      void el.offsetWidth;
+      el.classList.add('celda-actualizada');
+    });
+
+    setTimeout(() => {
+      elements.forEach(el => el.classList.remove('celda-actualizada'));
+    }, 1050);
+  }
+
   function ejecutarCalculo(nombreEscenario = 'Personalizado') {
     if (!window.LinAlg || !window.Solvers) return;
 
@@ -1644,13 +2138,19 @@ document.addEventListener('DOMContentLoaded', () => {
       const sumXRef = xRef.reduce((acc, val) => acc + val, 0);
       const wRef = xRef.map(val => (sumXRef !== 0 ? val / sumXRef : 0));
 
-      // Actualizar DOM en Sección 6: Solución de Referencia
+      // Actualizar DOM en Sección 6: Solución de Referencia con columna Δ vs Ideal (p.p.)
       const tbodyRef = document.getElementById('tbody-referencia');
       if (tbodyRef) {
+        const wIdeal = obtenerPesosEscenarioIdeal();
         tbodyRef.innerHTML = xRef.map((xi, idx) => {
           const wi = wRef[idx];
           const pct = wi * 100;
           const esLarga = xi >= 0;
+          const wiIdeal = (wIdeal && wIdeal[idx] !== undefined) ? wIdeal[idx] : wi;
+          const deltaPp = (wi - wiIdeal) * 100;
+          const deltaSign = deltaPp > 0.0001 ? '+' : '';
+          const deltaStr = Math.abs(deltaPp) < 0.005 ? '0.00 pp' : `${deltaSign}${deltaPp.toFixed(2)} pp`;
+          const deltaColor = Math.abs(deltaPp) < 0.005 ? 'text-gray-400' : (deltaPp > 0 ? 'text-emerald-400' : 'text-amber-400');
           return `
             <tr class="hover:bg-cyan-950/30 transition-colors">
               <td class="p-2.5">${renderActivoWidget(idx, 'pequeno', { mostrarNombre: false })}</td>
@@ -1658,6 +2158,7 @@ document.addEventListener('DOMContentLoaded', () => {
               <td class="p-2.5 text-right font-mono">${xi.toFixed(6)}</td>
               <td class="p-2.5 text-right font-mono text-cyan-200">${wi.toFixed(6)}</td>
               <td class="p-2.5 text-right font-mono ${pct >= 0 ? 'text-emerald-400' : 'text-rose-400'}">${pct.toFixed(2)} %</td>
+              <td class="p-2.5 text-right font-mono ${deltaColor} font-semibold">${deltaStr}</td>
               <td class="p-2.5 text-center">
                 <span class="px-2 py-0.5 rounded text-[10px] font-bold ${esLarga ? 'bg-emerald-950/80 text-emerald-400 border border-emerald-700' : 'bg-rose-950/80 text-rose-400 border border-rose-700'}">
                   ${esLarga ? 'LARGA' : 'CORTA'}
@@ -1667,6 +2168,9 @@ document.addEventListener('DOMContentLoaded', () => {
           `;
         }).join('');
       }
+
+      const tfootSumDelta = document.getElementById('tfoot-ref-sum-delta');
+      if (tfootSumDelta) tfootSumDelta.textContent = '0.00 pp';
 
       const tfootSumX = document.getElementById('tfoot-ref-sum-x');
       if (tfootSumX) tfootSumX.textContent = sumXRef.toFixed(6);
@@ -1755,6 +2259,9 @@ document.addEventListener('DOMContentLoaded', () => {
       // 5.2. Actualizar Sección 7: Demostración con Tolerancia Estricta
       actualizarDemostracionTolerancia(A, b, params.x0, params.maxIter);
 
+      // 5.3. Actualizar Sección 7: Traza Paso a Paso del Algoritmo (GCP vs GC)
+      actualizarTablaTraza(resGCP.traza, resGC.traza, nombreEscenario);
+
       // 6. Actualizar Sección 8: Análisis de Errores por Variable
       actualizarErroresVariable(A, b, xRef, resGCP);
 
@@ -1770,6 +2277,28 @@ document.addEventListener('DOMContentLoaded', () => {
       if (calcStatusMsg) {
         calcStatusMsg.innerHTML = `<span class="text-emerald-400">✓ Solución calculada:</span> Cholesky exacto, GC (${resGC.iteraciones} it) y GCP (${resGCP.iteraciones} it) ejecutados con éxito.`;
       }
+
+      // Sincronizar panel sticky HUD
+      const condA = (val.diagnostico && val.diagnostico.condicionA !== undefined)
+        ? val.diagnostico.condicionA
+        : (window.LinAlg.condNumber ? window.LinAlg.condNumber(A) : 1);
+      const condMA = window.Solvers.condPrecond ? window.Solvers.condPrecond(A) : null;
+      actualizarPanelSticky({
+        escenario: nombreEscenario,
+        esSPD: val.diagnostico ? val.diagnostico.esSPD : true,
+        condA: condA,
+        condMA: condMA,
+        iterGC: resGC.iteraciones,
+        iterGCP: resGCP.iteraciones,
+        resGCP: resGCP.residuoRelativo,
+        convergioGCP: resGCP.convergio
+      });
+
+      // Actualizar estado de cálculo a actualizado
+      actualizarEstadoCalculo(true);
+
+      // Resaltar celdas actualizadas durante ~1s
+      animarCeldasRecalculadas();
 
     } catch (error) {
       console.warn("Aviso en el cálculo numérico:", error);
@@ -2332,22 +2861,64 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 150);
   }
 
-  // Listeners para auto-recalculo en todos los inputs
+  // Listeners para marcar 'Resultados desactualizados' durante la edición manual
   const todosLosInputs = document.querySelectorAll('.input-matrix, .input-vector, #input-tol, #input-max-iter, #select-precond, #contenedor-x0-custom input');
   todosLosInputs.forEach(input => {
-    input.addEventListener('input', dispararRecalculoAuto);
-    input.addEventListener('change', dispararRecalculoAuto);
+    input.addEventListener('input', () => {
+      datosEditadosManualmente = true;
+      actualizarEstadoCalculo(false);
+    });
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        datosEditadosManualmente = true;
+        ejecutarCalculo('Personalizado');
+      }
+    });
+    input.addEventListener('change', () => {
+      if (input.id === 'select-precond' || input.id === 'input-tol' || input.id === 'input-max-iter') {
+        ejecutarCalculo('Personalizado');
+      }
+    });
   });
 
   if (btnCalcular) {
     btnCalcular.addEventListener('click', () => {
       datosEditadosManualmente = true;
       ejecutarCalculo('Personalizado');
-      if (calcStatusMsg) {
-        calcStatusMsg.innerHTML = `<span class="text-emerald-400">✓ Cálculo completado:</span> Solución de referencia y comparativa actualizadas.`;
-      }
     });
   }
+
+  // Controles del Panel Sticky HUD (Desktop y Móvil)
+  const stickyBtnCalcular = document.getElementById('sticky-btn-calcular');
+  if (stickyBtnCalcular) {
+    stickyBtnCalcular.addEventListener('click', () => {
+      datosEditadosManualmente = true;
+      ejecutarCalculo('Personalizado');
+    });
+  }
+  const stickyBtnCalcularM = document.getElementById('sticky-btn-calcular-m');
+  if (stickyBtnCalcularM) {
+    stickyBtnCalcularM.addEventListener('click', () => {
+      datosEditadosManualmente = true;
+      ejecutarCalculo('Personalizado');
+    });
+  }
+
+  const stickyBtnIdeal = document.getElementById('sticky-btn-ideal');
+  if (stickyBtnIdeal) stickyBtnIdeal.addEventListener('click', () => aplicarEscenario('ideal'));
+  const stickyBtnIdealM = document.getElementById('sticky-btn-ideal-m');
+  if (stickyBtnIdealM) stickyBtnIdealM.addEventListener('click', () => aplicarEscenario('ideal'));
+
+  const stickyBtnEstres = document.getElementById('sticky-btn-estres');
+  if (stickyBtnEstres) stickyBtnEstres.addEventListener('click', () => aplicarEscenario('bajo_estres'));
+  const stickyBtnEstresM = document.getElementById('sticky-btn-estres-m');
+  if (stickyBtnEstresM) stickyBtnEstresM.addEventListener('click', () => aplicarEscenario('bajo_estres'));
+
+  const stickyBtnMal = document.getElementById('sticky-btn-mal');
+  if (stickyBtnMal) stickyBtnMal.addEventListener('click', () => aplicarEscenario('mal_condicionado'));
+  const stickyBtnMalM = document.getElementById('sticky-btn-mal-m');
+  if (stickyBtnMalM) stickyBtnMalM.addEventListener('click', () => aplicarEscenario('mal_condicionado'));
 
   if (btnRecalcularDiag) {
     btnRecalcularDiag.addEventListener('click', () => {
@@ -2405,6 +2976,9 @@ document.addEventListener('DOMContentLoaded', () => {
   actualizarTablaComparativaSeccion3(DATOS_ESCENARIOS_RESPALDO.escenarios);
     actualizarTablaResumenSeccion10(DATOS_ESCENARIOS_RESPALDO.escenarios);
 
+  // Inicializar controles interactivos de la traza (Sección 7)
+  inicializarControlesTraza();
+
   // Inicializar todo con el escenario Ideal
   aplicarEscenario('ideal');
 
@@ -2427,7 +3001,13 @@ document.addEventListener('DOMContentLoaded', () => {
     resaltarCelda,
     limpiarTodosLosResaltados,
     marcarResultadosObsoletos,
-    restaurarResultadosValidos
+    restaurarResultadosValidos,
+    actualizarPanelSticky,
+    actualizarEstadoCalculo,
+    animarCeldasRecalculadas,
+    actualizarTablaTraza,
+    renderizarVistaTraza,
+    estadoTraza
   };
 
   // Iniciar en la sección solicitada por query param / hash o en Sección 1: Inicio

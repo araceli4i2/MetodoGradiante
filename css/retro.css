@@ -161,4 +161,75 @@ body {
   }
 }
 
+/* =========================================================================
+ * MEJORAS DE PRESENTACIÓN, ACCESIBILIDAD Y RENDIMIENTO (Prompt 10)
+ * ========================================================================= */
 
+/* Scroll suave en navegación continua */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Respeto estricto a prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
+  }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Animación de resaltado al recalcular (~1s) */
+@keyframes highlightRecalcCell {
+  0% {
+    background-color: rgba(0, 240, 255, 0.45);
+    box-shadow: 0 0 14px rgba(0, 240, 255, 0.7), inset 0 0 8px rgba(0, 240, 255, 0.4);
+    color: #ffffff;
+  }
+  50% {
+    background-color: rgba(0, 240, 255, 0.18);
+    box-shadow: 0 0 8px rgba(0, 240, 255, 0.35);
+  }
+  100% {
+    background-color: transparent;
+    box-shadow: none;
+  }
+}
+
+.celda-actualizada {
+  animation: highlightRecalcCell 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards !important;
+}
+
+/* Eliminación de text-shadow en párrafos largos, listas y tablas (reservado solo para títulos y cifras neon) */
+p, li, td, th {
+  text-shadow: none !important;
+}
+
+/* Mejora de contraste para texto secundario (WCAG AA >= 4.5:1) */
+.text-gray-400 {
+  color: #cbd5e1 !important; /* Slate-300: contraste > 9:1 sobre fondo oscuro */
+}
+.text-gray-500 {
+  color: #94a3b8 !important; /* Slate-400: contraste > 5.5:1 sobre fondo oscuro */
+}
+.text-cyan-600 {
+  color: #38bdf8 !important;
+}
+
+/* Utilidad para ocultar barras de scroll en paneles táctiles móviles */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Separación vertical generosa entre bloques */
+.content-section > * + * {
+  margin-top: 1.5rem;
+}

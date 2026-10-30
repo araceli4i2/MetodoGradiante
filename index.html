@@ -157,11 +157,104 @@
     </div>
   </nav>
 
+  <!-- PANEL DE RESUMEN FIJO (STICKY) // MONITOREO HUD CONTINUO -->
+  <aside id="panel-resumen-sticky" aria-label="Resumen rápido de optimización"
+    class="sticky top-[58px] md:top-[114px] z-20 bg-black/95 backdrop-blur-md border-b border-cyan-500/50 py-1.5 px-3 md:px-4 shadow-[0_4px_16px_rgba(0,0,0,0.7)] text-xs font-mono">
+    
+    <!-- Versión Desktop (md:flex) -->
+    <div class="hidden md:flex items-center justify-between gap-3 max-w-7xl mx-auto">
+      <!-- Grupo 1: Controles de ejecución rápida -->
+      <div class="flex items-center gap-2 shrink-0">
+        <button id="sticky-btn-calcular" type="button"
+          class="px-2.5 py-1 bg-cyan-500/20 hover:bg-cyan-500/40 text-cyan-200 border border-cyan-400 font-bold rounded shadow-[0_0_8px_rgba(0,240,255,0.3)] hover:shadow-[0_0_12px_rgba(0,240,255,0.6)] transition-all flex items-center gap-1 text-[11px]"
+          title="Ejecutar solver con datos actuales">
+          <span>▶</span> CALCULAR
+        </button>
+        <div class="inline-flex rounded border border-cyan-800 bg-black/50 p-0.5 text-[10px]">
+          <button id="sticky-btn-ideal" type="button" class="px-2 py-0.5 rounded text-cyan-300 hover:text-white hover:bg-cyan-900/60 transition-colors">Ideal</button>
+          <button id="sticky-btn-estres" type="button" class="px-2 py-0.5 rounded text-cyan-300 hover:text-white hover:bg-cyan-900/60 transition-colors">Estrés</button>
+          <button id="sticky-btn-mal" type="button" class="px-2 py-0.5 rounded text-cyan-300 hover:text-white hover:bg-cyan-900/60 transition-colors">Mal cond.</button>
+        </div>
+        <!-- Badge de Estado de Resultados -->
+        <span id="sticky-status-badge" class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 bg-emerald-950 border border-emerald-500 text-emerald-300 shadow-[0_0_6px_rgba(16,185,129,0.3)]">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+          <span id="sticky-status-text">ACTUALIZADO</span>
+        </span>
+      </div>
+
+      <!-- Grupo 2: Métricas clave -->
+      <div class="flex items-center gap-2.5 text-[11px] overflow-hidden whitespace-nowrap">
+        <div class="flex items-center gap-1 border-l border-cyan-900 pl-2">
+          <span class="text-gray-400">Escenario:</span>
+          <span id="sticky-escenario-nombre" class="font-bold text-white uppercase">Ideal</span>
+        </div>
+        <div class="flex items-center gap-1 border-l border-cyan-900 pl-2">
+          <span class="text-gray-400">SPD:</span>
+          <span id="sticky-spd-status" class="font-bold text-emerald-400">SÍ</span>
+        </div>
+        <div class="flex items-center gap-1 border-l border-cyan-900 pl-2">
+          <span class="text-gray-400">κ(A):</span>
+          <span id="sticky-cond-a" class="text-cyan-300 font-bold">13.97</span>
+        </div>
+        <div class="flex items-center gap-1 border-l border-cyan-900 pl-2">
+          <span class="text-gray-400">κ(M⁻¹A):</span>
+          <span id="sticky-cond-ma" class="text-cyan-300 font-bold">10.97</span>
+        </div>
+        <div class="flex items-center gap-1 border-l border-cyan-900 pl-2">
+          <span class="text-gray-400">GC:</span>
+          <span id="sticky-iter-gc" class="text-cyan-200">4 it</span>
+        </div>
+        <div class="flex items-center gap-1 border-l border-cyan-900 pl-2">
+          <span class="text-gray-400">GCP:</span>
+          <span id="sticky-iter-gcp" class="text-emerald-300 font-bold">4 it</span>
+        </div>
+        <div class="flex items-center gap-1 border-l border-cyan-900 pl-2">
+          <span class="text-gray-400">Res GCP:</span>
+          <span id="sticky-res-gcp" class="text-cyan-200">6.08e-14</span>
+        </div>
+        <div class="border-l border-cyan-900 pl-2">
+          <span id="sticky-convergencia-badge" class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-950 border border-emerald-500 text-emerald-300">
+            ✓ CONVERGIÓ
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Versión Móvil: Una sola fila horizontal compacta con scroll táctil sin barra -->
+    <div class="flex md:hidden items-center justify-between gap-2 overflow-x-auto no-scrollbar py-0.5 text-[11px] whitespace-nowrap">
+      <div class="flex items-center gap-1 shrink-0">
+        <button id="sticky-btn-calcular-m" type="button"
+          class="px-2 py-0.5 bg-cyan-500/20 hover:bg-cyan-500/40 text-cyan-200 border border-cyan-400 font-bold rounded text-[10px]">
+          ▶ CALC
+        </button>
+        <div class="inline-flex rounded border border-cyan-800 bg-black/60 p-0.5 text-[9px]">
+          <button id="sticky-btn-ideal-m" type="button" class="px-1.5 py-0.5 rounded text-cyan-300 hover:text-white">Ideal</button>
+          <button id="sticky-btn-estres-m" type="button" class="px-1.5 py-0.5 rounded text-cyan-300 hover:text-white">Estrés</button>
+          <button id="sticky-btn-mal-m" type="button" class="px-1.5 py-0.5 rounded text-cyan-300 hover:text-white">Mal</button>
+        </div>
+        <span id="sticky-status-badge-m" class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-emerald-950 border border-emerald-500 text-emerald-300">
+          <span id="sticky-status-text-m">ACTUAL</span>
+        </span>
+      </div>
+      <div class="flex items-center gap-2 shrink-0 text-[10px]">
+        <span class="text-gray-400">Esc: <strong id="sticky-escenario-nombre-m" class="text-white">Ideal</strong></span>
+        <span class="text-gray-400">SPD: <strong id="sticky-spd-status-m" class="text-emerald-400">SÍ</strong></span>
+        <span class="text-gray-400">κ: <strong id="sticky-cond-a-m" class="text-cyan-300">13.97</strong></span>
+        <span class="text-gray-400">κ(M⁻¹): <strong id="sticky-cond-ma-m" class="text-cyan-300">10.97</strong></span>
+        <span class="text-gray-400">GC: <strong id="sticky-iter-gc-m" class="text-cyan-200">4</strong></span>
+        <span class="text-gray-400">GCP: <strong id="sticky-iter-gcp-m" class="text-emerald-300">4</strong></span>
+        <span class="text-gray-400">Res: <strong id="sticky-res-gcp-m" class="text-cyan-200">6.08e-14</strong></span>
+        <span id="sticky-convergencia-badge-m" class="px-1 py-0.5 rounded text-[9px] font-bold bg-emerald-950 border border-emerald-500 text-emerald-300">✓</span>
+      </div>
+    </div>
+  </aside>
+
+
   <!-- Contenedor Principal de Secciones -->
   <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-8">
 
     <!-- SECCIÓN 1: INICIO -->
-    <section id="sec-inicio" class="content-section space-y-6">
+    <section id="sec-inicio" class="content-section space-y-6 scroll-mt-36 md:scroll-mt-32 mb-12">
       <div class="retro-panel rounded-lg p-6 border-cyan-500/50">
         <div class="flex items-center space-x-2 text-cyan-400 text-sm mb-3">
           <span class="cursor-blink">></span>
@@ -296,7 +389,7 @@
     </section>
 
     <!-- SECCIÓN 2: CASO DE ESTUDIO -->
-    <section id="sec-caso-estudio" class="content-section hidden space-y-6">
+    <section id="sec-caso-estudio" class="content-section space-y-6 scroll-mt-36 md:scroll-mt-32 mb-12">
       <div class="retro-panel rounded-lg p-6 border-cyan-500/50">
         <div class="flex items-center space-x-2 text-cyan-400 text-sm mb-3">
           <span class="cursor-blink">></span>
@@ -455,7 +548,7 @@
     </section>
 
     <!-- SECCIÓN 3: FORMULACIÓN -->
-    <section id="sec-formulacion" class="content-section hidden space-y-6">
+    <section id="sec-formulacion" class="content-section space-y-6 scroll-mt-36 md:scroll-mt-32 mb-12">
       <div class="retro-panel rounded-lg p-6 border-cyan-500/50">
         <div class="flex items-center space-x-2 text-cyan-400 text-sm mb-3">
           <span class="cursor-blink">></span>
@@ -740,7 +833,7 @@
     </section>
 
     <!-- SECCIÓN 4: ENTRADA DE DATOS -->
-    <section id="sec-entrada-datos" class="content-section hidden space-y-6">
+    <section id="sec-entrada-datos" class="content-section space-y-6 scroll-mt-36 md:scroll-mt-32 mb-12">
       <div class="retro-panel rounded-lg p-6 border-cyan-500/50">
         <div class="flex items-center space-x-2 text-cyan-400 text-sm mb-3">
           <span class="cursor-blink">></span>
@@ -1083,7 +1176,7 @@
     </section>
 
     <!-- SECCIÓN 5: TRES ESCENARIOS -->
-    <section id="sec-tres-escenarios" class="content-section hidden space-y-6">
+    <section id="sec-tres-escenarios" class="content-section space-y-6 scroll-mt-36 md:scroll-mt-32 mb-12">
       <div class="retro-panel rounded-lg p-6 border-cyan-500/50">
         <div class="flex items-center space-x-2 text-cyan-400 text-sm mb-3">
           <span class="cursor-blink">></span>
@@ -1257,7 +1350,7 @@
     </section>
 
     <!-- SECCIÓN 6: SOLUCIÓN DE REFERENCIA -->
-    <section id="sec-solucion-referencia" class="content-section hidden space-y-6">
+    <section id="sec-solucion-referencia" class="content-section space-y-6 scroll-mt-36 md:scroll-mt-32 mb-12">
       <div class="retro-panel rounded-lg p-6 border-cyan-500/50">
         <div class="flex items-center space-x-2 text-cyan-400 text-sm mb-3">
           <span class="cursor-blink">></span>
@@ -1297,6 +1390,7 @@
                 <th class="p-2.5 text-right">Peso no norm. (x_ref)</th>
                 <th class="p-2.5 text-right">Peso norm. (w_ref)</th>
                 <th class="p-2.5 text-right">Porcentaje (%)</th>
+                <th class="p-2.5 text-right font-mono text-cyan-300">Δ vs Ideal (p.p.)</th>
                 <th class="p-2.5 text-center">Posición</th>
               </tr>
             </thead>
@@ -1309,6 +1403,7 @@
                 <td id="tfoot-ref-sum-x" class="p-2.5 text-right">--</td>
                 <td id="tfoot-ref-sum-w" class="p-2.5 text-right">1.000000</td>
                 <td id="tfoot-ref-sum-pct" class="p-2.5 text-right">100.00 %</td>
+                <td id="tfoot-ref-sum-delta" class="p-2.5 text-right font-mono text-gray-300">0.00 pp</td>
                 <td class="p-2.5 text-center text-emerald-400 text-[10px]">BALANCEADA</td>
               </tr>
             </tfoot>
@@ -1331,7 +1426,7 @@
     </section>
 
     <!-- SECCIÓN 7: GCP VS GC -->
-    <section id="sec-gcp-vs-gc" class="content-section hidden space-y-6">
+    <section id="sec-gcp-vs-gc" class="content-section space-y-6 scroll-mt-36 md:scroll-mt-32 mb-12">
       <div class="retro-panel rounded-lg p-6 border-cyan-500/50">
         <div class="flex items-center space-x-2 text-cyan-400 text-sm mb-3">
           <span class="cursor-blink">></span>
@@ -1445,11 +1540,118 @@
           </p>
         </div>
 
+        <!-- Panel: Traza paso a paso del algoritmo (GCP vs GC) -->
+        <div id="panel-traza-algoritmo" class="border border-cyan-800 bg-black/60 p-4 md:p-5 rounded-lg space-y-4">
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-cyan-900/60 pb-3">
+            <div>
+              <div class="flex items-center gap-2 text-xs text-cyan-400 font-mono">
+                <span class="cursor-blink">></span>
+                <span class="font-bold uppercase tracking-wider">TRAZA DEL ALGORITMO // SUÑAGUA (2020)</span>
+              </div>
+              <h3 class="text-base md:text-lg font-bold text-white flex items-center gap-2 mt-0.5">
+                <span>Traza paso a paso del GCP</span>
+                <span id="traza-badge-metodo" class="text-xs px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-500 font-mono">GCP (Jacobi)</span>
+              </h3>
+              <p class="text-xs text-gray-400 mt-1">
+                Evolución vectorial y escalar detallada por iteración para el escenario activo, con la fórmula matricial de cada columna.
+              </p>
+            </div>
+
+            <!-- Controles: Anterior / Siguiente / Ver todo / Conmutador Método -->
+            <div class="flex flex-wrap items-center gap-2">
+              <div class="flex items-center rounded border border-cyan-800/80 bg-black/80 p-0.5 text-xs font-mono">
+                <button id="btn-traza-metodo-gcp" type="button" class="px-2.5 py-1 rounded bg-emerald-900/70 text-emerald-200 border border-emerald-500 font-bold transition-colors">GCP</button>
+                <button id="btn-traza-metodo-gc" type="button" class="px-2.5 py-1 rounded text-gray-400 hover:text-cyan-200 transition-colors">GC</button>
+              </div>
+
+              <div class="flex items-center gap-1.5">
+                <button id="btn-traza-prev" type="button" class="px-3 py-1.5 rounded bg-cyan-950/60 hover:bg-cyan-900/60 border border-cyan-700/80 text-cyan-200 text-xs font-mono font-bold flex items-center gap-1 transition-all disabled:opacity-40 disabled:cursor-not-allowed" aria-label="Iteración anterior de la traza">
+                  <span>◀</span>
+                  <span>Anterior</span>
+                </button>
+                <span id="traza-indicador-paso" class="px-2.5 py-1 rounded bg-black/90 border border-cyan-800 text-cyan-300 text-xs font-mono font-bold min-w-[110px] text-center">
+                  k = 0 (1/4)
+                </span>
+                <button id="btn-traza-next" type="button" class="px-3 py-1.5 rounded bg-cyan-950/60 hover:bg-cyan-900/60 border border-cyan-700/80 text-cyan-200 text-xs font-mono font-bold flex items-center gap-1 transition-all disabled:opacity-40 disabled:cursor-not-allowed" aria-label="Siguiente iteración de la traza">
+                  <span>Siguiente</span>
+                  <span>▶</span>
+                </button>
+              </div>
+
+              <button id="btn-traza-ver-todo" type="button" class="px-3 py-1.5 rounded bg-cyan-900/40 hover:bg-cyan-800/60 border border-cyan-500 text-cyan-100 text-xs font-mono font-bold transition-all shadow-[0_0_8px_rgba(6,182,212,0.2)]">
+                👁 Ver todo
+              </button>
+            </div>
+          </div>
+
+          <!-- Selector rápido de iteraciones -->
+          <div id="traza-pasos-nav" class="flex flex-wrap items-center gap-1.5 text-xs font-mono pt-1">
+            <span class="text-gray-400 text-[11px] mr-1">Ir a iteración:</span>
+            <!-- Botones dinámicos generados en UI -->
+          </div>
+
+          <!-- Tabla responsiva de la traza con fórmulas en cada columna -->
+          <div class="overflow-x-auto rounded border border-cyan-900/60 bg-black/80">
+            <table id="tabla-traza-gcp" class="w-full text-xs font-mono border-collapse min-w-[950px]">
+              <thead>
+                <tr class="bg-cyan-950/40 text-cyan-300 border-b border-cyan-800 text-left">
+                  <th class="p-2.5 border-r border-cyan-900/80 w-16 text-center">
+                    <span class="text-white font-bold block text-sm">k</span>
+                    <span class="text-[10px] text-cyan-400/90 font-normal block">Paso</span>
+                  </th>
+                  <th class="p-2.5 border-r border-cyan-900/80 min-w-[160px]">
+                    <span class="text-white font-bold block text-sm">rₖ</span>
+                    <span class="text-[10px] text-gray-300 font-normal block font-sans">rₖ = b − A·xₖ</span>
+                  </th>
+                  <th class="p-2.5 border-r border-cyan-900/80 min-w-[160px]" id="th-traza-zk">
+                    <span class="text-white font-bold block text-sm">zₖ</span>
+                    <span class="text-[10px] text-gray-300 font-normal block font-sans">M·zₖ = rₖ (rₖ,ᵢ / Aᵢᵢ)</span>
+                  </th>
+                  <th class="p-2.5 border-r border-cyan-900/80 min-w-[160px]">
+                    <span class="text-white font-bold block text-sm">pₖ</span>
+                    <span class="text-[10px] text-gray-300 font-normal block font-sans">zₖ + βₖ₋₁ pₖ₋₁</span>
+                  </th>
+                  <th class="p-2.5 border-r border-cyan-900/80 min-w-[120px] text-right">
+                    <span class="text-white font-bold block text-sm">αₖ</span>
+                    <span class="text-[10px] text-gray-300 font-normal block font-sans">(rₖᵀ zₖ) / (pₖᵀ A pₖ)</span>
+                  </th>
+                  <th class="p-2.5 border-r border-cyan-900/80 min-w-[160px]">
+                    <span class="text-white font-bold block text-sm">xₖ₊₁</span>
+                    <span class="text-[10px] text-gray-300 font-normal block font-sans">xₖ + αₖ·pₖ</span>
+                  </th>
+                  <th class="p-2.5 border-r border-cyan-900/80 min-w-[130px] text-right">
+                    <span class="text-white font-bold block text-sm">‖rₖ₊₁‖₂ / ‖b‖₂</span>
+                    <span class="text-[10px] text-gray-300 font-normal block font-sans">Criterio: &lt; 10⁻⁶</span>
+                  </th>
+                  <th class="p-2.5 min-w-[120px] text-right" id="th-traza-betak">
+                    <span class="text-white font-bold block text-sm">βₖ</span>
+                    <span class="text-[10px] text-gray-300 font-normal block font-sans">(rₖ₊₁ᵀ zₖ₊₁) / (rₖᵀ zₖ)</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody id="tbody-traza-gcp" class="divide-y divide-cyan-950/60">
+                <!-- Filas de la traza generadas dinámicamente -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Nota metodológica del precondicionador Jacobi -->
+          <div class="text-[11px] text-gray-400 font-mono flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pt-1 border-t border-cyan-950">
+            <div>
+              <span class="text-cyan-400 font-bold">* Formulación Suñagua (2020):</span>
+              Para GCP con Jacobi, M = diag(A) = diag(A₁₁, A₂₂, A₃₃, A₄₄). Para GC clásico, M = I (zₖ = rₖ).
+            </div>
+            <div id="traza-resumen-estado" class="text-emerald-400 font-bold text-xs">
+              <!-- Estado de convergencia -->
+            </div>
+          </div>
+        </div>
+
       </div>
     </section>
 
     <!-- SECCIÓN 8: ANÁLISIS DE ERRORES -->
-    <section id="sec-analisis-errores" class="content-section hidden space-y-6">
+    <section id="sec-analisis-errores" class="content-section space-y-6 scroll-mt-36 md:scroll-mt-32 mb-12">
       <div class="retro-panel rounded-lg p-6 border-cyan-500/50">
         <div class="flex items-center space-x-2 text-cyan-400 text-sm mb-3">
           <span class="cursor-blink">></span>
@@ -1740,7 +1942,7 @@
     </section>
 
     <!-- SECCIÓN 9: MÓDULO QA -->
-    <section id="sec-modulo-qa" class="content-section hidden space-y-6">
+    <section id="sec-modulo-qa" class="content-section space-y-6 scroll-mt-36 md:scroll-mt-32 mb-12">
       <div class="retro-panel rounded-lg p-6 border-cyan-500/50">
         <div class="flex items-center space-x-2 text-cyan-400 text-sm mb-3">
           <span class="cursor-blink">></span>
@@ -1845,7 +2047,7 @@
     </section>
 
     <!-- SECCIÓN 10: CONCLUSIONES Y REFERENCIAS -->
-    <section id="sec-conclusiones-referencias" class="content-section hidden space-y-6">
+    <section id="sec-conclusiones-referencias" class="content-section space-y-6 scroll-mt-36 md:scroll-mt-32 mb-12">
       <div class="retro-panel rounded-lg p-6 border-cyan-500/50">
         <div class="flex items-center space-x-2 text-cyan-400 text-sm mb-3">
           <span class="cursor-blink">></span>
